@@ -1,2 +1,3 @@
 # MDPGrp7Algo
-testing slack notification and stuff
+1. Exploration
+2. Shortest path (done)
