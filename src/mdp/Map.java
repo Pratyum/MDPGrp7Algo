@@ -58,9 +58,13 @@ public class Map {
             }
         });
     }
-    public void highlight(List<Vector2> hightlightPositions) {
+    public void highlight(List<Vector2> hightlightPositions, WPSpecialState wPSpecialState) {
         hightlightPositions.forEach((pos) -> {
-            _wpMap[pos.i()][pos.j()].specialState(WPSpecialState.IsHighlighted);
+            Waypoint curPoint = _wpMap[pos.i()][pos.j()];
+            if (curPoint.specialState() != WPSpecialState.IsStart &&
+                curPoint.specialState() != WPSpecialState.IsGoal) {
+                curPoint.specialState(wPSpecialState);
+            }
         });
     }
     public String toString(Robot robot) {
@@ -97,8 +101,14 @@ public class Map {
                         case IsGoal:
                             result += Console.ANSI_PURPLE + "G " + Console.ANSI_RESET;
                             continue;
-                        case IsHighlighted:
+                        case IsPathPoint:
                             result += Console.ANSI_GREEN + "x " + Console.ANSI_RESET;
+                            continue;
+                        case IsOpenedPoint:
+                            result += "x ";
+                            continue;
+                        case IsClosedPoint:
+                            result += Console.ANSI_YELLOW + "x " + Console.ANSI_RESET;
                             continue;
                         case NA:
                             break;

@@ -1,5 +1,5 @@
 package mdp;
 
 public enum WPSpecialState {
-    IsStart, IsGoal, NA, IsHighlighted;
+    IsStart, IsGoal, NA, IsPathPoint, IsOpenedPoint, IsClosedPoint;
 }

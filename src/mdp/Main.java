@@ -1,32 +1,30 @@
 package mdp;
 
 import java.io.IOException;
-import mdp.solver.Solver;
 import java.util.List;
 import java.util.ArrayList;
-import mdp.communication.SocketCommunicator;
-import mdp.communication.Translator;
 import mdp.solver.shortestpath.AStarSolver;
+import mdp.solver.shortestpath.AStarSolverResult;
 
 public class Main {
     
     private static int[][] _map = 
     {
-        { 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-        { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 },
-        { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0 },
-        { 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0 },
-        { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+        { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
     };
     
     public static void main(String[] args) throws IOException {
@@ -41,15 +39,22 @@ public class Main {
         // put some blockers into the map
         map.addObstacle(_genBlockers(_map));
         
-        Solver solver = new AStarSolver();
-        List<Vector2> solveResult = solver.solve(map, robot);
-        map.highlight(solveResult);
+        AStarSolver solver = new AStarSolver();
+        AStarSolverResult solveResult = solver.solve(map, robot);
+        map.highlight(solveResult.openedPoints, WPSpecialState.IsOpenedPoint);
+        map.highlight(solveResult.closedPoints, WPSpecialState.IsClosedPoint);
+        map.highlight(solveResult.shortestPath, WPSpecialState.IsPathPoint);
         
-        if (solveResult.size() != 0) {
-            System.out.println("Solution found:");
-            solveResult.forEach((point) -> {
-                System.out.println(point.toString());
-            });
+        System.out.println("Points opened: " + solveResult.openedPoints.size());
+        System.out.println("Points closed: " + solveResult.closedPoints.size());
+        
+        if (solveResult.shortestPath.size() != 0) {
+            System.out.println("Solution found (" + 
+                                (solveResult.shortestPath.size() + 1) + 
+                                " steps):");
+//            solveResult.forEach((point) -> {
+//                System.out.println(point.toString());
+//            });
         } else {
             System.out.println("No solution.");
         }
@@ -57,20 +62,20 @@ public class Main {
         System.out.println(map.toString(robot));
         
         
-        List<RobotAction> test = new ArrayList<RobotAction>();
-        test.add(RobotAction.RotateLeft);
-        test.add(RobotAction.RotateRight);
-        test.add(RobotAction.MoveForward);
-        test.add(RobotAction.MoveBackward);
-        Translator translator = new Translator();
-        translator.sendToArduino(test);
-        
-        while (true) {
-            String received = translator.readFromArduino();
-            if (received.length() != 0) {
-                System.out.println(received);
-            }
-        }
+//        List<RobotAction> test = new ArrayList<RobotAction>();
+//        test.add(RobotAction.RotateLeft);
+//        test.add(RobotAction.RotateRight);
+//        test.add(RobotAction.MoveForward);
+//        test.add(RobotAction.MoveBackward);
+//        Translator translator = new Translator();
+//        translator.sendToArduino(test);
+//        
+//        while (true) {
+//            String received = translator.readFromArduino();
+//            if (received.length() != 0) {
+//                System.out.println(received);
+//            }
+//        }
     }
     
     private static List<Vector2> _genBlockers(int[][] obstacleMap) {

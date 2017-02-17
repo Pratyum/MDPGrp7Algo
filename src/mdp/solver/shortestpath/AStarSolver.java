@@ -1,28 +1,23 @@
 package mdp.solver.shortestpath;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
+import java.util.HashMap;
 import mdp.Direction;
 import mdp.Map;
 import mdp.Vector2;
 import mdp.Robot;
 import mdp.WPObstacleState;
 import mdp.Waypoint;
-import mdp.solver.Solver;
 
-public class AStarSolver implements Solver {
+public class AStarSolver {
 
-    @Override
-    public List<Vector2> solve(Map map, Robot robot) {
-        List<Vector2> result = new ArrayList<Vector2>();
+    public AStarSolverResult solve(Map map, Robot robot) {
+        AStarSolverResult result = new AStarSolverResult();
         
         // save points in map in a lookup hashtable
-        Hashtable<String, AStarWaypoint> openedPoints = new Hashtable();
-        Hashtable<String, AStarWaypoint> closedPoints = new Hashtable();
-        
+        HashMap<String, AStarWaypoint> openedPoints = new HashMap();
+        HashMap<String, AStarWaypoint> closedPoints = new HashMap();
+                
         // record robot position as cur point
         AStarWaypoint curPoint = new AStarWaypoint(new Waypoint(robot.position()));
         
@@ -74,7 +69,7 @@ public class AStarSolver implements Solver {
             }
             
             // check all open points for potential next cur point
-            if (openedPoints.size() != 0) {
+            if (!openedPoints.isEmpty()) {
                 // loop through map info to find lowest fval point
                 AStarWaypoint lowestFvalPoint = new AStarWaypoint();
                 for (String key : openedPoints.keySet()) {
@@ -99,7 +94,7 @@ public class AStarSolver implements Solver {
         // path has been found
         do {
             // save current point to result
-            result.add(curPoint.position());
+            result.shortestPath.add(curPoint.position());
             
             // trace back the parent
             Vector2 parentDirection = curPoint.parentDir().toVector2();
@@ -108,7 +103,15 @@ public class AStarSolver implements Solver {
             // set cur to parent
             curPoint = closedPoints.get(parentPos.toString());
         } while (AStarUtil.getMDistance(curPoint.position(), robot.position()) != 0);
-        Collections.reverse(result);
+        Collections.reverse(result.shortestPath);
+        
+        // add opened & closed to result
+        openedPoints.forEach((pointKey, point) -> {
+            result.openedPoints.add(point.position());
+        });
+        closedPoints.forEach((pointKey, point) -> {
+            result.closedPoints.add(point.position());
+        });
         
         return result;
     }
