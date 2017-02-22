@@ -20,7 +20,7 @@ public class Map {
                 WPSpecialState curSpecState = WPSpecialState.NA;
                 WPObstacleState curObsState = WPObstacleState.IsWalkable;
                 
-                // change special state if appicable
+                // change special state if applicable
                 if (START_POS.equals(curPos)) {
                     curSpecState = WPSpecialState.IsStart;
                 } else if (GOAL_POS.equals(curPos)) {
