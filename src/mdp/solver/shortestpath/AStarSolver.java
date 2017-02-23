@@ -92,6 +92,7 @@ public class AStarSolver {
         }
         
         // path has been found
+        result.shortestPath.add(map.GOAL_POS);
         do {
             // save current point to result
             result.shortestPath.add(curPoint.position());

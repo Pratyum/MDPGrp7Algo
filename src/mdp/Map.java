@@ -1,5 +1,6 @@
 package mdp;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Map {
@@ -58,6 +59,28 @@ public class Map {
             }
         });
     }
+    public List<Waypoint> toList() {
+        List<Waypoint> result = new ArrayList<>();
+        for (int i = 0; i < DIM_I; i++) {
+            for (int j = 0; j < DIM_J; j++) {
+                result.add(_wpMap[i][j]);
+            }
+        }
+        return result;
+    }
+    
+//    public List<Vector2> getObsStatePos(WPObstacleState wpOS) {
+//        List<Vector2> result = new ArrayList<Vector2>();
+//        for (int i = 0; i < DIM_I; i++) {
+//            for (int j = 0; j < DIM_J; j++) {
+//                Vector2 curPos = new Vector2(i, j);
+//                if (_getObs(curPos).equals(wpOS)) {
+//                    result.add(curPos);
+//                }
+//            }
+//        }
+//        return result;
+//    }
     public void highlight(List<Vector2> hightlightPositions, WPSpecialState wPSpecialState) {
         hightlightPositions.forEach((pos) -> {
             Waypoint curPoint = _wpMap[pos.i()][pos.j()];
@@ -77,17 +100,17 @@ public class Map {
                     Waypoint curPoint = _wpMap[i][j];
                     if (curPoint.position().equals(robot.position())) {
                         String symbol = "  ";
-                        switch (robot.direction()) {
-                            case Up:
+                        switch (robot.orientation()) {
+                            case North:
                                 symbol = "^ ";
                                 break;
-                            case Down:
+                            case South:
                                 symbol = "_ ";
                                 break;
-                            case Left:
+                            case West:
                                 symbol = "< ";
                                 break;
-                            case Right:
+                            case East:
                                 symbol = "> ";
                                 break;
                         }

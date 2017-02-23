@@ -10,8 +10,8 @@ public class AStarSolverResult {
     public List<Vector2> closedPoints;
     
     AStarSolverResult() {
-        shortestPath = new ArrayList<Vector2>();
-        openedPoints = new ArrayList<Vector2>();
-        closedPoints = new ArrayList<Vector2>();
+        shortestPath = new ArrayList<>();
+        openedPoints = new ArrayList<>();
+        closedPoints = new ArrayList<>();
     }
 }
