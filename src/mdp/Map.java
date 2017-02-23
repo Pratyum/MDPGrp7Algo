@@ -132,6 +132,7 @@ public class Map {
     }
     
     public Waypoint getPoint(Vector2 position) {
+    		//System.out.println("i "+ position.i() + "j "+ position.j());
         return _wpMap[position.i()][position.j()];
     }
     

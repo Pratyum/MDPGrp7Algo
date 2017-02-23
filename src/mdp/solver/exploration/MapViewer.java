@@ -1,5 +1,6 @@
 package mdp.solver.exploration;
 import java.util.List;
+
 import java.util.List;
 import java.util.ArrayList;
 
@@ -8,7 +9,7 @@ import mdp.Map;
 import mdp.Robot;
 import mdp.Vector2;
 import mdp.Waypoint;
-
+import mdp.Direction;
 public class MapViewer{
 	
 	private static Map map;
@@ -19,6 +20,8 @@ public class MapViewer{
     public static final int DIM_I = 15;
     public static final int DIM_J = 20;
     
+    
+    //1 empty, 2 obstacle, 0 havent explored
     private static int[][] explored =       {
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -43,7 +46,7 @@ public class MapViewer{
     
     private static void markExploredEmpty(Vector2 v){
  
-    		explored[v.i()][v.j()] = 1;
+    		explored[v.i()][v.j()] = 1; 
     }
     
     private static void markExploredObstacle(Vector2 v){
@@ -57,6 +60,11 @@ public class MapViewer{
 		explored[i][j] = 1;
     }
     
+    private static int checkExploredState(Vector2 v){
+		
+    		return explored[v.i()][v.j()];
+    		
+    }
     
     
     public static String exploredAreaToString(){
@@ -68,8 +76,10 @@ public class MapViewer{
                 } else {
                   if(explored[i][j]== 0)
                 	  	result +="0 ";
-                  else
-                	  	result +="  ";
+                  else if (explored[i][j]== 2)
+                	  	result +="x ";
+                  else	
+                  	result +="  ";
                 }
             }
             result += "\n";
@@ -77,7 +87,44 @@ public class MapViewer{
         return result;
     	
     }
-    
+    // 1 walkable, 0 not walkable, 2 need further exploration
+    public int checkWalkable(Robot robot , Direction d){
+    		
+    		Vector2 edge1, edge2, edge3;
+    		int s1,s2,s3;
+    		Direction dir = Direction.Up;
+    		
+    		switch(d){
+    		case  Up:
+    			dir = robot.direction();break;
+    		case Down: 
+    			dir = robot.direction().getLeft().getLeft();break;
+    		case Right:
+    			dir = robot.direction().getRight();break;
+    		case Left:
+    			dir = robot.direction().getLeft();break;
+    		default:
+    			break;
+    		}
+    		
+    		
+    		
+    		edge2 = robot.position().fnAdd(dir.toVector2().fnMultiply(2));
+    		edge1 = edge2.fnAdd(dir.getLeft().toVector2());
+    		edge3 = edge2.fnAdd(dir.getRight().toVector2());
+    		
+    		s1 = checkExploredState(edge1);
+    		s2 = checkExploredState(edge2);
+    		s3 = checkExploredState(edge3);
+    		
+    		if(s1 == 1 && s2 == 1 && s3 == 1 )
+    			return 1;
+    		else if(s1 == 2 || s2 == 2 || s3 == 2)  // got obstacle
+    			return 0;
+    		else 
+    			return 2;
+    		
+    }
     
 	//take RPI data from Solver , update what I saw
 	public Map updateMap(Robot robot , SensingData s){
@@ -113,6 +160,12 @@ public class MapViewer{
 			markExploredObstacle(edge.fnAdd(robot.direction().toVector2().fnMultiply(i)));
 			
 		}
+		else
+		{
+			for(i=1; i<=3; i++){
+				markExploredEmpty(edge.fnAdd(robot.direction().toVector2().fnMultiply(i)));	
+			}
+		}
 		
 		if(s.front_l != 0){
 			obstaclePosition = edge_l.fnAdd(robot.direction().toVector2().fnMultiply(s.front_l));
@@ -122,6 +175,11 @@ public class MapViewer{
 				markExploredEmpty(edge_l.fnAdd(robot.direction().toVector2().fnMultiply(i)));
 			}
 			markExploredObstacle(edge_l.fnAdd(robot.direction().toVector2().fnMultiply(i)));
+		}
+		else{
+			for(i=1; i<=3; i++){
+				markExploredEmpty(edge_l.fnAdd(robot.direction().toVector2().fnMultiply(i)));
+			}
 		}
 		
 		if(s.front_r != 0){
@@ -133,13 +191,24 @@ public class MapViewer{
 			}
 			markExploredObstacle(edge_r.fnAdd(robot.direction().toVector2().fnMultiply(i)));
 		}
+		else{
+			for(i=1; i<= 3; i++){
+				markExploredEmpty(edge_r.fnAdd(robot.direction().toVector2().fnMultiply(i)));
+			}
+		}
 		
 		if(s.left != 0){
 			obstaclePosition = edge_l.fnAdd(robot.direction().getLeft().toVector2().fnMultiply(s.left));
 			if(map.checkValidPosition(obstaclePosition))
 				obstaclePositions.add(obstaclePosition);
-			for(i=1; i<=s.left; i++){
-				markExplored(edge_l.fnAdd(robot.direction().toVector2().fnMultiply(i)));
+			for(i=1; i<s.left; i++){
+				markExploredEmpty(edge_l.fnAdd(robot.direction().getLeft().toVector2().fnMultiply(i)));
+			}
+			markExploredObstacle(edge_l.fnAdd(robot.direction().getLeft().toVector2().fnMultiply(i)));
+		}
+		else{
+			for(i=1; i<=3; i++){
+				markExploredEmpty(edge_l.fnAdd(robot.direction().getLeft().toVector2().fnMultiply(i)));
 			}
 		}
 		
@@ -148,7 +217,19 @@ public class MapViewer{
 			obstaclePosition = edge_r.fnAdd(robot.direction().getRight().toVector2().fnMultiply(s.right));
 			if(map.checkValidPosition(obstaclePosition))
 				obstaclePositions.add(obstaclePosition);
+			for(i=1; i<s.right; i++){
+				markExploredEmpty(edge_r.fnAdd(robot.direction().getRight().toVector2().fnMultiply(i)));
+			}
+			markExploredObstacle(edge_r.fnAdd(robot.direction().getRight().toVector2().fnMultiply(i)));
 		}
+		else{
+			for(i=1; i<=3; i++){
+				markExploredEmpty(edge_r.fnAdd(robot.direction().getRight().toVector2().fnMultiply(i)));
+			}
+		}
+		
+		
+		
 		
 		map.addObstacle(obstaclePositions);
 		

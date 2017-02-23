@@ -21,14 +21,18 @@ public class Simulator {
 		
 		edge = robot.position().fnAdd(robot.direction().toVector2());
 		s.front_m = detect(edge , robot.direction());
+		System.out.println("s.front_m " +s.front_m);
 		edge_l = edge.fnAdd(robot.direction().getLeft().toVector2());
 		s.front_l = detect(edge_l , robot.direction());
+		System.out.println("s.front_l" +s.front_l);
 		edge_r = edge.fnAdd(robot.direction().getRight().toVector2());
 		s.front_r = detect(edge_r , robot.direction());
+		System.out.println("s.front_r " +s.front_r);
 		
 		s.left = detect(edge_l , robot.direction().getLeft());
+		System.out.println("s.left " +s.left);
 		s.right = detect(edge_r , robot.direction().getRight());
-		
+		System.out.println("s.right " +s.right);
 		return s;
 		
 	}
@@ -42,20 +46,20 @@ public class Simulator {
 		
 		    
     		tmp.add(unit);
-    		wp = objective_map.getPoint(tmp);
+  
     		
     		//seeing range is not relevant to virtual obstacle
-			if(!objective_map.checkValidBoundary(wp.position()) || wp.obstacleState()==WPObstacleState.IsActualObstacle )
-				return 1;
+			if(!objective_map.checkValidBoundary(tmp) || objective_map.getPoint(tmp).obstacleState()==WPObstacleState.IsActualObstacle )
+				return 1; 
 			tmp.add(unit);
-			wp = objective_map.getPoint(tmp);
-			if(!objective_map.checkValidBoundary(wp.position()) || wp.obstacleState()==WPObstacleState.IsActualObstacle )
+
+			if(!objective_map.checkValidBoundary(tmp) || objective_map.getPoint(tmp).obstacleState()==WPObstacleState.IsActualObstacle )
     			return 2;
 			tmp.add(unit);
-			wp = objective_map.getPoint(tmp);
-			if(!objective_map.checkValidBoundary(wp.position()) || wp.obstacleState()==WPObstacleState.IsActualObstacle)
+
+			if(!objective_map.checkValidBoundary(tmp) || objective_map.getPoint(tmp).obstacleState()==WPObstacleState.IsActualObstacle)
 				return 3;
-			return 0;
+			return 0; // no obstacle in front
 			
 		}
 

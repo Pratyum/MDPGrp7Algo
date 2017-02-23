@@ -3,7 +3,11 @@ package mdp;
 public enum Direction {
     Up, Left, Down, Right;
     private Direction _getWithOffset(int offset) {
-        return values()[(this.ordinal() + offset) % values().length];
+        if(this.ordinal() + offset < 0){
+        		return values()[(this.ordinal() + offset+ 4) % values().length];
+        }
+        else 
+    			return values()[(this.ordinal() + offset) % values().length];
     }
     public Direction getLeft() {
         return _getWithOffset(1);

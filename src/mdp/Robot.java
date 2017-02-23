@@ -13,7 +13,9 @@ public class Robot {
     public Direction direction() { return _direction; }
     public void position(Vector2 position) { _position = position; }
     public void direction(Direction direction) { _direction = direction; }
-        
+    
+    
+    
     public void execute(RobotAction action) {
         Vector2 dirVector = _direction.toVector2();
         switch (action) {
