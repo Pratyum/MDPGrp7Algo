@@ -43,7 +43,7 @@ public class ExplorationSolver {
    
 	public static void main(String[] args){
 		
-        Vector2 robotPos = new Vector2(3, 2);
+        Vector2 robotPos = new Vector2(1, 1);
         Direction robotDir = Direction.Right;
         Robot robot = new Robot(robotPos, robotDir);
 
@@ -63,7 +63,7 @@ public class ExplorationSolver {
 	    		
 	    		
 	    		//data = getDataFromRPI();
-        for(x=0;x<10;x++){
+        for(x=0;x<100;x++){
             view(robot);
 	    	
 	    	    	if(mapViewer.checkWalkable(robot, Direction.Right)==1){
@@ -89,6 +89,36 @@ public class ExplorationSolver {
 	    		    	else
 	    		    		System.out.println("Error1");
 	    	    	}
+	    	    
+	    	    	// if all around empty, avoid turning in a loop, find the wall directly
+	    	    	if(mapViewer.checkAllAroundEmpty(robot)==1){
+	    	    		switch(robot.direction()){
+	    	    		case Right:
+	    	    			robot.execute(RobotAction.RotateLeft);
+	    	    			robot.execute(RobotAction.RotateLeft);
+	    	    			break;
+	    	    		case Left:
+	    	    			break;
+	    	    		case Up:
+	    	    			robot.execute(RobotAction.RotateLeft);
+	    	    			break;
+	    	    		case Down:
+	    	    			robot.execute(RobotAction.RotateRight);
+	    	    			break;
+	    	    
+	    	    	
+	    	    		}
+	    	    		//go find a wall
+	    	    
+		    	    	while(mapViewer.checkWalkable(robot, Direction.Up)!=0 ){
+	    	    			robot.execute(RobotAction.MoveForward);
+	    	    			if(mapViewer.checkWalkable(robot, Direction.Up)==2)
+	    	    				view(robot);
+	    	    			}
+		    	    	robot.execute(RobotAction.RotateLeft);
+	    	    	
+	    	    	}
+	    	    	
         }
         		
 	    			
@@ -140,9 +170,11 @@ public class ExplorationSolver {
     			turnLeftTillEmpty( robot);
     			
     		}
-
+    		
     	
     }
+    
+    
     
 
 }

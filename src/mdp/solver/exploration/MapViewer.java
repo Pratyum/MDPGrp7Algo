@@ -61,7 +61,8 @@ public class MapViewer{
     }
     
     private static int checkExploredState(Vector2 v){
-		
+    		if(!map.checkValidBoundary(v))
+    			return 2; 
     		return explored[v.i()][v.j()];
     		
     }
@@ -87,6 +88,29 @@ public class MapViewer{
         return result;
     	
     }
+    
+    
+    public int checkAllAroundEmpty(Robot robot){
+    		int l ,r , b ,f;
+    		
+    		l =checkWalkable( robot ,  Direction.Left);
+    		r =checkWalkable( robot ,  Direction.Right);
+    		b =checkWalkable( robot ,  Direction.Down);
+    		f =checkWalkable( robot ,  Direction.Up);
+    		
+    		if(l == 1 && r ==1 && b ==1 && f ==1){
+    			return 1;
+    		}
+    		if(l == 2 || r ==2 || b ==2 || f ==2){
+    			return 2;
+    		}
+    		else
+    			return 0;
+    		
+    }
+    
+    
+    
     // 1 walkable, 0 not walkable, 2 need further exploration
     public int checkWalkable(Robot robot , Direction d){
     		
