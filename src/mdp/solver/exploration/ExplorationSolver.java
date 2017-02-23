@@ -16,6 +16,8 @@ public class ExplorationSolver {
     private static Map subjective_map = new Map();
     private Robot robot ;
     
+
+    
     private static MapViewer mapViewer = new MapViewer();
 
     private static int[][] _map = 
@@ -44,36 +46,36 @@ public class ExplorationSolver {
         Vector2 robotPos = new Vector2(3, 2);
         Direction robotDir = Direction.Right;
         Robot robot = new Robot(robotPos, robotDir);
-        Vector2 edge,edge_l, edge_r;
-        SensingData s= new SensingData(); 
+
+        SensingData s; 
+        Simulator simulator = new Simulator();
         
         // put some blockers into the map
         objective_map.addObstacle(_genBlockers(_map));
         
+        simulator.initializeMap(objective_map);
         
         System.out.println(objective_map.toString(robot));
-
+        
+        
                
 	    	
 	    		
 	    		
 	    		//data = getDataFromRPI();
-        		edge = robot.position().fnAdd(robot.direction().toVector2());
-        		s.front_m = detect(edge , robot.direction());
-        		edge_l = edge.fnAdd(robot.direction().getLeft().toVector2());
-        		s.front_l = detect(edge_l , robot.direction());
-        		edge_r = edge.fnAdd(robot.direction().getRight().toVector2());
-        		s.front_r = detect(edge_r , robot.direction());
-        		
-        		s.left = detect(edge_l , robot.direction().getLeft());
-        		s.right = detect(edge_r , robot.direction().getRight());
-        		
-        		
-	    		subjective_map= mapViewer.updateMap(robot , s);
+        
+        s= simulator.getSensingData(robot); 		
+	    	subjective_map= mapViewer.updateMap(robot , s);
+	    	System.out.println(mapViewer.exploredAreaToString());
 	    	
-	    		System.out.println(subjective_map.toString(robot));
+	    //if(!mapViewer.checkObstacle(robot)){
+	    			
+	    			
+	    	//}
+	    		
+	    	System.out.println(subjective_map.toString(robot));
         		
-	    	
+	    		
 	    	
 		
 	}
@@ -89,31 +91,6 @@ public class ExplorationSolver {
         return blockers;
     }
     
-    private static int detect(Vector2 position, Direction dir){
-    		Vector2 tmp = new Vector2(position.i(),position.j());
-    		Waypoint wp;
-    		Vector2 unit;
-    		unit = dir.toVector2();
-    		
-    		
-    		    
-	    		tmp.add(unit);
-	    		wp = objective_map.getPoint(tmp);
-	    		
-	    		//seeing range is not relevant to virtual obstacle
-    			if(!objective_map.checkValidPosition(wp.position()) || wp.obstacleState()==WPObstacleState.IsActualObstacle )
-    				return 1;
-    			tmp.add(unit);
-    			wp = objective_map.getPoint(tmp);
-    			if(!objective_map.checkValidPosition(wp.position()) || wp.obstacleState()==WPObstacleState.IsActualObstacle )
-        			return 2;
-    			tmp.add(unit);
-    			wp = objective_map.getPoint(tmp);
-    			if(!objective_map.checkValidPosition(wp.position()) || wp.obstacleState()==WPObstacleState.IsActualObstacle)
-    				return 3;
-    			return 0;
-    			
-    		}
     
 
 }

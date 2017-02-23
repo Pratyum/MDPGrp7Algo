@@ -2,7 +2,7 @@ package mdp.solver.exploration;
 import mdp.Waypoint ;
 import mdp.Robot;
 import mdp.Map;
-public class PathFormulator {
+public class ActionFormulator {
 	private Map map;
 	
 	
