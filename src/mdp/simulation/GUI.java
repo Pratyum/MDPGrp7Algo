@@ -14,7 +14,7 @@ import mdp.map.Map;
 import mdp.robot.Robot;
 import mdp.robot.RobotAction;
 import mdp.common.Vector2;
-import mdp.map.DescriptorParser;
+import mdp.map.Descriptor;
 import mdp.map.WPObstacleState;
 import mdp.map.WPSpecialState;
 import mdp.solver.shortestpath.AStarSolver;
@@ -36,19 +36,24 @@ public class GUI {
         GridContainer gridContainer = _mainFrame
             .getMainPanel()
             .getGridPanel()
-            .getGridContainer();                
-        ControlPanel controlPanel = _mainFrame
-            .getMainPanel()
-            .getControlPanel();
+            .getGridContainer();
         
         gridContainer.setGridAdapter(_onToggleObstacle());
-        controlPanel
+        _mainFrame
+            .getMainPanel()
+            .getDescCtrlPanel()
             .getLoadDescBtn().addMouseListener(_onLoadDesc());
-        controlPanel
+        _mainFrame
+            .getMainPanel()
+            .getRunCtrlPanel()
             .getShortestPathBtn().addMouseListener(_onShortestPath());
-        controlPanel
+        _mainFrame
+            .getMainPanel()
+            .getIntrCtrlPanel()
             .getResetBtn().addMouseListener(_onReset());
-        controlPanel
+        _mainFrame
+            .getMainPanel()
+            .getIntrCtrlPanel()
             .getStopBtn().addMouseListener(_onStop());
     }
     
@@ -71,7 +76,11 @@ public class GUI {
             public void mouseClicked(MouseEvent e) {
                 try {
                     _reset();
-                    update(DescriptorParser.getMapFromFile());
+                    String filePath = _mainFrame
+                        .getMainPanel()
+                        .getDescCtrlPanel()
+                        .getFilePathBtn().getText();
+                    update(Descriptor.parseFromFile(filePath));
                 } catch (IOException ex) {
                     Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
                 }

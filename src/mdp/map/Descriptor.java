@@ -6,26 +6,22 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import mdp.common.Vector2;
 
-public class DescriptorParser {
+public class Descriptor {
     
     private static String _getFilePath(String fileName) throws IOException {
         String rootPath = new File(".").getCanonicalPath() + "\\src\\";
-        String packagePath = DescriptorParser.class.getPackage().getName().replace(".", "\\") + "\\";
+        String packagePath = Descriptor.class.getPackage().getName().replace(".", "\\") + "\\";
         return rootPath + packagePath + fileName;
     }
     
-    public static Map getMapFromFile() throws IOException {
-        return getMapFromFile("descriptor.txt");
-    }
-    
-    public static Map getMapFromFile(String fileNameOrPath) throws IOException {
+    public static Map parseFromFile(String filePath) throws IOException {
         Map result = new Map();
         
         File file;
-        if (fileNameOrPath.contains("\\")) {
-            file = new File(fileNameOrPath);
+        if (filePath.contains("\\")) {
+            file = new File(filePath);
         } else {
-            file = new File(_getFilePath(fileNameOrPath));
+            file = new File(_getFilePath(filePath));
         }
         
         try (Scanner scanner = new Scanner(file)) {
