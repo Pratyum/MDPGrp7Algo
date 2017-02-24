@@ -97,10 +97,10 @@ public class MapViewer{
     public int checkAllAroundEmpty(Robot robot){
     		int l ,r , b ,f;
     		
-    		l =checkWalkable( robot ,  Direction.West);
-    		r =checkWalkable( robot ,  Direction.East);
-    		b =checkWalkable( robot ,  Direction.South);
-    		f =checkWalkable( robot ,  Direction.North);
+    		l =checkWalkable(robot ,  Direction.Left);
+    		r =checkWalkable(robot ,  Direction.Right);
+    		b =checkWalkable(robot ,  Direction.Down);
+    		f =checkWalkable(robot ,  Direction.Up);
     		
     		if(l == 1 && r ==1 && b ==1 && f ==1){
     			return 1;
@@ -120,16 +120,16 @@ public class MapViewer{
     		
     		Vector2 edge1, edge2, edge3;
     		int s1,s2,s3;
-    		Direction dir = Direction.North;
+    		Direction dir = Direction.Up;
     		
     		switch(d){
-    		case  North:
+    		case  Up:
     			dir = robot.orientation();break;
-    		case South: 
+    		case Down: 
     			dir = robot.orientation().getLeft().getLeft();break;
-    		case East:
+    		case Right:
     			dir = robot.orientation().getRight();break;
-    		case West:
+    		case Left:
     			dir = robot.orientation().getLeft();break;
     		default:
     			break;

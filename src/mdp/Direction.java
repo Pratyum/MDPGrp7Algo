@@ -1,7 +1,7 @@
 package mdp;
 
 public enum Direction {
-    North, West, South, East;
+    Up, Left, Down, Right;
     private Direction _getWithOffset(int offset) {
         return values()[(this.ordinal() + offset + values().length) % values().length];
     }
@@ -16,10 +16,10 @@ public enum Direction {
     }
     public Vector2 toVector2() {
         switch (this) {
-            case North: return new Vector2(-1, 0);
-            case South: return new Vector2(1, 0);
-            case West: return new Vector2(0, -1);
-            case East: return new Vector2(0, 1);
+            case Up: return new Vector2(-1, 0);
+            case Down: return new Vector2(1, 0);
+            case Left: return new Vector2(0, -1);
+            case Right: return new Vector2(0, 1);
             default: return new Vector2(0, 0);
         }
     }

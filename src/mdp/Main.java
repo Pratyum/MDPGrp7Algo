@@ -42,7 +42,7 @@ public class Main {
          
         // initialize robot
         Vector2 robotPos = new Vector2(1, 1);
-        Direction robotDir = Direction.East;
+        Direction robotDir = Direction.Right;
         Robot robot = new Robot(robotPos, robotDir);
         
         // solve map for shortest path

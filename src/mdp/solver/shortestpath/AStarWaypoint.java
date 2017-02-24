@@ -16,7 +16,7 @@ public class AStarWaypoint extends Waypoint {
         _parentDir = parentIndex;
     }
     public AStarWaypoint(Waypoint wp) {
-        this(wp, 1000000, 1000000, Direction.North);
+        this(wp, 1000000, 1000000, Direction.Up);
     }
     public AStarWaypoint() {
         this(new Waypoint());

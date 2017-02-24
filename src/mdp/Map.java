@@ -101,16 +101,16 @@ public class Map {
                     if (curPoint.position().equals(robot.position())) {
                         String symbol = "  ";
                         switch (robot.orientation()) {
-                            case North:
+                            case Up:
                                 symbol = "^ ";
                                 break;
-                            case South:
+                            case Down:
                                 symbol = "_ ";
                                 break;
-                            case West:
+                            case Left:
                                 symbol = "< ";
                                 break;
-                            case East:
+                            case Right:
                                 symbol = "> ";
                                 break;
                         }
