@@ -10,6 +10,7 @@ public class Waypoint {
         _position = position;
         _specialState = specialState;
         _obstacleState = obstacleState;
+    
     }
     public Waypoint(Vector2 position) {
         this(position, WPSpecialState.NA, WPObstacleState.IsWalkable);

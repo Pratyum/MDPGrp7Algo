@@ -1,10 +1,13 @@
 # MDPGrp7Algo
+
 ## Algorithm
-1. Exploration - Modified Sweep
+1. Exploration - Modified Sweep (in progress)
 2. Shortest path - Weighted A* (done)
+
 ## Communication
 1. To Arduino (done)
 2. To Android (in progress)
+
 ## Simulation
 1. CLI - Standard IO with ANSI formatting (done)
-2. GUI - Java Swing
+2. GUI - Java Swing (in progress)

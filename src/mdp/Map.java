@@ -21,7 +21,7 @@ public class Map {
                 WPSpecialState curSpecState = WPSpecialState.NA;
                 WPObstacleState curObsState = WPObstacleState.IsWalkable;
                 
-                // change special state if appicable
+                // change special state if applicable
                 if (START_POS.equals(curPos)) {
                     curSpecState = WPSpecialState.IsStart;
                 } else if (GOAL_POS.equals(curPos)) {
@@ -155,6 +155,7 @@ public class Map {
     }
     
     public Waypoint getPoint(Vector2 position) {
+    		//System.out.println("i "+ position.i() + "j "+ position.j());
         return _wpMap[position.i()][position.j()];
     }
     
@@ -163,4 +164,8 @@ public class Map {
                pos.j() > 0 && pos.j() < DIM_J;
     }
     
+    public boolean checkValidBoundary(Vector2 pos){
+    		return pos.i() >=0 && pos.i() < DIM_I &&
+                pos.j() >=0 && pos.j() < DIM_J;
+    }
 }
