@@ -1,7 +1,10 @@
-package mdp;
+package mdp.map;
 
 import java.util.ArrayList;
 import java.util.List;
+import mdp.common.Console;
+import mdp.robot.Robot;
+import mdp.common.Vector2;
 
 public class Map {
     // constants
@@ -36,7 +39,7 @@ public class Map {
         }
     }
     
-    private void _setObs(Vector2 pos, WPObstacleState obsState) {
+    private void _setObstacle(Vector2 pos, WPObstacleState obsState) {
         _wpMap[pos.i()][pos.j()].obstacleState(obsState);
     }
     
@@ -46,7 +49,7 @@ public class Map {
                                         WPObstacleState virtualState) {
         obsList.forEach((curObsPos) -> {
             // add blocking tag for the obstacle
-            _setObs(curObsPos, actualState);
+            _setObstacle(curObsPos, actualState);
             
             // add blocking tag for points adjacent to the obstacle
             for (int deltaI = -1; deltaI <= 1; deltaI++) {
@@ -56,7 +59,7 @@ public class Map {
                     if (adjI > -1 && adjI < DIM_I && adjJ > -1 && adjJ < DIM_J &&
                         _wpMap[adjI][adjJ].obstacleState() == virtualCheckState) {
                         Vector2 adjacentPos = new Vector2(adjI, adjJ);
-                        _setObs(adjacentPos, virtualState);
+                        _setObstacle(adjacentPos, virtualState);
                     }
                 }
             }

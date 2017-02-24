@@ -3,14 +3,14 @@ import java.util.ArrayList;
 
 
 import java.util.List;
-import mdp.Waypoint;
-import mdp.Direction;
-import mdp.Map;
-import mdp.Robot;
-import mdp.Vector2;
-import mdp.WPObstacleState;
+import mdp.map.Waypoint;
+import mdp.common.Direction;
+import mdp.map.Map;
+import mdp.robot.Robot;
+import mdp.common.Vector2;
+import mdp.map.WPObstacleState;
 import mdp.solver.exploration.MapViewer;
-import mdp.RobotAction;
+import mdp.robot.RobotAction;
 import java.util.LinkedList;
 
 public class ExplorationSolver {

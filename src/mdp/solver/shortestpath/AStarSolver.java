@@ -2,12 +2,12 @@ package mdp.solver.shortestpath;
 
 import java.util.Collections;
 import java.util.HashMap;
-import mdp.Direction;
-import mdp.Map;
-import mdp.Vector2;
-import mdp.Robot;
-import mdp.WPObstacleState;
-import mdp.Waypoint;
+import mdp.common.Direction;
+import mdp.map.Map;
+import mdp.common.Vector2;
+import mdp.robot.Robot;
+import mdp.map.WPObstacleState;
+import mdp.map.Waypoint;
 
 public class AStarSolver {
 

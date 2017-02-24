@@ -1,4 +1,6 @@
-package mdp;
+package mdp.map;
+
+import mdp.common.Vector2;
 
 public class Waypoint {
     

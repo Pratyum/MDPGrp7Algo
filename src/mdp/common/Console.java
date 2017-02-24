@@ -1,4 +1,4 @@
-package mdp;
+package mdp.common;
 
 public class Console {
     

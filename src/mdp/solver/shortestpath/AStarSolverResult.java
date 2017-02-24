@@ -2,7 +2,7 @@ package mdp.solver.shortestpath;
 
 import java.util.ArrayList;
 import java.util.List;
-import mdp.Vector2;
+import mdp.common.Vector2;
 
 public class AStarSolverResult {
     public List<Vector2> shortestPath;

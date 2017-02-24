@@ -1,8 +1,8 @@
 package mdp.solver.shortestpath;
 
-import mdp.Direction;
-import mdp.Robot;
-import mdp.Vector2;
+import mdp.common.Direction;
+import mdp.robot.Robot;
+import mdp.common.Vector2;
 
 public class AStarUtil {
     

@@ -1,7 +1,7 @@
 package mdp.solver.shortestpath;
 
-import mdp.Direction;
-import mdp.Waypoint;
+import mdp.common.Direction;
+import mdp.map.Waypoint;
 
 public class AStarWaypoint extends Waypoint {
     

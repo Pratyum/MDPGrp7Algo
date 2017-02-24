@@ -1,11 +1,11 @@
 package mdp.solver.exploration;
 
-import mdp.Direction;
-import mdp.Map;
-import mdp.Robot;
-import mdp.Vector2;
-import mdp.WPObstacleState;
-import mdp.Waypoint;
+import mdp.common.Direction;
+import mdp.map.Map;
+import mdp.robot.Robot;
+import mdp.common.Vector2;
+import mdp.map.WPObstacleState;
+import mdp.map.Waypoint;
 public class Simulator {
 
 	private static Map objective_map;

@@ -7,12 +7,12 @@ import java.awt.event.WindowEvent;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
-import mdp.Map;
-import mdp.Robot;
-import mdp.RobotAction;
-import mdp.Vector2;
-import mdp.WPObstacleState;
-import mdp.WPSpecialState;
+import mdp.map.Map;
+import mdp.robot.Robot;
+import mdp.robot.RobotAction;
+import mdp.common.Vector2;
+import mdp.map.WPObstacleState;
+import mdp.map.WPSpecialState;
 import mdp.solver.shortestpath.AStarSolver;
 import mdp.solver.shortestpath.AStarSolverResult;
 

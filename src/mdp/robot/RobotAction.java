@@ -1,7 +1,9 @@
-package mdp;
+package mdp.robot;
 
 import java.util.LinkedList;
 import java.util.List;
+import mdp.common.Direction;
+import mdp.common.Vector2;
 
 public enum RobotAction {
     MoveForward, MoveBackward, RotateLeft, RotateRight;

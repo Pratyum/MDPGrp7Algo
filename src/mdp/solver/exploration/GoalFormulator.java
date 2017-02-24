@@ -1,6 +1,6 @@
 package mdp.solver.exploration;
-import mdp.Map;
-import mdp.Waypoint;
+import mdp.map.Map;
+import mdp.map.Waypoint;
 public class GoalFormulator {
 	
 	private Waypoint frontiers;

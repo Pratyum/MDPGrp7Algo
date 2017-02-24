@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.JPanel;
-import mdp.Map;
-import mdp.Robot;
-import mdp.Vector2;
-import mdp.WPObstacleState;
+import mdp.map.Map;
+import mdp.robot.Robot;
+import mdp.common.Vector2;
+import mdp.map.WPObstacleState;
 
 public class GridContainer extends JPanel {
     

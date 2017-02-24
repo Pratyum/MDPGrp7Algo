@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.List;
 import java.util.ArrayList;
 
-import mdp.Console;
-import mdp.Map;
-import mdp.Robot;
-import mdp.Vector2;
-import mdp.Waypoint;
-import mdp.Direction;
+import mdp.common.Console;
+import mdp.map.Map;
+import mdp.robot.Robot;
+import mdp.common.Vector2;
+import mdp.map.Waypoint;
+import mdp.common.Direction;
 public class MapViewer{
 	
 	private static Map map;

@@ -1,7 +1,7 @@
 package mdp.simulation;
 
 import javax.swing.JPanel;
-import mdp.Vector2;
+import mdp.common.Vector2;
 
 public class GridSquare extends JPanel {
     

@@ -1,7 +1,7 @@
 package mdp.solver.exploration;
-import mdp.Waypoint ;
-import mdp.Robot;
-import mdp.Map;
+import mdp.map.Waypoint ;
+import mdp.robot.Robot;
+import mdp.map.Map;
 public class ActionFormulator {
 	private Map map;
 	

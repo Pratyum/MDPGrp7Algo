@@ -2,8 +2,8 @@ package mdp.communication;
 
 import java.io.IOException;
 import java.util.List;
-import mdp.Map;
-import mdp.RobotAction;
+import mdp.map.Map;
+import mdp.robot.RobotAction;
 
 public class Translator {
     

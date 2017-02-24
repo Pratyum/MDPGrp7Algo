@@ -5,7 +5,7 @@ import javax.swing.JFrame;
 
 public class MainFrame extends JFrame {
     
-    private static final String _FRAME_NAME = "MDP Grp 7 - Simulation";
+    private static final String _FRAME_NAME = "MDP Grp 7 - Simulator";
     private static final int _FRAME_WIDTH = 750;
     private static final int _FRAME_HEIGHT = 570;
     
@@ -17,7 +17,7 @@ public class MainFrame extends JFrame {
     
     public MainFrame() {
         // config
-        this.setName(_FRAME_NAME);
+        this.setTitle(_FRAME_NAME);
         this.setSize(new Dimension(_FRAME_WIDTH, _FRAME_HEIGHT));
         
         // children

@@ -1,4 +1,4 @@
-package mdp;
+package mdp.common;
 
 public class Vector2 {
     private int _i;
