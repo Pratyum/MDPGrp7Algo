@@ -71,23 +71,23 @@ public class ExplorationSolver {
         	
         	view(robot);
 	    	
-	    	    	if(mapViewer.checkWalkable(robot, Direction.Right)==1){
+	    	    	if(mapViewer.checkWalkable(robot, Direction.Right)==Know.Yes){
 	    	    		robot.execute(RobotAction.RotateRight);robotActions.add(RobotAction.RotateRight);
 	    	    		robot.execute(RobotAction.MoveForward);robotActions.add(RobotAction.MoveForward);
 	    	    	}
-	    	    	else if (mapViewer.checkWalkable(robot, Direction.Right)==0){
+	    	    	else if (mapViewer.checkWalkable(robot, Direction.Right)==Know.No){
 	    	    		turnLeftTillEmpty(robot); //now didnt turn left , so execute directly
 	    	    	}
-	    	    	else if (mapViewer.checkWalkable(robot, Direction.Right)==2){
+	    	    	else if (mapViewer.checkWalkable(robot, Direction.Right)==Know.Unsure){
 	    	    		robot.execute(RobotAction.RotateRight);robotActions.add(RobotAction.RotateRight);
 	    	    		
 	    	    		view(robot);
 	    	    		
 	
-	    		    if (mapViewer.checkWalkable(robot, Direction.Up)==1){
+	    		    if (mapViewer.checkWalkable(robot, Direction.Up)==Know.Yes){
 	    		    		robot.execute(RobotAction.MoveForward);robotActions.add(RobotAction.MoveForward);
 	    		    	}
-	    		    else if(mapViewer.checkWalkable(robot, Direction.Up)==0){
+	    		    else if(mapViewer.checkWalkable(robot, Direction.Up)==Know.No){
 	    		    		robot.execute(RobotAction.RotateLeft);robotActions.add(RobotAction.RotateLeft);
 	    		    		turnLeftTillEmpty(robot); 
 	    		    }
@@ -96,7 +96,7 @@ public class ExplorationSolver {
 	    	    	}
 	    	    
 	    	    	// if all around empty, avoid turning in a loop, find the wall directly
-	    	    	if(mapViewer.checkAllAroundEmpty(robot)==1){
+	    	    	if(mapViewer.checkAllAroundEmpty(robot)==Know.Yes){
 	    	    		/*switch(robot.direction()){
 	    	    		case Right:
 	    	    			robot.execute(RobotAction.RotateLeft);
@@ -160,22 +160,22 @@ public class ExplorationSolver {
     
     public static void turnLeftTillEmpty(Robot robot){
     	
-    		int check = mapViewer.checkWalkable(robot, Direction.Up);
+    		Know check = mapViewer.checkWalkable(robot, Direction.Up);
 
-    		if(check==2){
+    		if(check==Know.Unsure){
     			view(robot);
     		}
     		// make sure it is viewed before turn
     		//update
     		check = mapViewer.checkWalkable(robot, Direction.Up);
     		
-    		if(check==1){
+    		if(check==Know.Yes){
     			robot.execute(RobotAction.MoveForward);robotActions.add(RobotAction.MoveForward);
     			return;
     		}
     		
     		
-    		if(check==0){
+    		if(check==Know.No){
     			robot.execute(RobotAction.RotateLeft);robotActions.add(RobotAction.RotateLeft);
     			turnLeftTillEmpty( robot);
     			
