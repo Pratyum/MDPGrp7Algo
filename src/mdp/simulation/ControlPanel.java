@@ -8,6 +8,7 @@ public class ControlPanel extends JPanel {
     
     private static final Color _BG_COLOR = new Color(128, 128, 128);
     
+    private JButton _loadDescBtn;
     private JButton _explorationBtn;
     private JButton _shortestPathBtn;
     private JButton _combinedBtn;
@@ -19,11 +20,13 @@ public class ControlPanel extends JPanel {
         this.setBackground(_BG_COLOR);
         
         // children
-        _explorationBtn = new JButton("Start Exploration");
-        _shortestPathBtn = new JButton("Start Shortest Path");
-        _combinedBtn = new JButton("Start Combined Algo");
+        _loadDescBtn = new JButton("Load Map from Descriptor");
+        _explorationBtn = new JButton("Exploration");
+        _shortestPathBtn = new JButton("Shortest Path");
+        _combinedBtn = new JButton("Combined Algo");
         _stopBtn = new JButton("Stop");
         _resetBtn = new JButton("Reset");
+        this.add(_loadDescBtn);
         this.add(_explorationBtn);
         this.add(_shortestPathBtn);
         this.add(_combinedBtn);
@@ -31,6 +34,10 @@ public class ControlPanel extends JPanel {
         this.add(_resetBtn);
     }
 
+    public JButton getLoadDescBtn() {
+        return _loadDescBtn;
+    }
+    
     public JButton getExplorationBtn() {
         return _explorationBtn;
     }

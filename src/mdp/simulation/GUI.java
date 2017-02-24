@@ -4,13 +4,17 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import mdp.map.Map;
 import mdp.robot.Robot;
 import mdp.robot.RobotAction;
 import mdp.common.Vector2;
+import mdp.map.DescriptorParser;
 import mdp.map.WPObstacleState;
 import mdp.map.WPSpecialState;
 import mdp.solver.shortestpath.AStarSolver;
@@ -39,6 +43,8 @@ public class GUI {
         
         gridContainer.setGridAdapter(_onToggleObstacle());
         controlPanel
+            .getLoadDescBtn().addMouseListener(_onLoadDesc());
+        controlPanel
             .getShortestPathBtn().addMouseListener(_onShortestPath());
         controlPanel
             .getResetBtn().addMouseListener(_onReset());
@@ -55,6 +61,20 @@ public class GUI {
             @Override
             public void windowClosing(WindowEvent e) {
                 System.exit(0);
+            }
+        };
+    }
+    
+    private MouseAdapter _onLoadDesc() {
+        return new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    _reset();
+                    update(DescriptorParser.getMapFromFile());
+                } catch (IOException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         };
     }
@@ -131,6 +151,9 @@ public class GUI {
             .getGridPanel()
             .getGridContainer().fillGrid(_map, _robot);
         _mainFrame.revalidate();
+    }
+    public void update(Map map) {
+        update(map, _robot);
     }
     
 }

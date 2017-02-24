@@ -8,10 +8,10 @@ import mdp.common.Vector2;
 
 public class Map {
     // constants
-    public final int DIM_I = 15;
-    public final int DIM_J = 20;
-    public final Vector2 START_POS = new Vector2(1, 1);
-    public final Vector2 GOAL_POS = new Vector2(DIM_I - 2, DIM_J - 2);
+    public static final int DIM_I = 15;
+    public static final int DIM_J = 20;
+    public static final Vector2 START_POS = new Vector2(1, 1);
+    public static final Vector2 GOAL_POS = new Vector2(DIM_I - 2, DIM_J - 2);
     
     private final Waypoint[][] _wpMap;
     

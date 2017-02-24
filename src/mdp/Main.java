@@ -11,10 +11,14 @@ import mdp.simulation.GUI;
 public class Main {
     
     public static void main(String[] args) throws IOException {
-        
+                
         // run simulation
         System.out.println("Initiating GUI...");
         GUI gui = new GUI();
+        
+        // get map from descriptor
+//        DescriptorParser dt = new DescriptorParser();
+//        gui.update(dt.getMapFromFile("descriptor.txt"));
         
         // connect & send string to RPi
 //        _checkRPiConnection();
