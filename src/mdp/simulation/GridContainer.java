@@ -3,6 +3,8 @@ package mdp.simulation;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,9 +21,10 @@ public class GridContainer extends JPanel {
     private static final int _SQUARE_SIZE = 30;
     private static final int _GAP = 1;
     
-    private JPanel[][] _grid;
+    private GridSquare[][] _grid;
+    private MouseAdapter _gridMouseAdapter;
 
-    public JPanel[][] getGrid() {
+    public GridSquare[][] getGrid() {
         return _grid;
     }
 
@@ -35,38 +38,7 @@ public class GridContainer extends JPanel {
         this.setBackground(ColorConfig.BG);
         
         // children
-        _grid = new JPanel[_DIM_ROW][_DIM_COL];
-    }
-    
-    public void fillGrid(Map map, Robot robot) {
-        this.removeAll();
-        _grid = new JPanel[_DIM_ROW][_DIM_COL];
-
-        HashMap<String, Color> specialColors = _genSpecialColor(map, robot);
-
-        for (int i = 0; i < _DIM_ROW; i++) {
-            for (int j = 0; j < _DIM_COL; j++) {
-                _grid[i][j] = new JPanel();
-
-                Vector2 curLocation = new Vector2(i, j);
-                Color curColor = ColorConfig.NORMAL;
-                if (specialColors.containsKey(curLocation.toString())) {
-                    curColor = specialColors.get(curLocation.toString());
-                }
-                _grid[i][j].setBackground(curColor);                    
-
-                _grid[i][j].setPreferredSize(new Dimension(
-                    _SQUARE_SIZE,
-                    _SQUARE_SIZE
-                ));
-            }
-        }
-        
-        for (JPanel[] row : _grid) {
-            for (JPanel square : row) {
-                this.add(square);
-            }
-        }
+        this.fillGrid(new Map(), new Robot());
     }
     
     private List<Vector2> _gen3x3(Vector2 curPos) {
@@ -170,6 +142,57 @@ public class GridContainer extends JPanel {
         });
         
         return result;
+    }
+    
+    private void _applyMouseAdapter() {
+        for (GridSquare[] row : _grid) {
+            for (GridSquare square : row) {
+                for (MouseListener mouseListener : square.getMouseListeners()) {
+                    square.removeMouseListener(mouseListener);
+                }
+                square.addMouseListener(_gridMouseAdapter);
+            }
+        }
+    }
+    
+    public void fillGrid(Map map, Robot robot) {
+        boolean isFirstTime = _grid == null;
+//        this.removeAll();
+        if (isFirstTime) _grid = new GridSquare[_DIM_ROW][_DIM_COL];
+
+        HashMap<String, Color> specialColors = _genSpecialColor(map, robot);
+
+        for (int i = 0; i < _DIM_ROW; i++) {
+            for (int j = 0; j < _DIM_COL; j++) {
+                if (isFirstTime) _grid[i][j] = new GridSquare(new Vector2(i, j));
+
+                Vector2 curLocation = new Vector2(i, j);
+                Color targetColor = ColorConfig.NORMAL;
+                if (specialColors.containsKey(curLocation.toString())) {
+                    targetColor = specialColors.get(curLocation.toString());
+                }
+                _grid[i][j].setBackground(targetColor);                    
+                
+                if (isFirstTime) {
+                    _grid[i][j].setPreferredSize(new Dimension(
+                        _SQUARE_SIZE,
+                        _SQUARE_SIZE
+                    ));
+                }
+            }
+        }
+        if (isFirstTime) {
+            for (GridSquare[] row : _grid) {
+                for (GridSquare square : row) {
+                    this.add(square);
+                }
+            }
+        }
+    }
+    
+    public void setGridAdapter(MouseAdapter adapter) {
+        _gridMouseAdapter = adapter;
+        _applyMouseAdapter();
     }
     
 }

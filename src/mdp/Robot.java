@@ -6,6 +6,10 @@ public class Robot {
     private Direction _direction;
     private Map pathMap;
     
+    public Robot() {
+        this(new Vector2(1, 1), Direction.Right);
+    }
+    
     public Robot(Vector2 position, Direction direction) {
         _position = position;
         _orientation = direction;

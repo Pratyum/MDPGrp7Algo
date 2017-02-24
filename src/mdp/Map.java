@@ -40,10 +40,13 @@ public class Map {
         _wpMap[pos.i()][pos.j()].obstacleState(obsState);
     }
     
-    public void addObstacle(List<Vector2> obstaclePositions) {
-        obstaclePositions.forEach((curObsPos) -> {
+    private void _processObstacleList(List<Vector2> obsList, 
+                                        WPObstacleState actualState,
+                                        WPObstacleState virtualCheckState,
+                                        WPObstacleState virtualState) {
+        obsList.forEach((curObsPos) -> {
             // add blocking tag for the obstacle
-            _setObs(curObsPos, WPObstacleState.IsActualObstacle);
+            _setObs(curObsPos, actualState);
             
             // add blocking tag for points adjacent to the obstacle
             for (int deltaI = -1; deltaI <= 1; deltaI++) {
@@ -51,13 +54,39 @@ public class Map {
                     int adjI = curObsPos.i() + deltaI;
                     int adjJ = curObsPos.j() + deltaJ;
                     if (adjI > -1 && adjI < DIM_I && adjJ > -1 && adjJ < DIM_J &&
-                        _wpMap[adjI][adjJ].obstacleState() == WPObstacleState.IsWalkable) {
+                        _wpMap[adjI][adjJ].obstacleState() == virtualCheckState) {
                         Vector2 adjacentPos = new Vector2(adjI, adjJ);
-                        _setObs(adjacentPos, WPObstacleState.IsVirtualObstacle);
+                        _setObs(adjacentPos, virtualState);
                     }
                 }
             }
         });
+    }
+    public void addObstacle(List<Vector2> obstaclePositions) {
+        _processObstacleList(
+            obstaclePositions,
+            WPObstacleState.IsActualObstacle,
+            WPObstacleState.IsWalkable,
+            WPObstacleState.IsVirtualObstacle
+        );
+    }
+    public void addObstacle(Vector2 pos) {
+        List<Vector2> temp = new ArrayList<>();
+        temp.add(pos);
+        addObstacle(temp);
+    }
+    public void clearObstacle(List<Vector2> obstaclePositions) {
+        _processObstacleList(
+            obstaclePositions,
+            WPObstacleState.IsWalkable,
+            WPObstacleState.IsVirtualObstacle,
+            WPObstacleState.IsWalkable
+        );
+    }
+    public void clearObstacle(Vector2 pos) {
+        List<Vector2> temp = new ArrayList<>();
+        temp.add(pos);
+        clearObstacle(temp);
     }
     public List<Waypoint> toList() {
         List<Waypoint> result = new ArrayList<>();
@@ -69,18 +98,6 @@ public class Map {
         return result;
     }
     
-//    public List<Vector2> getObsStatePos(WPObstacleState wpOS) {
-//        List<Vector2> result = new ArrayList<Vector2>();
-//        for (int i = 0; i < DIM_I; i++) {
-//            for (int j = 0; j < DIM_J; j++) {
-//                Vector2 curPos = new Vector2(i, j);
-//                if (_getObs(curPos).equals(wpOS)) {
-//                    result.add(curPos);
-//                }
-//            }
-//        }
-//        return result;
-//    }
     public void highlight(List<Vector2> hightlightPositions, WPSpecialState wPSpecialState) {
         hightlightPositions.forEach((pos) -> {
             Waypoint curPoint = _wpMap[pos.i()][pos.j()];
@@ -90,6 +107,17 @@ public class Map {
             }
         });
     }
+    public void clearAllHighlight() {
+        for (Waypoint[] row : _wpMap) {
+            for (Waypoint wp : row) {
+                if (!wp.specialState().equals(WPSpecialState.IsStart) && 
+                    !wp.specialState().equals(WPSpecialState.IsGoal)) {
+                    wp.specialState(WPSpecialState.NA);
+                }
+            }
+        }
+    }
+    
     public String toString(Robot robot) {
         String result = "";
         for (int i = -1; i <= DIM_I; i++) {

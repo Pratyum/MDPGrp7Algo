@@ -1,4 +1,4 @@
-package mdp; //say something else, conflict here
+package mdp;
 
 public enum Direction {
     Up, Left, Down, Right;
