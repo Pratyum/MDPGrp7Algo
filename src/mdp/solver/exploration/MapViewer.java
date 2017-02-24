@@ -94,29 +94,29 @@ public class MapViewer{
     }
     
     
-    public int checkAllAroundEmpty(Robot robot){
-    		int l ,r , b ,f;
+    public Know checkAllAroundEmpty(Robot robot){
+    		Know l ,r , b ,f;
     		
     		l =checkWalkable(robot ,  Direction.Left);
     		r =checkWalkable(robot ,  Direction.Right);
     		b =checkWalkable(robot ,  Direction.Down);
     		f =checkWalkable(robot ,  Direction.Up);
     		
-    		if(l == 1 && r ==1 && b ==1 && f ==1){
-    			return 1;
+    		if(l == Know.Yes && r ==Know.Yes && b ==Know.Yes && f ==Know.Yes){
+    			return Know.Yes;
     		}
-    		if(l == 2 || r ==2 || b ==2 || f ==2){
-    			return 2;
+    		if(l == Know.Unsure || r ==Know.Unsure || b ==Know.Unsure || f ==Know.Unsure){
+    			return Know.Unsure;
     		}
     		else
-    			return 0;
+    			return Know.No;
     		
     }
     
     
     
     // 1 walkable, 0 not walkable, 2 need further exploration
-    public int checkWalkable(Robot robot , Direction d){
+    public Know checkWalkable(Robot robot , Direction d){
     		
     		Vector2 edge1, edge2, edge3;
     		int s1,s2,s3;
@@ -146,11 +146,11 @@ public class MapViewer{
     		s3 = checkExploredState(edge3);
     		
     		if(s1 == 1 && s2 == 1 && s3 == 1 )
-    			return 1;
+    			return Know.Yes;
     		else if(s1 == 2 || s2 == 2 || s3 == 2)  // got obstacle
-    			return 0;
+    			return Know.No;
     		else 
-    			return 2;
+    			return Know.Unsure;
     		
     }
     

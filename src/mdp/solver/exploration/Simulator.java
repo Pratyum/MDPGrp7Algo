@@ -15,6 +15,8 @@ public class Simulator {
 		 
 	}
 	
+	
+	
 	public SensingData getSensingData(Robot robot){
 		Vector2 edge, edge_l , edge_r;
 		
