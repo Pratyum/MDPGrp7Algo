@@ -1,6 +1,7 @@
 package mdp.solver.exploration;
 import java.util.ArrayList;
 
+
 import java.util.List;
 import mdp.Waypoint;
 import mdp.Direction;
@@ -10,12 +11,13 @@ import mdp.Vector2;
 import mdp.WPObstacleState;
 import mdp.solver.exploration.MapViewer;
 import mdp.RobotAction;
+import java.util.LinkedList;
 
 public class ExplorationSolver {
     private static Map objective_map = new Map(); // generated from map solver
     private static Map subjective_map = new Map();
     private Robot robot ;
-    
+    private static LinkedList<RobotAction> robotActions= new LinkedList<>() ;
     private static Simulator simulator = new Simulator();
     
     private static MapViewer mapViewer = new MapViewer();
@@ -44,14 +46,14 @@ public class ExplorationSolver {
 	public static void main(String[] args){
 		
         Vector2 robotPos = new Vector2(1, 1);
-        Direction robotDir = Direction.Right;
+        Direction robotDir = Direction.Down;
         Robot robot = new Robot(robotPos, robotDir);
-
+        
         SensingData s; 
         int x;
         
         // put some blockers into the map
-        objective_map.addObstacle(_genBlockers(_map));
+        objective_map.addObstacle(_genBlockers(_map));//integrate
         
         simulator.initializeMap(objective_map);
         
@@ -63,27 +65,30 @@ public class ExplorationSolver {
 	    		
 	    		
 	    		//data = getDataFromRPI();
-        for(x=0;x<100;x++){
-            view(robot);
+        for(x=0;x<100 ;x++){
+        ///    
+        	robotActions.clear();
+        	
+        	view(robot);
 	    	
 	    	    	if(mapViewer.checkWalkable(robot, Direction.Right)==1){
-	    	    		robot.execute(RobotAction.RotateRight);
-	    	    		robot.execute(RobotAction.MoveForward);
+	    	    		robot.execute(RobotAction.RotateRight);robotActions.add(RobotAction.RotateRight);
+	    	    		robot.execute(RobotAction.MoveForward);robotActions.add(RobotAction.MoveForward);
 	    	    	}
 	    	    	else if (mapViewer.checkWalkable(robot, Direction.Right)==0){
 	    	    		turnLeftTillEmpty(robot); //now didnt turn left , so execute directly
 	    	    	}
 	    	    	else if (mapViewer.checkWalkable(robot, Direction.Right)==2){
-	    	    		robot.execute(RobotAction.RotateRight);
+	    	    		robot.execute(RobotAction.RotateRight);robotActions.add(RobotAction.RotateRight);
 	    	    		
 	    	    		view(robot);
 	    	    		
 	
 	    		    if (mapViewer.checkWalkable(robot, Direction.Up)==1){
-	    		    		robot.execute(RobotAction.MoveForward);
+	    		    		robot.execute(RobotAction.MoveForward);robotActions.add(RobotAction.MoveForward);
 	    		    	}
 	    		    else if(mapViewer.checkWalkable(robot, Direction.Up)==0){
-	    		    		robot.execute(RobotAction.RotateLeft);
+	    		    		robot.execute(RobotAction.RotateLeft);robotActions.add(RobotAction.RotateLeft);
 	    		    		turnLeftTillEmpty(robot); 
 	    		    }
 	    		    	else
@@ -92,7 +97,7 @@ public class ExplorationSolver {
 	    	    
 	    	    	// if all around empty, avoid turning in a loop, find the wall directly
 	    	    	if(mapViewer.checkAllAroundEmpty(robot)==1){
-	    	    		switch(robot.direction()){
+	    	    		/*switch(robot.direction()){
 	    	    		case Right:
 	    	    			robot.execute(RobotAction.RotateLeft);
 	    	    			robot.execute(RobotAction.RotateLeft);
@@ -107,17 +112,22 @@ public class ExplorationSolver {
 	    	    			break;
 	    	    
 	    	    	
-	    	    		}
+	    	    		} */
 	    	    		//go find a wall
 	    	    
-		    	    	while(mapViewer.checkWalkable(robot, Direction.Up)!=0 ){
+		    	    /*	while(mapViewer.checkWalkable(robot, Direction.Up)!=0 ){
 	    	    			robot.execute(RobotAction.MoveForward);
 	    	    			if(mapViewer.checkWalkable(robot, Direction.Up)==2)
 	    	    				view(robot);
 	    	    			}
+	    	    		
 		    	    	robot.execute(RobotAction.RotateLeft);
-	    	    	
+	    	    		*/
+	    	    		robot.execute(RobotAction.RotateRight);robotActions.add(RobotAction.RotateRight);
+	    	    		robot.execute(RobotAction.MoveForward);robotActions.add(RobotAction.MoveForward);
 	    	    	}
+	    	    	
+	    	    	// make a call to simulator
 	    	    	
         }
         		
@@ -160,13 +170,13 @@ public class ExplorationSolver {
     		check = mapViewer.checkWalkable(robot, Direction.Up);
     		
     		if(check==1){
-    			robot.execute(RobotAction.MoveForward);
+    			robot.execute(RobotAction.MoveForward);robotActions.add(RobotAction.MoveForward);
     			return;
     		}
     		
     		
     		if(check==0){
-    			robot.execute(RobotAction.RotateLeft);
+    			robot.execute(RobotAction.RotateLeft);robotActions.add(RobotAction.RotateLeft);
     			turnLeftTillEmpty( robot);
     			
     		}

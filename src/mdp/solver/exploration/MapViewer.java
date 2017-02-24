@@ -49,6 +49,7 @@ public class MapViewer{
     		explored[v.i()][v.j()] = 1; 
     }
     
+    
     private static void markExploredObstacle(Vector2 v){
     	 
     		if(map.checkValidBoundary(v))  //prevent it being a wall , out of bound array
@@ -67,6 +68,9 @@ public class MapViewer{
     		
     }
     
+    public Map getSubjectiveMap(){
+    		return map;
+    }
     
     public static String exploredAreaToString(){
         String result = "";

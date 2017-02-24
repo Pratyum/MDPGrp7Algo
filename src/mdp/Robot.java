@@ -3,6 +3,7 @@ package mdp;
 public class Robot {    
     private Vector2 _position;
     private Direction _direction;
+    private Map pathMap;
     
     public Robot(Vector2 position, Direction direction) {
         _position = position;
