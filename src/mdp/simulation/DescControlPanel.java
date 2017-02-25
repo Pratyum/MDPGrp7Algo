@@ -10,7 +10,8 @@ public class DescControlPanel extends JPanel {
     private static final Color _BG_COLOR = new Color(128, 128, 128);
     
     private JTextField _filePathBtn;
-    private JButton _loadDescBtn;
+    private JButton _openDescBtn;
+    private JButton _saveDescBtn;
     
     public DescControlPanel() {
         // config
@@ -18,17 +19,23 @@ public class DescControlPanel extends JPanel {
         
         // children
         _filePathBtn = new JTextField("descriptor.txt", 40);
-        _loadDescBtn = new JButton("Load Map");
+        _openDescBtn = new JButton("Open");
+        _saveDescBtn = new JButton("Save");
         this.add(_filePathBtn);
-        this.add(_loadDescBtn);
+        this.add(_openDescBtn);
+        this.add(_saveDescBtn);
     }
 
     public JTextField getFilePathBtn() {
         return _filePathBtn;
     }
 
-    public JButton getLoadDescBtn() {
-        return _loadDescBtn;
+    public JButton getOpenDescBtn() {
+        return _openDescBtn;
+    }
+
+    public JButton getSaveDescBtn() {
+        return _saveDescBtn;
     }
     
 }

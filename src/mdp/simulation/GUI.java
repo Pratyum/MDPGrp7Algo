@@ -42,7 +42,11 @@ public class GUI {
         _mainFrame
             .getMainPanel()
             .getDescCtrlPanel()
-            .getLoadDescBtn().addMouseListener(_onLoadDesc());
+            .getOpenDescBtn().addMouseListener(_onOpenDesc());
+        _mainFrame
+            .getMainPanel()
+            .getDescCtrlPanel()
+            .getSaveDescBtn().addMouseListener(_onSaveDesc());
         _mainFrame
             .getMainPanel()
             .getRunCtrlPanel()
@@ -70,7 +74,31 @@ public class GUI {
         };
     }
     
-    private MouseAdapter _onLoadDesc() {
+    private MouseAdapter _onSaveDesc() {
+        return new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    String filePath = _mainFrame
+                        .getMainPanel()
+                        .getDescCtrlPanel()
+                        .getFilePathBtn().getText();
+                    /////// for testing
+                    boolean[][] explored = new boolean[Map.DIM_I][Map.DIM_J];
+                    for (int i = 0; i < Map.DIM_I; i++) {
+                        for (int j = 0; j < Map.DIM_J; j++) {
+                            explored[i][j] = true;
+                        }
+                    }
+                    ///////
+                    Descriptor.saveToFile(filePath, _map, explored);
+                } catch (IOException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        };
+    }
+    private MouseAdapter _onOpenDesc() {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
