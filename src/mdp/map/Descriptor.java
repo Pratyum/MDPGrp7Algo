@@ -15,6 +15,54 @@ public class Descriptor {
         return rootPath + packagePath + fileName;
     }
     
+    private static String _binToHex(String bin) {
+        String result = "";
+        
+        // ensure bin length is multiples of 4
+        String fixedBin = bin;
+        for (int i = 0; i < bin.length() % 4; i++) {
+            fixedBin = "0" + fixedBin;
+        }
+        
+        // translate each blocks of 4 bits
+        for (int i = 0; i < bin.length(); i += 4) {
+            String curSection = fixedBin.substring(i, i + 4);
+            int sectionDec = 0;
+            for (int j = 0; j < curSection.length(); j++) {
+                if (curSection.charAt(curSection.length() - 1 - j) == '1') {
+                    sectionDec += Math.pow(2, j);
+                }
+            }
+            if (sectionDec > 9) {
+                // A -> F
+                result += (char) (sectionDec % 9 + 64);
+            } else {
+                // 0 -> 9
+                result += sectionDec;
+            }
+        }
+        
+        return result;
+    }
+    
+    public static String[] toHex(String desc) {
+        String[] result = new String[2];
+        int resultIndex = 0;
+        for (String curLine : desc.split("\n")) {
+            if (curLine.equals("11")) {
+                if (result[0] != null && !result[0].isEmpty()) {
+                    resultIndex++;
+                }
+            } else {
+                if (result[resultIndex] == null) result[resultIndex] = "";
+                result[resultIndex] += curLine;
+            }            
+        }
+        result[0] = _binToHex("11" + result[0] + "11");
+        result[1] = _binToHex(result[1]);
+        return result;
+    }
+    
     public static String stringify(Map map, boolean[][] explored) {
         String result = "";
         
@@ -59,6 +107,25 @@ public class Descriptor {
         
         writer.write(stringify(map, explored));
         writer.close();
+    }
+    
+    public static String readFile(String filePath) throws IOException {
+        String result = "";
+        
+        File file;
+        if (filePath.contains("\\")) {
+            file = new File(filePath);
+        } else {
+            file = new File(_getFilePath(filePath));
+        }
+        
+        try (Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNext()) {
+                result += scanner.nextLine() + "\n";
+            }
+        }
+        
+        return result;
     }
     
     public static Map parseFromFile(String filePath) throws IOException {

@@ -2,6 +2,7 @@ package mdp.communication;
 
 import java.io.IOException;
 import java.util.List;
+import mdp.map.Descriptor;
 import mdp.map.Map;
 import mdp.robot.RobotAction;
 
@@ -46,10 +47,9 @@ public class Translator {
         return result;
     }
     
-    private String _compileMap(Map map) {
-        String result = "";
-        // do stuff
-        return result;
+    private String _compileMap(Map map, boolean[][] explored) {
+        String[] hexDesc = Descriptor.toHex(Descriptor.stringify(map, explored));
+        return hexDesc[0] + "-" + hexDesc[1];
     }
     
     public void sendToArduino(List<RobotAction> actions) throws IOException {
@@ -57,12 +57,11 @@ public class Translator {
         _socketCommunicator.echo(message);
     }
     
-    public void sendToAndroid(Map map) throws IOException {
-        String message = _TO_ANDROID_MARKER + _compileMap(map);
+    public void sendToAndroid(Map map, boolean[][] explored) throws IOException {
+        String message = _TO_ANDROID_MARKER + _compileMap(map, explored);
         _socketCommunicator.echo(message);
     }
     
-    // test
     public String readFromArduino() throws IOException {
         return _socketCommunicator.read();
     }
