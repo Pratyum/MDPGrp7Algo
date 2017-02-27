@@ -1,4 +1,6 @@
+
 package mdp.common;
+
 
 public enum Direction {
     Up, Left, Down, Right;
