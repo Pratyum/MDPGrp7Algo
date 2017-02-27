@@ -175,7 +175,7 @@ public class EventHandler {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                _robotAnimation.cancel();
+                if (_robotAnimation != null) _robotAnimation.cancel();
                 _gui.getMap().clearAllHighlight();
                 _gui.update(_gui.getMap(), new Robot());
             }
