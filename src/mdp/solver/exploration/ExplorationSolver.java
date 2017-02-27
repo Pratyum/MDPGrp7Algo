@@ -49,7 +49,7 @@ public class ExplorationSolver {
         // put some blockers into the map
         simulator.addObstacle(_map);      
         System.out.println(objective_map.toString(robot));
-        
+        mapViewer.startSimulationTimer();
 	    		
 	    		//data = getDataFromRPI();
         
