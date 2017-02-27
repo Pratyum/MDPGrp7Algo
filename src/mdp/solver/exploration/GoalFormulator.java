@@ -1,10 +1,15 @@
 package mdp.solver.exploration;
 import mdp.map.Map;
 import mdp.map.Waypoint;
+import mdp.common.Vector2;
 public class GoalFormulator {
 	
-	private Waypoint frontiers;
-	private Map map;
+
+	private MapViewer mapViewer;
+	
+	public GoalFormulator(MapViewer mv){
+		mapViewer = mv;
+	}
 	
 	public void updateFrontiers(Map map){
 		
@@ -16,9 +21,11 @@ public class GoalFormulator {
 		return waypoint;
 	}
 	
-
-	
-	
-	
+	public boolean checkIfReachFinalGoal(Vector2 v){
+		return (v.i()== 13) && (v.j()== 18);
+	}
+	public boolean checkIfReachStartZone(Vector2 v){
+		return (v.i()== 1) && (v.j()== 1);
+	}
 }
 

@@ -9,7 +9,7 @@ import mdp.common.Direction;
 import mdp.map.Map;
 public class ActionFormulator {
 
-	private static LinkedList<RobotAction> robotActions= new LinkedList<>() ;
+
 	private static MapViewer mapViewer;
 
 	private static Simulator simulator;
@@ -28,72 +28,48 @@ public class ActionFormulator {
 		
 	}
 
-	public LinkedList<RobotAction> rightWallFollower(Robot robot){
-    		robotActions.clear();
-    	
-	    	view(robot);
+	public void rightWallFollower(Robot robot){
+
+	    	view(robot); // for scanning purpose
 	    	
 	    	    	if(mapViewer.checkWalkable(robot, Direction.Right)==Know.Yes){
-	    	    		robot.execute(RobotAction.RotateRight);robotActions.add(RobotAction.RotateRight);
-	    	    		robot.execute(RobotAction.MoveForward);robotActions.add(RobotAction.MoveForward);
+	    	    		robot.bufferAction(RobotAction.RotateRight);
+	    	    		robot.bufferAction(RobotAction.MoveForward);
 	    	    	}
 	    	    	else if (mapViewer.checkWalkable(robot, Direction.Right)==Know.No){
 	    	    		turnLeftTillEmpty(robot); //now didnt turn left , so execute directly
 	    	    	}
 	    	    	else if (mapViewer.checkWalkable(robot, Direction.Right)==Know.Unsure){
-	    	    		robot.execute(RobotAction.RotateRight);robotActions.add(RobotAction.RotateRight);
+	    	    		robot.bufferAction(RobotAction.RotateRight);
 	    	    		
 	    	    		view(robot);
 	    	    		
 	
 	    		    if (mapViewer.checkWalkable(robot, Direction.Up)==Know.Yes){
-	    		    		robot.execute(RobotAction.MoveForward);robotActions.add(RobotAction.MoveForward);
-	    		    	}
+	    		    		robot.bufferAction(RobotAction.MoveForward);}
 	    		    else if(mapViewer.checkWalkable(robot, Direction.Up)==Know.No){
-	    		    		robot.execute(RobotAction.RotateLeft);robotActions.add(RobotAction.RotateLeft);
+	    		    		robot.bufferAction(RobotAction.RotateLeft);
 	    		    		turnLeftTillEmpty(robot); 
 	    		    }
 	    		    	else
 	    		    		System.out.println("Error1");
 	    	    	}
 	    	    
+	    	    	
 	    	    	// if all around empty, avoid turning in a loop, find the wall directly
 	    	    	if(mapViewer.checkAllAroundEmpty(robot)==Know.Yes){
-	    	    		/*switch(robot.direction()){
-	    	    		case Right:
-	    	    			robot.execute(RobotAction.RotateLeft);
-	    	    			robot.execute(RobotAction.RotateLeft);
-	    	    			break;
-	    	    		case Left:
-	    	    			break;
-	    	    		case Up:
-	    	    			robot.execute(RobotAction.RotateLeft);
-	    	    			break;
-	    	    		case Down:
-	    	    			robot.execute(RobotAction.RotateRight);
-	    	    			break;
-	    	    
-	    	    	
-	    	    		} */
-	    	    		//go find a wall
-	    	    
-		    	    /*	while(mapViewer.checkWalkable(robot, Direction.Up)!=0 ){
-	    	    			robot.execute(RobotAction.MoveForward);
-	    	    			if(mapViewer.checkWalkable(robot, Direction.Up)==2)
-	    	    				view(robot);
-	    	    			}
-	    	    		
-		    	    	robot.execute(RobotAction.RotateLeft);
-	    	    		*/
-	    	    		robot.execute(RobotAction.RotateRight);robotActions.add(RobotAction.RotateRight);
-	    	    		robot.execute(RobotAction.MoveForward);robotActions.add(RobotAction.MoveForward);
+
+	    	    		robot.bufferAction(RobotAction.RotateRight);
+	    	    		robot.bufferAction(RobotAction.MoveForward);
 	    	    	}
 		
-    	    	return robotActions;
+    	    
 	}
 	
 	   // look through map and update 
     public static Map view(Robot robot){
+        if(robot.checkIfHavingBufferActions())
+    			robot.executeBufferActions();
         
     		SensingData s;
     		s= simulator.getSensingData(robot); 		
@@ -116,21 +92,17 @@ public class ActionFormulator {
     		check = mapViewer.checkWalkable(robot, Direction.Up);
     		
     		if(check==Know.Yes){
-    			robot.execute(RobotAction.MoveForward);robotActions.add(RobotAction.MoveForward);
+    			robot.bufferAction(RobotAction.MoveForward);
     			return;
     		}
     		
     		
     		if(check==Know.No){
-    			robot.execute(RobotAction.RotateLeft);robotActions.add(RobotAction.RotateLeft);
+    			robot.bufferAction(RobotAction.RotateLeft);
     			turnLeftTillEmpty( robot);
     			
     		}
     		
     	
     }
-    
-    
-	
-	
 }
