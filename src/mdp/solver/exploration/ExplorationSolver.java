@@ -45,7 +45,12 @@ public class ExplorationSolver {
         		actionFormulator.rightWallFollower(robot);
 	    	
         }
-        		
+        	
+        //while(mapView.exploredNotFinished())
+        //	mapView.findNearestGoal(robot)
+        //  result = AStarSolver.solve(map, robot, goal)
+        //  robot.fromPath(result.) 
+        
 	    	System.out.println("i:"+ robot.position().i());
 	    	System.out.println("j:"+ robot.position().j());
 	    	

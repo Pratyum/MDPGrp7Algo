@@ -10,8 +10,9 @@ import mdp.map.WPObstacleState;
 import mdp.map.Waypoint;
 
 public class AStarSolver {
+	
+	public AStarSolverResult solve(Map map, Robot robot, Vector2 goal) {
 
-    public AStarSolverResult solve(Map map, Robot robot) {
         AStarSolverResult result = new AStarSolverResult();
         
         // save points in map in a lookup hashtable
@@ -22,7 +23,7 @@ public class AStarSolver {
         AStarWaypoint curPoint = new AStarWaypoint(new Waypoint(robot.position()));
         
         // loop until a point next tp goal is found
-        while (AStarUtil.getMDistance(curPoint.position(), map.GOAL_POS) != 1) {
+        while (AStarUtil.getMDistance(curPoint.position(), goal) != 1) {
 //            System.out.println("Cur:");
 //            System.out.println(curPoint.position());
 
@@ -92,7 +93,7 @@ public class AStarSolver {
         }
         
         // path has been found
-        result.shortestPath.add(map.GOAL_POS);
+        result.shortestPath.add(goal);
         do {
             // save current point to result
             result.shortestPath.add(curPoint.position());
@@ -115,6 +116,11 @@ public class AStarSolver {
         });
         
         return result;
+
+	}
+
+    public AStarSolverResult solve(Map map, Robot robot) { 
+    		return solve(map, robot, map.GOAL_POS);
     }
 
 }
