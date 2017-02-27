@@ -95,7 +95,7 @@ public class MapViewer{
     }
     
     
-    public Know checkAllAroundEmpty(Robot robot){
+    public Know checkAllAroundEmpty(Robot robot) throws InterruptedException{
         if(robot.checkIfHavingBufferActions())
     			robot.executeBufferActions();
         
@@ -121,7 +121,7 @@ public class MapViewer{
     
     
     // 1 walkable, 0 not walkable, 2 need further exploration
-    public Know checkWalkable(Robot robot , Direction d){
+    public Know checkWalkable(Robot robot , Direction d) throws InterruptedException{
         if(robot.checkIfHavingBufferActions())
     			robot.executeBufferActions();
         

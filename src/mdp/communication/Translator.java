@@ -10,7 +10,7 @@ import mdp.map.Descriptor;
 import mdp.map.Map;
 import mdp.robot.RobotAction;
 
-public class Translator {
+public class Translator implements ITranslatable {
     
     
     private static final String _TO_ARDUINO_MARKER = "a";
@@ -31,6 +31,7 @@ public class Translator {
         _inputBuffer = "";
     }
 
+    @Override
     public String getInputBuffer() {
         return _inputBuffer;
     }
@@ -62,14 +63,16 @@ public class Translator {
     
     private String _compileMap(Map map, boolean[][] explored) {
         String[] hexDesc = Descriptor.toHex(Descriptor.stringify(map, explored));
-        return hexDesc[0] + "-" + hexDesc[1];
+        return hexDesc[0] + hexDesc[1];
     }
     
+    @Override
     public void sendToArduino(List<RobotAction> actions) throws IOException {
         String message = _TO_ARDUINO_MARKER + _compileActions(actions);
         _socketCommunicator.echo(message);
     }
     
+    @Override
     public void sendToAndroid(Map map, boolean[][] explored) throws IOException {
         String message = _TO_ANDROID_MARKER + _compileMap(map, explored);
         _socketCommunicator.echo(message);
@@ -79,6 +82,7 @@ public class Translator {
         return _socketCommunicator.read();
     }
     
+    @Override
     public void listen(Runnable handler) {
         new Thread() {
             @Override
@@ -96,7 +100,7 @@ public class Translator {
                                 probingTimer.cancel();
                             }
                         } catch (IOException ex) {
-                            Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(ITranslatable.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 }, 0, _PROBING_PERIOD);
