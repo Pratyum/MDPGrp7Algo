@@ -10,15 +10,21 @@ import mdp.simulation.GUI;
 
 public class Main {
     
+    public static GUI _gui;
+    
     public static void main(String[] args) throws IOException {
                 
         // run simulation
         System.out.println("Initiating GUI...");
-        GUI gui = new GUI();
+        _gui = new GUI();
         
         // connect & send string to RPi
 //        _checkRPiConnection();
 
+    }
+    
+    public static GUI getGUI() {
+        return _gui;
     }
     
     private static void _checkRPiConnection() throws IOException {

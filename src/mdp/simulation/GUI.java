@@ -17,6 +17,7 @@ import mdp.common.Vector2;
 import mdp.map.Descriptor;
 import mdp.map.WPObstacleState;
 import mdp.map.WPSpecialState;
+import mdp.solver.exploration.ExplorationSolver;
 import mdp.solver.shortestpath.AStarSolver;
 import mdp.solver.shortestpath.AStarSolverResult;
 
@@ -47,6 +48,10 @@ public class GUI {
             .getMainPanel()
             .getDescCtrlPanel()
             .getSaveDescBtn().addMouseListener(_onSaveDesc());
+        _mainFrame
+            .getMainPanel()
+            .getRunCtrlPanel()
+            .getExplorationBtn().addMouseListener(_onExploration());
         _mainFrame
             .getMainPanel()
             .getRunCtrlPanel()
@@ -115,7 +120,14 @@ public class GUI {
             }
         };
     }
-    
+    private MouseAdapter _onExploration() {
+        return new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                ExplorationSolver.main(new String[0]);
+            }
+        };
+    }
     private MouseAdapter _onShortestPath() {
         return new MouseAdapter() {
             @Override
