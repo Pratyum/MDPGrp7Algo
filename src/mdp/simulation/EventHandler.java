@@ -129,7 +129,7 @@ public class EventHandler {
             @Override
             public void mouseClicked(MouseEvent e) {
                 try {
-                    ExplorationSolver.main(new String[0]);
+                    ExplorationSolver.main(_gui.getMap());
                 } catch (InterruptedException ex) {
                     Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
                 }

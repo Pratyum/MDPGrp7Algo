@@ -7,37 +7,21 @@ import mdp.common.Vector2;
 import mdp.solver.exploration.MapViewer;
 
 public class ExplorationSolver {
-    private static Map objective_map = new Map(); // generated from map solver
+    private static Map objective_map ; // generated from map solver
     private static Map subjective_map = new Map();
     private Robot robot ;
 
-    private static Simulator simulator = new Simulator(objective_map);
+    private static Simulator simulator ;
 
     private static MapViewer mapViewer = new MapViewer();
     private static ActionFormulator actionFormulator = new ActionFormulator(mapViewer , simulator  );
     private static GoalFormulator goalFormulator = new GoalFormulator(mapViewer);
-    private static int[][] _map = 
-        {
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-        };
 
 
    
-	public static void main(String[] args) throws InterruptedException{
+	public static void main(Map map) throws InterruptedException{
+		objective_map = map;
+		simulator = new Simulator(objective_map);
 		
         Vector2 robotPos = new Vector2(1, 1);
         Direction robotDir = Direction.Down;
@@ -47,22 +31,18 @@ public class ExplorationSolver {
         int x;
         
         // put some blockers into the map
-        simulator.addObstacle(_map);      
+            
         System.out.println(objective_map.toString(robot));
-        mapViewer.startSimulationTimer();
+        
 	    		
 	    		//data = getDataFromRPI();
         
         while(!goalFormulator.checkIfReachFinalGoal(robot.position())){
-
-	    	    	actionFormulator.rightWallFollower(robot);
-	    	    	// make a call to simulator
-	    	    	
+	    	    	actionFormulator.rightWallFollower(robot);	    	    	
         }
         while(!goalFormulator.checkIfReachStartZone(robot.position())){
 
         		actionFormulator.rightWallFollower(robot);
-	    	// make a call to simulator
 	    	
         }
         		

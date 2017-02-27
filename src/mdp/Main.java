@@ -20,7 +20,7 @@ public class Main {
         _rpi = new Translator();
         
         // connect & send string to RPi
-        _listenToRPi();
+//        _listenToRPi();
 
     }
     
