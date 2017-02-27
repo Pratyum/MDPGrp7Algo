@@ -2,6 +2,7 @@ package mdp.robot;
 
 import java.util.LinkedList;
 
+import mdp.Main;
 import mdp.common.Direction;
 import mdp.common.Vector2;
 import mdp.map.Map;
@@ -52,7 +53,8 @@ public class Robot {
     		for(int i = 0 ; i <bufferedActions.size() ; i++){
     			robotAction = bufferedActions.get(i);
     			execute(robotAction);
-    			Thread.sleep(1000);
+    			Main.getGUI().update(this);
+    			Thread.sleep(100);
     		}
     		bufferedActions.clear();
     }

@@ -19,7 +19,7 @@ public class Main {
         _gui = new GUI();
         
         // connect & send string to RPi
-        _checkRPiConnection();
+        //_checkRPiConnection();
 
     }
     

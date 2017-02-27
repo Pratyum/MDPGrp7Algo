@@ -74,6 +74,8 @@ public class MapViewer{
     		return map;
     }
     
+    private static void convert
+    
     public  String exploredAreaToString(){
         String result = "";
         for (int i = -1; i <= DIM_I; i++) {
@@ -271,21 +273,23 @@ public class MapViewer{
 		
 		map.addObstacle(obstaclePositions);
 		
+		Main.getGUI().update(map);
 		return map;
 	}
 	
-	public void startSimulationTimer(){
+	/*public void startSimulationTimer(){
 		Timer timer = new Timer();
 		//create an instance of an anonymous subclass
 		timer.schedule( new TimerTask(){
 			public void run(){
 				System.out.println("I AM HERE");
 				Main.getGUI().update(map);
+				
 			}
 		}, 1000, 1000);
 	
 	}
 	
-	
+	*/
 	
 }

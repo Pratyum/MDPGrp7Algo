@@ -82,6 +82,7 @@ public class Simulator {
     }
     
     public void addObstacle(int[][] obstacleMap){
+    		
     		objective_map.addObstacle(_genBlockers(obstacleMap));
     }
 
