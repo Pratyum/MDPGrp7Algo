@@ -19,7 +19,7 @@ public class Main {
         _gui = new GUI();
         
         // connect & send string to RPi
-//        _checkRPiConnection();
+        _checkRPiConnection();
 
     }
     
@@ -35,13 +35,16 @@ public class Main {
         test.add(RobotAction.MoveBackward);
         Translator translator = new Translator();
         translator.sendToArduino(test);
+        translator.listen(() -> {
+            String inStr = translator.getInputBuffer();
+        });
         
-        while (true) {
-            String received = translator.readFromArduino();
-            if (received.length() != 0) {
-                System.out.println(received);
-            }
-        }
+//        while (true) {
+//            String received = translator.readAsString();
+//            if (received.length() != 0) {
+//                System.out.println(received);
+//            }
+//        }
     }
     
 }

@@ -2,13 +2,16 @@ package mdp.communication;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import mdp.map.Descriptor;
 import mdp.map.Map;
 import mdp.robot.RobotAction;
 
 public class Translator {
     
-    private SocketCommunicator _socketCommunicator;
     
     private static final String _TO_ARDUINO_MARKER = "a";
     private static final String _TO_ANDROID_MARKER = "b";
@@ -18,8 +21,18 @@ public class Translator {
     private static final String _ROTATE_LEFT_STR = "l";
     private static final String _ROTATE_RIGHT_STR = "r";
     
+    private static final int _PROBING_PERIOD = 200;
+    
+    private SocketCommunicator _socketCommunicator;
+    private String _inputBuffer;
+    
     public Translator() throws IOException {
         _socketCommunicator = new SocketCommunicator();
+        _inputBuffer = "";
+    }
+
+    public String getInputBuffer() {
+        return _inputBuffer;
     }
     
     private String _compileActions(List<RobotAction> actions) {
@@ -62,7 +75,32 @@ public class Translator {
         _socketCommunicator.echo(message);
     }
     
-    public String readFromArduino() throws IOException {
+    private String _readAsString() throws IOException {
         return _socketCommunicator.read();
+    }
+    
+    public void listen(Runnable handler) {
+        new Thread() {
+            @Override
+            public void run() {
+                Timer probingTimer = new Timer();
+                probingTimer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        try {
+                            String readResult = _readAsString();
+                            _inputBuffer = "";
+                            if (!readResult.isEmpty()) {
+                                _inputBuffer = readResult;
+                                handler.run();
+                                probingTimer.cancel();
+                            }
+                        } catch (IOException ex) {
+                            Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }, 0, _PROBING_PERIOD);
+            }
+        }.start();
     }
 }
