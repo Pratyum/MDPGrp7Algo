@@ -13,4 +13,5 @@ public class ColorConfig {
     public static final Color PATH = new Color(152, 251, 152);
     public static final Color OPENED = new Color(175, 238, 238);
     public static final Color CLOSED = new Color(255, 204, 102);
+    public static final Color UNOBSERVED = Color.BLACK;
 }
