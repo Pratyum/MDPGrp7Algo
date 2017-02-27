@@ -128,11 +128,14 @@ public class EventHandler {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                try {
-                    ExplorationSolver.main(_gui.getMap());
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                new Thread(() -> {
+                    try {
+                        ExplorationSolver.main(_gui.getMap());
+                        System.out.println("End of Exploration");
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }).start();
             }
         };
     }
@@ -185,7 +188,7 @@ public class EventHandler {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                _robotAnimation.cancel();
+                if (_robotAnimation != null) _robotAnimation.cancel();
                 _gui.reset();
             }
         };

@@ -7,6 +7,7 @@ import mdp.common.Direction;
 import mdp.common.Vector2;
 import mdp.map.Map;
 import java.lang.Thread;
+
 public class Robot {    
     private Vector2 _position;
     private Direction _orientation;
@@ -46,20 +47,20 @@ public class Robot {
         }
     }
     public boolean bufferAction(RobotAction action){
-    		return bufferedActions.add(action);
+        return bufferedActions.add(action);
     }
     public void executeBufferActions() throws InterruptedException{
-    		RobotAction robotAction;
-    		for(int i = 0 ; i <bufferedActions.size() ; i++){
-    			robotAction = bufferedActions.get(i);
-    			execute(robotAction);
-    			Main.getGUI().update(this);
-    			Thread.sleep(100);
-    		}
-    		bufferedActions.clear();
+        RobotAction robotAction;
+        for(int i = 0 ; i <bufferedActions.size() ; i++){
+            robotAction = bufferedActions.get(i);
+            execute(robotAction);
+            Main.getGUI().update(this);
+            Thread.sleep(100);
+        }
+        bufferedActions.clear();
     }
     
     public boolean checkIfHavingBufferActions(){
-    		return !bufferedActions.isEmpty();
+        return !bufferedActions.isEmpty();
     }
 }

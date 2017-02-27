@@ -98,50 +98,58 @@ public class GridContainer extends JPanel {
             // actual obstacle
             curKey = curPoint.position().toString();
             
+            boolean isUnexplored = false;
             if (curPoint.specialState().equals(WPSpecialState.IsUnexplored)) {
                 result.put(curKey, _resolveColor(curKey, ColorConfig.UNOBSERVED, result));
-            } else if (curPoint.obstacleState().equals(WPObstacleState.IsActualObstacle)) {
+                isUnexplored = true;
+            }
+            if (curPoint.obstacleState().equals(WPObstacleState.IsActualObstacle)) {
                 result.put(curKey, _resolveColor(curKey, ColorConfig.OBSTACLE, result));
-                
-                // 3x3
-                switch (curPoint.specialState()) {
-                    case IsStart:
-                        for (Vector2 curPos : _gen3x3(curPoint.position())) {
-                            curKey = curPos.toString();
-                            result.put(curKey, _resolveColor(curKey, ColorConfig.START, result));
-                        }
-                        break;
-                    case IsGoal:
-                        for (Vector2 curPos : _gen3x3(curPoint.position())) {
-                            curKey = curPos.toString();
-                            result.put(curKey, _resolveColor(curKey, ColorConfig.GOAL, result));
-                        }
-                        break;
-                    case IsPathPoint:
+            }
+            // 3x3
+            switch (curPoint.specialState()) {
+                case IsStart:
+                    for (Vector2 curPos : _gen3x3(curPoint.position())) {
+                        curKey = curPos.toString();
+                        result.put(curKey, _resolveColor(curKey, ColorConfig.START, result));
+                    }
+                    break;
+                case IsGoal:
+                    for (Vector2 curPos : _gen3x3(curPoint.position())) {
+                        curKey = curPos.toString();
+                        result.put(curKey, _resolveColor(curKey, ColorConfig.GOAL, result));
+                    }
+                    break;
+                case IsPathPoint:
+                    if (!isUnexplored) {
                         curKey = curPoint.position().toString();
                         result.put(curKey, _resolveColor(curKey, ColorConfig.PATH, result));
-                        break;
-                    case IsClosedPoint:
+                    }
+                    break;
+                case IsClosedPoint:
+                    if (!isUnexplored) {
                         curKey = curPoint.position().toString();
                         result.put(curKey, _resolveColor(curKey, ColorConfig.CLOSED, result));
-                        break;
-                    case IsOpenedPoint:
+                    }
+                    break;
+                case IsOpenedPoint:
+                    if (!isUnexplored) {
                         curKey = curPoint.position().toString();
                         result.put(curKey, _resolveColor(curKey, ColorConfig.OPENED, result));
-                        break;
-                }
-                // robot
-                if (curPoint.position().equals(robot.position())) {
-                    for (Vector2 curPos : _gen3x3(curPoint.position())) {
-                        Color robotSqColor = ColorConfig.ROBOT_BODY;
-                        if (robot.position()
-                                .fnAdd(robot.orientation().toVector2())
-                                .equals(curPos)) {
-                            robotSqColor = ColorConfig.ROBOT_HEAD;
-                        }
-                        curKey = curPos.toString();
-                        result.put(curKey, _resolveColor(curKey, robotSqColor, result));
                     }
+                    break;
+            }
+            // robot
+            if (curPoint.position().equals(robot.position())) {
+                for (Vector2 curPos : _gen3x3(curPoint.position())) {
+                    Color robotSqColor = ColorConfig.ROBOT_BODY;
+                    if (robot.position()
+                            .fnAdd(robot.orientation().toVector2())
+                            .equals(curPos)) {
+                        robotSqColor = ColorConfig.ROBOT_HEAD;
+                    }
+                    curKey = curPos.toString();
+                    result.put(curKey, _resolveColor(curKey, robotSqColor, result));
                 }
             }
             

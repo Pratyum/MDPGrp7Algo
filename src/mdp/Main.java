@@ -17,7 +17,7 @@ public class Main {
         // run simulation
         System.out.println("Initiating GUI...");
         _gui = new GUI();
-        _rpi = new Translator();
+//        _rpi = new Translator();
         
         // connect & send string to RPi
 //        _listenToRPi();
