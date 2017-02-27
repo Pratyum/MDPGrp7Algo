@@ -1,5 +1,7 @@
 package mdp.robot;
 
+import java.util.LinkedList;
+
 import mdp.common.Direction;
 import mdp.common.Vector2;
 import mdp.map.Map;
@@ -9,6 +11,7 @@ public class Robot {
     private Direction _orientation;
     private Direction _direction;
     private Map pathMap;
+    private static LinkedList<RobotAction> bufferedActions= new LinkedList<>() ;
     
     public Robot() {
         this(new Vector2(1, 1), Direction.Right);
@@ -40,5 +43,20 @@ public class Robot {
                 _orientation = _orientation.getRight();
                 break;
         }
+    }
+    public boolean bufferAction(RobotAction action){
+    		return bufferedActions.add(action);
+    }
+    public void executeBufferActions(){
+    		RobotAction robotAction;
+    		for(int i = 0 ; i <bufferedActions.size() ; i++){
+    			robotAction = bufferedActions.get(i);
+    			execute(robotAction);
+    		}
+    		bufferedActions.clear();
+    }
+    
+    public boolean checkIfHavingBufferActions(){
+    		return !bufferedActions.isEmpty();
     }
 }

@@ -1,5 +1,8 @@
 package mdp.solver.exploration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import mdp.common.Direction;
 
 import mdp.map.Map;
@@ -11,7 +14,7 @@ public class Simulator {
 
 	private static Map objective_map;
 	private static SensingData s = new SensingData();
-	public void initializeMap(Map map){
+	public  Simulator(Map map){
 		objective_map = map;
 		 
 	}
@@ -65,9 +68,22 @@ public class Simulator {
 			return 0; // no obstacle in front
 			
 		}
+	
+    private static List<Vector2> _genBlockers(int[][] obstacleMap) {
+        List<Vector2> blockers = new ArrayList<>();
+        for (int i = 0; i < obstacleMap.length; i++) {
+            for (int j = 0; j < obstacleMap[0].length; j++) {
+                if (obstacleMap[i][j] == 1) {
+                    blockers.add(new Vector2(i, j));
+                }
+            }
+        }
+        return blockers;
+    }
+    
+    public void addObstacle(int[][] obstacleMap){
+    		objective_map.addObstacle(_genBlockers(obstacleMap));
+    }
 
-	
-	
-	
 }
 

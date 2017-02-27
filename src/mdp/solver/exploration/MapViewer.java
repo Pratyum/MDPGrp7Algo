@@ -72,7 +72,7 @@ public class MapViewer{
     		return map;
     }
     
-    public static String exploredAreaToString(){
+    public  String exploredAreaToString(){
         String result = "";
         for (int i = -1; i <= DIM_I; i++) {
             for (int j = -1; j <= DIM_J; j++) {
@@ -95,6 +95,10 @@ public class MapViewer{
     
     
     public Know checkAllAroundEmpty(Robot robot){
+        if(robot.checkIfHavingBufferActions())
+    			robot.executeBufferActions();
+        
+    		
     		Know l ,r , b ,f;
     		
     		l =checkWalkable(robot ,  Direction.Left);
@@ -117,6 +121,9 @@ public class MapViewer{
     
     // 1 walkable, 0 not walkable, 2 need further exploration
     public Know checkWalkable(Robot robot , Direction d){
+        if(robot.checkIfHavingBufferActions())
+    			robot.executeBufferActions();
+        
     		
     		Vector2 edge1, edge2, edge3;
     		int s1,s2,s3;
