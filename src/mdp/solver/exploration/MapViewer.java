@@ -4,9 +4,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import mdp.common.Console;
 import mdp.map.Map;
+import mdp.map.WPSpecialState;
 import mdp.robot.Robot;
 import mdp.common.Vector2;
 import mdp.map.Waypoint;
@@ -74,7 +76,16 @@ public class MapViewer{
     		return map;
     }
     
-    private static void convert
+    private static void insertExploredIntoMap(){
+    		LinkedList<Vector2> listOfObserved = new LinkedList<>();
+    		for(int i =0 ; i < 15 ; i++){
+    			for(int j=0; j<19 ; j++){
+    				if(explored[i][j]>0)
+    					listOfObserved.add(new Vector2(i,j));
+    			}
+    		}
+    		map.highlight(listOfObserved,WPSpecialState.IsExplored);
+    }
     
     public  String exploredAreaToString(){
         String result = "";
@@ -272,7 +283,7 @@ public class MapViewer{
 		
 		
 		map.addObstacle(obstaclePositions);
-		
+		insertExploredIntoMap();
 		Main.getGUI().update(map);
 		return map;
 	}
