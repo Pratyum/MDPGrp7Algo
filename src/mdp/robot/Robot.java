@@ -41,4 +41,9 @@ public class Robot {
                 break;
         }
     }
+    public boolean bufferAction(RobotAction action){
+    		
+    	
+    }
+    
 }
