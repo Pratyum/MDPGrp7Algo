@@ -204,5 +204,8 @@ public class GUI {
     public void update(Map map) {
         update(map, _robot);
     }
+    public void update(Robot robot) {
+        update(_map, robot);
+    }
     
 }
