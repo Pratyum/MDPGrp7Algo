@@ -1,6 +1,7 @@
 package mdp.solver.exploration;
 import java.util.List;
-
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -95,7 +96,7 @@ public class MapViewer{
     }
     
     
-    public Know checkAllAroundEmpty(Robot robot){
+    public Know checkAllAroundEmpty(Robot robot) throws InterruptedException{
         if(robot.checkIfHavingBufferActions())
     			robot.executeBufferActions();
         
@@ -121,7 +122,7 @@ public class MapViewer{
     
     
     // 1 walkable, 0 not walkable, 2 need further exploration
-    public Know checkWalkable(Robot robot , Direction d){
+    public Know checkWalkable(Robot robot , Direction d) throws InterruptedException{
         if(robot.checkIfHavingBufferActions())
     			robot.executeBufferActions();
         
@@ -258,6 +259,7 @@ public class MapViewer{
 			}
 			markExploredObstacle(edge_r.fnAdd(robot.orientation().getRight().toVector2().fnMultiply(i)));
 		}
+		
 		else{
 			for(i=1; i<=3; i++){
 				markExploredEmpty(edge_r.fnAdd(robot.orientation().getRight().toVector2().fnMultiply(i)));
@@ -269,11 +271,21 @@ public class MapViewer{
 		
 		map.addObstacle(obstaclePositions);
 		
-		
-		
-		Main.getGUI().update(map);
-		
 		return map;
 	}
+	
+	public void startSimulationTimer(){
+		Timer timer = new Timer();
+		//create an instance of an anonymous subclass
+		timer.schedule( new TimerTask(){
+			public void run(){
+				System.out.println("I AM HERE");
+				Main.getGUI().update(map);
+			}
+		}, 1000, 1000);
+	
+	}
+	
+	
 	
 }

@@ -37,7 +37,7 @@ public class ExplorationSolver {
 
 
    
-	public static void main(String[] args){
+	public static void main(String[] args) throws InterruptedException{
 		
         Vector2 robotPos = new Vector2(1, 1);
         Direction robotDir = Direction.Down;
@@ -49,7 +49,7 @@ public class ExplorationSolver {
         // put some blockers into the map
         simulator.addObstacle(_map);      
         System.out.println(objective_map.toString(robot));
-        
+        mapViewer.startSimulationTimer();
 	    		
 	    		//data = getDataFromRPI();
         

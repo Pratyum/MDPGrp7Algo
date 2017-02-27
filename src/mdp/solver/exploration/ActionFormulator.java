@@ -28,7 +28,7 @@ public class ActionFormulator {
 		
 	}
 
-	public void rightWallFollower(Robot robot){
+	public void rightWallFollower(Robot robot) throws InterruptedException{
 
 	    	view(robot); // for scanning purpose
 	    	
@@ -67,7 +67,7 @@ public class ActionFormulator {
 	}
 	
 	   // look through map and update 
-    public static Map view(Robot robot){
+    public static Map view(Robot robot) throws InterruptedException{
         if(robot.checkIfHavingBufferActions())
     			robot.executeBufferActions();
         
@@ -80,7 +80,7 @@ public class ActionFormulator {
 	    	return subjective_map;
     }
     
-    public static void turnLeftTillEmpty(Robot robot){
+    public static void turnLeftTillEmpty(Robot robot) throws InterruptedException{
     	
     		Know check = mapViewer.checkWalkable(robot, Direction.Up);
 

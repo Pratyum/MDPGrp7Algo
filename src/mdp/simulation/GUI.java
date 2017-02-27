@@ -124,7 +124,12 @@ public class GUI {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                ExplorationSolver.main(new String[0]);
+                try {
+					ExplorationSolver.main(new String[0]);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
             }
         };
     }
