@@ -14,7 +14,7 @@ public class ExplorationSolver {
     private static Simulator simulator ;
 
     private static MapViewer mapViewer = new MapViewer();
-    private static ActionFormulator actionFormulator = new ActionFormulator(mapViewer , simulator  );
+    private static ActionFormulator actionFormulator ;
     private static GoalFormulator goalFormulator = new GoalFormulator(mapViewer);
 
 
@@ -26,7 +26,7 @@ public class ExplorationSolver {
         Vector2 robotPos = new Vector2(1, 1);
         Direction robotDir = Direction.Down;
         Robot robot = new Robot(robotPos, robotDir);
-        
+        actionFormulator = new ActionFormulator(mapViewer , simulator  );
         SensingData s; 
         int x;
         
