@@ -10,6 +10,7 @@ import mdp.robot.Robot;
 import mdp.common.Vector2;
 import mdp.map.Waypoint;
 import mdp.common.Direction;
+import mdp.Main;
 public class MapViewer{
 	
 	private static Map map;
@@ -267,6 +268,10 @@ public class MapViewer{
 		
 		
 		map.addObstacle(obstaclePositions);
+		
+		
+		
+		Main.getGUI().update(map);
 		
 		return map;
 	}
