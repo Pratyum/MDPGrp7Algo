@@ -2,7 +2,9 @@ package mdp.simulation;
 
 import java.awt.Color;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 public class RunControlPanel extends JPanel {
     
@@ -11,6 +13,7 @@ public class RunControlPanel extends JPanel {
     private JButton _explorationBtn;
     private JButton _shortestPathBtn;
     private JButton _combinedBtn;
+    private JTextField _exePeriod;
     
     public RunControlPanel() {
         // config
@@ -20,9 +23,14 @@ public class RunControlPanel extends JPanel {
         _explorationBtn = new JButton("Exploration");
         _shortestPathBtn = new JButton("Shortest Path");
         _combinedBtn = new JButton("Combined");
+        _exePeriod = new JTextField("500", 5);
         this.add(_explorationBtn);
         this.add(_shortestPathBtn);
         this.add(_combinedBtn);
+        this.add(_exePeriod);
+        JLabel exePeriodLabel = new JLabel("s/action");
+        exePeriodLabel.setForeground(Color.WHITE);
+        this.add(exePeriodLabel);
     }
     
     public JButton getExplorationBtn() {
@@ -35,6 +43,10 @@ public class RunControlPanel extends JPanel {
 
     public JButton getCombinedBtn() {
         return _combinedBtn;
+    }
+
+    public JTextField getExePeriod() {
+        return _exePeriod;
     }
     
 }

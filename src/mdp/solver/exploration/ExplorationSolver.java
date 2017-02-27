@@ -17,8 +17,11 @@ public class ExplorationSolver {
     private static MapViewer mapViewer = new MapViewer();
     private static ActionFormulator actionFormulator;
     private static GoalFormulator goalFormulator = new GoalFormulator(mapViewer);
+    
+    private static int _exePeriod;
 
-    public static void main(Map map) throws InterruptedException {
+    public static void main(Map map, int exePeriod) throws InterruptedException {
+        _exePeriod = exePeriod;
         objective_map = map;
         simulator = new Simulator(objective_map);
 
@@ -49,6 +52,10 @@ public class ExplorationSolver {
         System.out.println("i:" + robot.position().i());
         System.out.println("j:" + robot.position().j());
 
+    }
+
+    public static int getExePeriod() {
+        return _exePeriod;
     }
 
 }

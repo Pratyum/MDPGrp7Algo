@@ -49,13 +49,11 @@ public class Robot {
     public boolean bufferAction(RobotAction action){
         return bufferedActions.add(action);
     }
-    public void executeBufferActions() throws InterruptedException{
-        RobotAction robotAction;
-        for(int i = 0 ; i <bufferedActions.size() ; i++){
-            robotAction = bufferedActions.get(i);
-            execute(robotAction);
+    public void executeBufferActions(int sleepPeriod) throws InterruptedException {
+        for (RobotAction action: bufferedActions) {
+            execute(action);
             Main.getGUI().update(this);
-            Thread.sleep(100);
+            Thread.sleep(sleepPeriod);
         }
         bufferedActions.clear();
     }

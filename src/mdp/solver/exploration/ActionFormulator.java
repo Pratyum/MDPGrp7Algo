@@ -65,7 +65,7 @@ public class ActionFormulator {
     // look through map and update 
     public static Map view(Robot robot) throws InterruptedException {
         if (robot.checkIfHavingBufferActions()) {
-            robot.executeBufferActions();
+            robot.executeBufferActions(ExplorationSolver.getExePeriod());
         }
 
         SensingData s;

@@ -24,7 +24,8 @@ import mdp.solver.shortestpath.AStarSolverResult;
 public class EventHandler {
     
     private IGUIControllable _gui;
-    private Timer _robotAnimation;
+    private Timer _shortestPathThread;
+    private Thread _explorationThread;
 
     public EventHandler(IGUIControllable gui) {
         _gui = gui;
@@ -128,14 +129,21 @@ public class EventHandler {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                new Thread(() -> {
+                _explorationThread = new Thread(() -> {
                     try {
-                        ExplorationSolver.main(_gui.getMap());
+                        int exePeriod = Integer.parseInt(
+                            _gui.getMainFrame()
+                                .getMainPanel()
+                                .getRunCtrlPanel()
+                                .getExePeriod().getText()
+                        );
+                        ExplorationSolver.main(_gui.getMap(), exePeriod);
                         System.out.println("End of Exploration");
                     } catch (InterruptedException ex) {
                         Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                }).start();
+                });
+                _explorationThread.start();
             }
         };
     }
@@ -151,18 +159,25 @@ public class EventHandler {
                 LinkedList<RobotAction> actions = RobotAction
                                 .fromPath(_gui.getRobot(), solveResult.shortestPath);
 
-                _robotAnimation = new Timer();
-                _robotAnimation.schedule(new TimerTask() {
+                int exePeriod = Integer.parseInt(
+                    _gui.getMainFrame()
+                        .getMainPanel()
+                        .getRunCtrlPanel()
+                        .getExePeriod().getText()
+                );
+                _shortestPathThread = new Timer();
+                _shortestPathThread.schedule(new TimerTask() {
                     @Override
                     public void run() {
                         if (!actions.isEmpty()) {
                             _gui.getRobot().execute(actions.pop());
                             _gui.update(_gui.getMap(), _gui.getRobot());
                         } else {
+                            System.out.println("End of Shortest Path");
                             this.cancel();
                         }
                     }
-                }, 200, 200);
+                }, exePeriod, exePeriod);
             }
         };
     }
@@ -178,7 +193,8 @@ public class EventHandler {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (_robotAnimation != null) _robotAnimation.cancel();
+                if (_shortestPathThread != null) _shortestPathThread.cancel();
+                if (_explorationThread != null) _explorationThread.interrupt();
                 _gui.getMap().clearAllHighlight();
                 _gui.update(_gui.getMap(), new Robot());
             }
@@ -188,7 +204,8 @@ public class EventHandler {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (_robotAnimation != null) _robotAnimation.cancel();
+                if (_shortestPathThread != null) _shortestPathThread.cancel();
+                if (_explorationThread != null) _explorationThread.interrupt();
                 _gui.reset();
             }
         };
