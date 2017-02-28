@@ -99,11 +99,13 @@ public class GridContainer extends JPanel {
             curKey = curPoint.position().toString();
             
             boolean isUnexplored = false;
-            if (!curPoint.specialState().equals(WPSpecialState.IsExplored) &&
-                !curPoint.specialState().equals(WPSpecialState.IsStart) &&
-                !curPoint.specialState().equals(WPSpecialState.IsGoal)) {
-                result.put(curKey, _resolveColor(curKey, ColorConfig.UNEXPLORED, result));
-                isUnexplored = true;
+            if (!EventHandler.isShortestPath) {
+                if (!curPoint.specialState().equals(WPSpecialState.IsExplored) &&
+                    !curPoint.specialState().equals(WPSpecialState.IsStart) &&
+                    !curPoint.specialState().equals(WPSpecialState.IsGoal)) {
+                    result.put(curKey, _resolveColor(curKey, ColorConfig.UNEXPLORED, result));
+                    isUnexplored = true;
+                }
             }
             if (curPoint.obstacleState().equals(WPObstacleState.IsActualObstacle)) {
                 result.put(curKey, _resolveColor(curKey, ColorConfig.OBSTACLE, result));
