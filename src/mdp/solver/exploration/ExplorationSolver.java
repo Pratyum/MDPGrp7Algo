@@ -4,20 +4,17 @@ import mdp.common.Direction;
 import mdp.map.Map;
 import mdp.robot.Robot;
 import mdp.common.Vector2;
-import mdp.solver.exploration.MapViewer;
 
 public class ExplorationSolver {
 
     private static Map objective_map; // generated from map solver
-    private static Map subjective_map = new Map();
-    private Robot robot;
 
     private static Simulator simulator;
 
     private static MapViewer mapViewer = new MapViewer();
     private static ActionFormulator actionFormulator;
     private static GoalFormulator goalFormulator = new GoalFormulator(mapViewer);
-    
+
     private static int _exePeriod;
 
     public static void main(Map map, int exePeriod) throws InterruptedException {
@@ -45,10 +42,6 @@ public class ExplorationSolver {
 
         }
 
-        //while(mapView.exploredNotFinished())
-        //	mapView.findNearestGoal(robot)
-        //  result = AStarSolver.solve(map, robot, goal)
-        //  robot.fromPath(result.) 
         System.out.println("i:" + robot.position().i());
         System.out.println("j:" + robot.position().j());
 
@@ -56,6 +49,10 @@ public class ExplorationSolver {
 
     public static int getExePeriod() {
         return _exePeriod;
+    }
+
+    public static MapViewer getMapViewer() {
+        return mapViewer;
     }
 
 }

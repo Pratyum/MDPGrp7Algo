@@ -9,8 +9,4 @@ public class SensingData {
     public int left = 0;
     public int right = 0;
 
-    SensingData() {
-
-    }
-
 }

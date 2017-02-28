@@ -23,7 +23,7 @@ public class RunControlPanel extends JPanel {
         _explorationBtn = new JButton("Exploration");
         _shortestPathBtn = new JButton("Shortest Path");
         _combinedBtn = new JButton("Combined");
-        _exePeriod = new JTextField("500", 5);
+        _exePeriod = new JTextField("100", 5);
         this.add(_explorationBtn);
         this.add(_shortestPathBtn);
         this.add(_combinedBtn);

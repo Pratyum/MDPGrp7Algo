@@ -4,8 +4,6 @@ import mdp.map.Waypoint;
 import mdp.robot.Robot;
 import mdp.robot.RobotAction;
 
-import java.util.LinkedList;
-
 import mdp.common.Direction;
 import mdp.map.Map;
 
@@ -33,23 +31,37 @@ public class ActionFormulator {
 
         view(robot); // for scanning purpose
 
-        if (mapViewer.checkWalkable(robot, Direction.Right) == Know.Yes) {
-            robot.bufferAction(RobotAction.RotateRight);
-            robot.bufferAction(RobotAction.MoveForward);
-        } else if (mapViewer.checkWalkable(robot, Direction.Right) == Know.No) {
-            turnLeftTillEmpty(robot); //now didnt turn left , so execute directly
-        } else if (mapViewer.checkWalkable(robot, Direction.Right) == Know.Unsure) {
-            robot.bufferAction(RobotAction.RotateRight);
-
-            view(robot);
-
-            if (mapViewer.checkWalkable(robot, Direction.Up) == Know.Yes) {
-                robot.bufferAction(RobotAction.MoveForward);
-            } else if (mapViewer.checkWalkable(robot, Direction.Up) == Know.No) {
-                robot.bufferAction(RobotAction.RotateLeft);
-                turnLeftTillEmpty(robot);
-            } else {
-                System.out.println("Error1");
+        if (null != mapViewer.checkWalkable(robot, Direction.Right)) {
+            switch (mapViewer.checkWalkable(robot, Direction.Right)) {
+                case Yes:
+                    robot.bufferAction(RobotAction.RotateRight);
+                    robot.bufferAction(RobotAction.MoveForward);
+                    break;
+                case No:
+                    turnLeftTillEmpty(robot); //now didnt turn left , so execute directly
+                    break;
+                case Unsure:
+                    robot.bufferAction(RobotAction.RotateRight);
+                    view(robot);
+                    if (null == mapViewer.checkWalkable(robot, Direction.Up)) {
+                        System.out.println("Error1");
+                    } else {
+                        switch (mapViewer.checkWalkable(robot, Direction.Up)) {
+                            case Yes:
+                                robot.bufferAction(RobotAction.MoveForward);
+                                break;
+                            case No:
+                                robot.bufferAction(RobotAction.RotateLeft);
+                                turnLeftTillEmpty(robot);
+                                break;
+                            default:
+                                System.out.println("Error1");
+                                break;
+                        }
+                    }
+                    break;
+                default:
+                    break;
             }
         }
 

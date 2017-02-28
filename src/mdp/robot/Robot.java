@@ -6,7 +6,6 @@ import mdp.Main;
 import mdp.common.Direction;
 import mdp.common.Vector2;
 import mdp.map.Map;
-import java.lang.Thread;
 
 public class Robot {    
     private Vector2 _position;

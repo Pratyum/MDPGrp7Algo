@@ -1,33 +1,24 @@
 package mdp.solver.exploration;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import mdp.common.Console;
 import mdp.map.Map;
 import mdp.map.WPSpecialState;
 import mdp.robot.Robot;
 import mdp.common.Vector2;
-import mdp.map.Waypoint;
 import mdp.common.Direction;
 import mdp.Main;
 
 public class MapViewer {
 
-    private static Map map;
-    private int detectRange;  //default to 3
-    private float[] front_sensors;
-    private float left_sensor;
-    private float right_sensor;
+    private Map map;
     public static final int DIM_I = 15;
     public static final int DIM_J = 20;
 
     //1 empty, 2 obstacle, 0 havent explored
-    private static int[][] explored = {
+    private int[][] explored = {
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -49,12 +40,20 @@ public class MapViewer {
         map = new Map();
     }
 
-    private static void markExploredEmpty(Vector2 v) {
+    public int[][] getExplored() {
+        return explored;
+    }
+
+    public Map getMap() {
+        return map;
+    }
+
+    private void markExploredEmpty(Vector2 v) {
 
         explored[v.i()][v.j()] = 1;
     }
 
-    private static void markExploredObstacle(Vector2 v) {
+    private void markExploredObstacle(Vector2 v) {
 
         if (map.checkValidBoundary(v)) //prevent it being a wall , out of bound array
         {
@@ -62,12 +61,12 @@ public class MapViewer {
         }
     }
 
-    private static void markExploredDirectEmpty(int i, int j) {
+    private void markExploredDirectEmpty(int i, int j) {
 
         explored[i][j] = 1;
     }
 
-    private static int checkExploredState(Vector2 v) {
+    private int checkExploredState(Vector2 v) {
         if (!map.checkValidBoundary(v)) {
             return 2;
         }
@@ -79,7 +78,7 @@ public class MapViewer {
         return map;
     }
 
-    private static void insertExploredIntoMap() {
+    private void insertExploredIntoMap() {
         LinkedList<Vector2> listOfObserved = new LinkedList<>();
         for (int i = 0; i < 15; i++) {
             for (int j = 0; j < 19; j++) {
@@ -98,12 +97,16 @@ public class MapViewer {
                 if (i == -1 || j == -1 || i == DIM_I || j == DIM_J) {
                     result += "# ";
                 } else {
-                    if (explored[i][j] == 0) {
-                        result += "0 ";
-                    } else if (explored[i][j] == 2) {
-                        result += "x ";
-                    } else {
-                        result += "  ";
+                    switch (explored[i][j]) {
+                        case 0:
+                            result += "0 ";
+                            break;
+                        case 2:
+                            result += "x ";
+                            break;
+                        default:
+                            result += "  ";
+                            break;
                     }
                 }
             }
@@ -284,19 +287,4 @@ public class MapViewer {
         Main.getGUI().update(map);
         return map;
     }
-
-    /*public void startSimulationTimer(){
-		Timer timer = new Timer();
-		//create an instance of an anonymous subclass
-		timer.schedule( new TimerTask(){
-			public void run(){
-				System.out.println("I AM HERE");
-				Main.getGUI().update(map);
-				
-			}
-		}, 1000, 1000);
-	
-	}
-	
-     */
 }

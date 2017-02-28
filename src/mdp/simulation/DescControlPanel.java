@@ -12,18 +12,21 @@ public class DescControlPanel extends JPanel {
     private JTextField _filePathBtn;
     private JButton _openDescBtn;
     private JButton _saveDescBtn;
+    private JButton _getHexBtn;
     
     public DescControlPanel() {
         // config
         this.setBackground(_BG_COLOR);
         
         // children
-        _filePathBtn = new JTextField("descriptor.txt", 40);
+        _filePathBtn = new JTextField("descriptor.txt", 30);
         _openDescBtn = new JButton("Open");
         _saveDescBtn = new JButton("Save");
+        _getHexBtn = new JButton("Get Hex");
         this.add(_filePathBtn);
         this.add(_openDescBtn);
         this.add(_saveDescBtn);
+        this.add(_getHexBtn);
     }
 
     public JTextField getFilePathBtn() {
@@ -36,6 +39,10 @@ public class DescControlPanel extends JPanel {
 
     public JButton getSaveDescBtn() {
         return _saveDescBtn;
+    }
+
+    public JButton getGetHexBtn() {
+        return _getHexBtn;
     }
     
 }

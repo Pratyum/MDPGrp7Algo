@@ -20,7 +20,7 @@ public class Descriptor {
         
         // ensure bin length is multiples of 4
         String fixedBin = bin;
-        for (int i = 0; i < bin.length() % 4; i++) {
+        while (fixedBin.length() % 4 != 0) {
             fixedBin = "0" + fixedBin;
         }
         
@@ -63,6 +63,37 @@ public class Descriptor {
         return result;
     }
     
+    public static String stringify(Map map, int[][] explored) {
+        String result = "";
+        
+        result += "11\n";
+        
+        int[] descRowLength = new int[Map.DIM_J];
+        for (int descI = 0; descI < Map.DIM_J; descI++) {
+            descRowLength[descI] = 0;
+        }
+        
+        for (int descI = 0; descI < Map.DIM_J; descI++) {
+            for (int descJ = 0; descJ < Map.DIM_I; descJ++) {
+                result += explored[descJ][descI] >= 1 ? "1" : "0";
+                descRowLength[descI] += explored[descJ][descI] >= 1 ? 1 : 0;
+            }
+            result += "\n";
+        }
+        
+        result += "11\n";
+        
+        for (int descI = 0; descI < Map.DIM_J; descI++) {
+            for (int descJ = 0; descJ < descRowLength[descI]; descJ++) {
+                boolean isObstacle = explored[Map.DIM_I - 1 - descJ][Map.DIM_J - 1 - descI] == 2;
+                result += isObstacle ? "1" : "0";
+            }
+            result += "\n";
+        }
+        
+        return result;
+    }
+    
     public static String stringify(Map map, boolean[][] explored) {
         String result = "";
         
@@ -85,8 +116,9 @@ public class Descriptor {
         
         for (int descI = 0; descI < Map.DIM_J; descI++) {
             for (int descJ = 0; descJ < descRowLength[descI]; descJ++) {
+//                System.out.println(new Vector2(Map.DIM_J - 1 - descJ, Map.DIM_I - 1 - descI));
                 boolean isObstacle = map
-                    .getPoint(new Vector2(descJ, descI))
+                    .getPoint(new Vector2(Map.DIM_I - 1 - descJ, Map.DIM_J - 1 - descI))
                         .obstacleState().equals(WPObstacleState.IsActualObstacle);
                 result += isObstacle ? "1" : "0";
             }
@@ -164,7 +196,10 @@ public class Descriptor {
                 for (int descJ = 0; descJ < curLine.length(); descJ++) {
                     if (curLine.charAt(descJ) == '1') {
                         Vector2 descPos = descRow.get(descJ);
-                        result.addObstacle(new Vector2(descPos.j(), descPos.i()));
+                        result.addObstacle(new Vector2(
+                            Map.DIM_I - 1 - descPos.j(),
+                            Map.DIM_J - 1 - descPos.i()
+                        ));
                     }
                 }
             });

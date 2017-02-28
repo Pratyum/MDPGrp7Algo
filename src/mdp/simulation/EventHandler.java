@@ -49,6 +49,10 @@ public class EventHandler {
             .getMainPanel()
             .getDescCtrlPanel()
             .getSaveDescBtn().addMouseListener(_onSaveDesc());
+        _gui.getMainFrame()
+            .getMainPanel()
+            .getDescCtrlPanel()
+            .getGetHexBtn().addMouseListener(_onGetHex());
         
         // run control event
         _gui.getMainFrame()
@@ -122,6 +126,25 @@ public class EventHandler {
                 } catch (IOException ex) {
                     Logger.getLogger(IGUIControllable.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            }
+        };
+    }
+    private MouseAdapter _onGetHex() {
+        return new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Map map = ExplorationSolver.getMapViewer().getMap();
+                int[][] explored = ExplorationSolver.getMapViewer().getExplored();
+                
+                String descStr = Descriptor.stringify(map, explored);
+                String content = String.join("\n", Descriptor.toHex(descStr));
+                
+                System.out.println(map.toString(new Robot()));
+                
+                HexFrame hexFrame = new HexFrame();
+                hexFrame
+                    .getHexFramePanel()
+                    .getHexTextArea().setText(content);
             }
         };
     }
