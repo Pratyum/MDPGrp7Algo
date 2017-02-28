@@ -14,8 +14,6 @@ import mdp.Main;
 public class MapViewer {
 
     private Map map;
-    public static final int DIM_I = 15;
-    public static final int DIM_J = 20;
 
     //1 empty, 2 obstacle, 0 havent explored
     private int[][] explored = {
@@ -80,8 +78,8 @@ public class MapViewer {
 
     private void insertExploredIntoMap() {
         LinkedList<Vector2> listOfObserved = new LinkedList<>();
-        for (int i = 0; i < 15; i++) {
-            for (int j = 0; j < 19; j++) {
+        for (int i = 0; i < Map.DIM_I; i++) {
+            for (int j = 0; j < Map.DIM_J; j++) {
                 if (explored[i][j] > 0) {
                     listOfObserved.add(new Vector2(i, j));
                 }
@@ -92,9 +90,9 @@ public class MapViewer {
 
     public String exploredAreaToString() {
         String result = "";
-        for (int i = -1; i <= DIM_I; i++) {
-            for (int j = -1; j <= DIM_J; j++) {
-                if (i == -1 || j == -1 || i == DIM_I || j == DIM_J) {
+        for (int i = -1; i <= Map.DIM_I; i++) {
+            for (int j = -1; j <= Map.DIM_J; j++) {
+                if (i == -1 || j == -1 || i == Map.DIM_I || j == Map.DIM_J) {
                     result += "# ";
                 } else {
                     switch (explored[i][j]) {

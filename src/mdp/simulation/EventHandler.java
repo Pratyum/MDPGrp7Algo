@@ -109,6 +109,8 @@ public class EventHandler {
                 } catch (IOException ex) {
                     Logger.getLogger(IGUIControllable.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                
+                System.out.println("Save desc completed.");
             }
         };
     }
@@ -126,6 +128,8 @@ public class EventHandler {
                 } catch (IOException ex) {
                     Logger.getLogger(IGUIControllable.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                
+                System.out.println("Open desc completed.");
             }
         };
     }
@@ -145,6 +149,8 @@ public class EventHandler {
                 hexFrame
                     .getHexFramePanel()
                     .getHexTextArea().setText(content);
+                
+                System.out.println("Get hex completed.");
             }
         };
     }
@@ -161,7 +167,7 @@ public class EventHandler {
                                 .getExePeriod().getText()
                         );
                         ExplorationSolver.main(_gui.getMap(), exePeriod);
-                        System.out.println("End of Exploration");
+                        System.out.println("Exploration completed.");
                     } catch (InterruptedException ex) {
                         Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -196,7 +202,7 @@ public class EventHandler {
                             _gui.getRobot().execute(actions.pop());
                             _gui.update(_gui.getMap(), _gui.getRobot());
                         } else {
-                            System.out.println("End of Shortest Path");
+                            System.out.println("Shortest path completed.");
                             this.cancel();
                         }
                     }
@@ -220,6 +226,8 @@ public class EventHandler {
                 if (_explorationThread != null) _explorationThread.interrupt();
                 _gui.getMap().clearAllHighlight();
                 _gui.update(_gui.getMap(), new Robot());
+                
+                System.out.println("Stop completed.");
             }
         };
     }
@@ -230,6 +238,8 @@ public class EventHandler {
                 if (_shortestPathThread != null) _shortestPathThread.cancel();
                 if (_explorationThread != null) _explorationThread.interrupt();
                 _gui.reset();
+                
+                System.out.println("Reset completed.");
             }
         };
     }
@@ -245,8 +255,9 @@ public class EventHandler {
                 } else {
                     _gui.getMap().addObstacle(clickedPos);
                 }
-                System.out.println("Toggled obstacle at " + clickedPos);
                 target.toggleBackground();
+                
+                System.out.println("Toggled obstacle at " + clickedPos);
             }
         };
     }
