@@ -291,8 +291,7 @@ public class MapViewer {
         for(int row=0;row<10;++row){
             for(int col=0;col<20;++col){
                 if(explored[row][col] == 0){
-                    System.out.println(String.valueOf(row) + "," + String.valueOf(col));
-                    if(unexplored.get(unexplored.size()).i()==row){
+                    if(unexplored.size()>0 && unexplored.get(unexplored.size()-1).i()==row){
                         unexplored.remove(unexplored.size());
                     }
                     Vector2 pair = new Vector2(row, col);
@@ -301,6 +300,17 @@ public class MapViewer {
                 }
             }
         }
+        int i=0;
+        while(unexplored.size()-2 >= i){
+            if(unexplored.get(i+1).j() ==unexplored.get(i).j()){
+                if(unexplored.get(i+1).i() - unexplored.get(i).i() <= 2){
+                    unexplored.remove(i);
+                    --i;
+                }
+            }
+            ++i;
+        }
+        
         return unexplored;
     }
     

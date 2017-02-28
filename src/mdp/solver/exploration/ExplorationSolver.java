@@ -8,6 +8,7 @@ import mdp.common.Direction;
 import mdp.map.Map;
 import mdp.robot.Robot;
 import mdp.common.Vector2;
+import mdp.solver.shortestpath.AStarSolver;
 
 public class ExplorationSolver {
 
@@ -45,7 +46,15 @@ public class ExplorationSolver {
             actionFormulator.rightWallFollower(robot);
 
         }
-        ArrayList<Pair<Integer,Integer>> unexplored = getUnExplored();
+        ArrayList<Vector2> unexplored = mapViewer.getUnExplored();
+        Vector2 start_coord = new Vector2(1,1);
+        for(Vector2 coord: unexplored){
+            coord.i(coord.i()+3);
+            System.out.println("x "+ String.valueOf(coord.i())+" y "+ String.valueOf(coord.j()));
+            AStarSolver solver = new AStarSolver();
+            solver.solve(objective_map, robot, coord);
+            solver.solve(objective_map, robot,start_coord);
+        }
         System.out.println("i:" + robot.position().i());
         System.out.println("j:" + robot.position().j());
 
@@ -58,19 +67,6 @@ public class ExplorationSolver {
     public static MapViewer getMapViewer() {
         return mapViewer;
     }
-    public static ArrayList<Pair<Integer,Integer>> getUnExplored(){
-        int [][] explored = mapViewer.getExplored();
-        ArrayList<Pair<Integer,Integer>> unexplored = new ArrayList<Pair<Integer, Integer>>() ;
-        for(int row=0;row<10;++row){
-            for(int col=0;col<20;++col){
-                if(explored[row][col]==0){
-                    System.out.println(String.valueOf(row) + "," + String.valueOf(col));
-                    Pair<Integer,Integer> pair = new Pair<Integer,Integer>(row, col);
-                    unexplored.add(pair);
-                }
-            }
-        }
-        return unexplored;
-    }
+
     
 }
