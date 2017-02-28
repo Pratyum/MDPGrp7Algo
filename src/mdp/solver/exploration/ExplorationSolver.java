@@ -26,8 +26,6 @@ public class ExplorationSolver {
         Direction robotDir = Direction.Down;
         Robot robot = new Robot(robotPos, robotDir);
         actionFormulator = new ActionFormulator(mapViewer, simulator);
-        SensingData s;
-        int x;
 
         // put some blockers into the map
         System.out.println(objective_map.toString(robot));
