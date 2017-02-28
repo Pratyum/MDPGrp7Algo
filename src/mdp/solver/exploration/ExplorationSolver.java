@@ -1,5 +1,9 @@
 package mdp.solver.exploration;
 
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.List;
+import javafx.util.Pair;
 import mdp.common.Direction;
 import mdp.map.Map;
 import mdp.robot.Robot;
@@ -41,7 +45,7 @@ public class ExplorationSolver {
             actionFormulator.rightWallFollower(robot);
 
         }
-
+        ArrayList<Pair<Integer,Integer>> unexplored = getUnExplored();
         System.out.println("i:" + robot.position().i());
         System.out.println("j:" + robot.position().j());
 
@@ -54,5 +58,19 @@ public class ExplorationSolver {
     public static MapViewer getMapViewer() {
         return mapViewer;
     }
-
+    public static ArrayList<Pair<Integer,Integer>> getUnExplored(){
+        int [][] explored = mapViewer.getExplored();
+        ArrayList<Pair<Integer,Integer>> unexplored = new ArrayList<Pair<Integer, Integer>>() ;
+        for(int row=0;row<10;++row){
+            for(int col=0;col<20;++col){
+                if(explored[row][col]==0){
+                    System.out.println(String.valueOf(row) + "," + String.valueOf(col));
+                    Pair<Integer,Integer> pair = new Pair<Integer,Integer>(row, col);
+                    unexplored.add(pair);
+                }
+            }
+        }
+        return unexplored;
+    }
+    
 }

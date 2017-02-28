@@ -10,8 +10,8 @@ import mdp.common.Vector2;
 public class Descriptor {
     
     private static String _getFilePath(String fileName) throws IOException {
-        String rootPath = new File(".").getCanonicalPath() + "\\src\\";
-        String packagePath = Descriptor.class.getPackage().getName().replace(".", "\\") + "\\";
+        String rootPath = new File(".").getCanonicalPath() + "//src//";
+        String packagePath = Descriptor.class.getPackage().getName().replace(".", "//") + "//";
         return rootPath + packagePath + fileName;
     }
     
@@ -145,7 +145,7 @@ public class Descriptor {
         String result = "";
         
         File file;
-        if (filePath.contains("\\")) {
+        if (filePath.contains("//")) {
             file = new File(filePath);
         } else {
             file = new File(_getFilePath(filePath));
@@ -164,7 +164,7 @@ public class Descriptor {
         Map result = new Map();
         
         File file;
-        if (filePath.contains("\\")) {
+        if (filePath.contains("//")) {
             file = new File(filePath);
         } else {
             file = new File(_getFilePath(filePath));

@@ -29,7 +29,7 @@ public class DescControlPanel extends JPanel {
         this.add(_getHexBtn);
     }
 
-    public JTextField getFilePathBtn() {
+    public JTextField getFilePathTextField() {
         return _filePathBtn;
     }
 

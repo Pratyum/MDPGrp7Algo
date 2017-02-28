@@ -3,6 +3,7 @@ package mdp.solver.exploration;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import javafx.util.Pair;
 
 import mdp.map.Map;
 import mdp.map.WPSpecialState;
@@ -182,7 +183,6 @@ public class MapViewer {
         }
 
     }
-
     //take RPI data from Solver , update what I saw
     public Map updateMap(Robot robot, SensingData s) {
         List<Vector2> obstaclePositions = new ArrayList<>();
@@ -285,4 +285,25 @@ public class MapViewer {
         Main.getGUI().update(map);
         return map;
     }
+
+    public ArrayList<Vector2> getUnExplored(){
+        ArrayList<Vector2> unexplored = new ArrayList<Vector2>() ;
+        for(int row=0;row<10;++row){
+            for(int col=0;col<20;++col){
+                if(explored[row][col] == 0){
+                    System.out.println(String.valueOf(row) + "," + String.valueOf(col));
+                    if(unexplored.get(unexplored.size()).i()==row){
+                        unexplored.remove(unexplored.size());
+                    }
+                    Vector2 pair = new Vector2(row, col);
+                    unexplored.add(pair);
+                    
+                }
+            }
+        }
+        return unexplored;
+    }
+    
+    
 }
+
