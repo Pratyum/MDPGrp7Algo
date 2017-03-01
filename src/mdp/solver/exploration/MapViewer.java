@@ -288,27 +288,28 @@ public class MapViewer {
 
     public ArrayList<Vector2> getUnExplored(){
         ArrayList<Vector2> unexplored = new ArrayList<Vector2>() ;
-        for(int row=0;row<10;++row){
-            for(int col=0;col<20;++col){
+        for(int row=0;row<Map.DIM_I;++row){
+            for(int col=0;col<Map.DIM_J;++col){
                 if(explored[row][col] == 0){
-                    if(unexplored.size()>0 && unexplored.get(unexplored.size()-1).i()==row){
-                        unexplored.remove(unexplored.size());
+                    if(unexplored.size()>0 && unexplored.get(unexplored.size()-1).j()==row){
+                        unexplored.remove(unexplored.size()-1);
                     }
                     Vector2 pair = new Vector2(row, col);
+                    System.out.println(pair);
                     unexplored.add(pair);
                     
                 }
             }
         }
-        int i=0;
-        while(unexplored.size()-2 >= i){
-            if(unexplored.get(i+1).j() ==unexplored.get(i).j()){
-                if(unexplored.get(i+1).i() - unexplored.get(i).i() <= 2){
-                    unexplored.remove(i);
-                    --i;
+        int count=0;
+        while(unexplored.size()-2 >= count){
+            if(unexplored.get(count+1).i() ==unexplored.get(count).i()){
+                if(unexplored.get(count+1).j() - unexplored.get(count).j() <= 2){
+                    unexplored.remove(count);
+                    --count;
                 }
             }
-            ++i;
+            ++count;
         }
         
         return unexplored;

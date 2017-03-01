@@ -2,13 +2,18 @@ package mdp.solver.exploration;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import javafx.util.Pair;
+import mdp.Main;
 import mdp.common.Direction;
 import mdp.map.Map;
 import mdp.robot.Robot;
 import mdp.common.Vector2;
+import mdp.map.WPSpecialState;
+import mdp.robot.RobotAction;
 import mdp.solver.shortestpath.AStarSolver;
+import mdp.solver.shortestpath.AStarSolverResult;
 
 public class ExplorationSolver {
 
@@ -47,14 +52,42 @@ public class ExplorationSolver {
 
         }
         ArrayList<Vector2> unexplored = mapViewer.getUnExplored();
+        //Print unexplored
+        System.out.println("/////UnExplored////////");
+        for(Vector2 coord: unexplored){
+            System.out.println(coord);
+        }
+        System.out.println("//////////////////////");
         Vector2 start_coord = new Vector2(1,1);
         for(Vector2 coord: unexplored){
-            coord.i(coord.i()+3);
+            coord.j(coord.j()+2);
             System.out.println("x "+ String.valueOf(coord.i())+" y "+ String.valueOf(coord.j()));
             AStarSolver solver = new AStarSolver();
-            solver.solve(objective_map, robot, coord);
-            solver.solve(objective_map, robot,start_coord);
-        }
+            AStarSolverResult result = solver.solve(objective_map, robot, coord);
+            if(result.shortestPath.size()!=0){
+//            System.out.println("///////////////");
+//            System.out.println(objective_map.toString(robot));
+//            System.out.println(coord);
+                Map hlMap = mapViewer.getMap();
+                hlMap.highlight(result.shortestPath, WPSpecialState.IsPathPoint);
+                Main.getGUI().update(hlMap, robot);
+                LinkedList<RobotAction> robotactions = RobotAction.fromPath(robot,result.shortestPath);
+                for (RobotAction action: robotactions){
+                    robot.bufferAction(action);
+                    view(robot);
+                }
+            }else{
+                coord.j(coord.j()+1);
+            }
+       }
+       AStarSolver solver = new AStarSolver();
+       AStarSolverResult result = solver.solve(objective_map, robot, start_coord);
+       LinkedList<RobotAction> robotactions = RobotAction.fromPath(robot,result.shortestPath);
+       for (RobotAction action: robotactions){
+            System.out.println(action);
+            robot.bufferAction(action);
+            view(robot);
+       }
         System.out.println("i:" + robot.position().i());
         System.out.println("j:" + robot.position().j());
 
@@ -66,6 +99,21 @@ public class ExplorationSolver {
 
     public static MapViewer getMapViewer() {
         return mapViewer;
+    }
+    
+        // look through map and update 
+    public static Map view(Robot robot) throws InterruptedException {
+        if (robot.checkIfHavingBufferActions()) {
+            robot.executeBufferActions(ExplorationSolver.getExePeriod());
+        }
+
+        SensingData s;
+        s = simulator.getSensingData(robot);
+        Map subjective_map = mapViewer.updateMap(robot, s);
+        System.out.println(mapViewer.exploredAreaToString());
+        System.out.println(subjective_map.toString(robot));
+
+        return subjective_map;
     }
 
     

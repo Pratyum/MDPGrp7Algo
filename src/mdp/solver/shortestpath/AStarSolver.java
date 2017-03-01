@@ -43,7 +43,7 @@ public class AStarSolver {
                     Waypoint adjMapPoint = map.getPoint(adjPos);
                     AStarWaypoint adjPoint = new AStarWaypoint(
                         adjMapPoint,
-                        AStarUtil.getMDistance(adjPos, map.GOAL_POS),
+                        AStarUtil.getMDistance(adjPos, goal),
                         AStarUtil.getMoveCost(robot, dir) + curPoint.gval(),
                         dir.getBehind()
                     );
