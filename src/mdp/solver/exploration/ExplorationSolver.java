@@ -39,9 +39,8 @@ public class ExplorationSolver {
             actionFormulator.rightWallFollower(robot);
 
         }
-
-        System.out.println("i:" + robot.position().i());
-        System.out.println("j:" + robot.position().j());
+        
+        
 
     }
 
