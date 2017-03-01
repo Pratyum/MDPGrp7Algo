@@ -96,9 +96,9 @@ public class EventHandler {
             public void mouseClicked(MouseEvent e) {
                 try {
                     String filePath = _gui.getMainFrame()
-                            .getMainPanel()
-                            .getDescCtrlPanel()
-                            .getFilePathBtn().getText();
+                        .getMainPanel()
+                        .getDescCtrlPanel()
+                        .getFilePathTextField().getText();
                     /////// for testing
                     boolean[][] explored = new boolean[Map.DIM_I][Map.DIM_J];
                     for (int i = 0; i < Map.DIM_I; i++) {
@@ -124,9 +124,10 @@ public class EventHandler {
                 try {
                     _gui.reset();
                     String filePath = _gui.getMainFrame()
-                            .getMainPanel()
-                            .getDescCtrlPanel()
-                            .getFilePathBtn().getText();
+                        .getMainPanel()
+                        .getDescCtrlPanel()
+                        .getFilePathTextField().getText();
+                    System.out.println(filePath);
                     _gui.update(Descriptor.parseFromFile(filePath));
                 } catch (IOException ex) {
                     Logger.getLogger(IGUIControllable.class.getName()).log(Level.SEVERE, null, ex);

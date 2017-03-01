@@ -1,6 +1,9 @@
 package mdp.simulation;
 
+import java.awt.Color;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import mdp.common.Vector2;
 
 public class GridSquare extends JPanel {
@@ -9,6 +12,9 @@ public class GridSquare extends JPanel {
 
     public GridSquare(Vector2 position) {
         _position = position;
+        JLabel label = new JLabel(_position.toString());
+        label.setForeground(Color.white);
+        this.add(label); 
     }
 
     public Vector2 position() {
