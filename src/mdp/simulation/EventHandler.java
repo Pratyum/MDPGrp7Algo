@@ -18,6 +18,7 @@ import mdp.map.WPSpecialState;
 import mdp.robot.Robot;
 import mdp.robot.RobotAction;
 import mdp.solver.exploration.ExplorationSolver;
+import mdp.solver.exploration.Terminator;
 import mdp.solver.shortestpath.AStarSolver;
 import mdp.solver.shortestpath.AStarSolverResult;
 
@@ -171,6 +172,29 @@ public class EventHandler {
                                         .getRunCtrlPanel()
                                         .getExePeriod().getText()
                         );
+                        int termCoverage = Integer.parseInt(_gui
+                            .getMainFrame()
+                            .getMainPanel()
+                            .getIntrCtrlPanel()
+                            .getTermCoverageText().getText()
+                        );
+                        int termTime = Integer.parseInt(_gui
+                            .getMainFrame()
+                            .getMainPanel()
+                            .getIntrCtrlPanel()
+                            .getTermTimeText().getText()
+                        );
+                        System.out.println("coverage = " + termCoverage);
+                        System.out.println("time = " + termTime);
+                        Runnable stopCallback = () -> {
+                            System.out.println(">> STOP <<");
+                            _explorationThread.interrupt();
+                        };
+                        if (termCoverage != 0) {
+                            new Terminator(termCoverage / 100f, stopCallback).observe();
+                        } else if (termTime != 0) {
+                            new Terminator(termTime, stopCallback).observe();
+                        }
                         ExplorationSolver.main(_gui.getMap(), exePeriod);
                         System.out.println("Exploration completed.");
                     } catch (InterruptedException ex) {

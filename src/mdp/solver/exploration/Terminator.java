@@ -2,9 +2,7 @@ package mdp.solver.exploration;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import mdp.Main;
 import mdp.map.Map;
-import mdp.simulation.IGUIUpdatable;
 
 public class Terminator {
     
@@ -13,20 +11,24 @@ public class Terminator {
     private float _maxCoverage;
     private long _maxDiffTime;
     private TerminatorType _terminationType;
+    private Runnable _callback;
     
-    private Timer _thread;
+    private java.util.Timer _thread;
     
-    public Terminator(float maxCoverage) {
+    public Terminator(float maxCoverage, Runnable callback) {
         _maxCoverage = maxCoverage;
         _terminationType = TerminatorType.Coverage;
+        _callback = callback;
     }
     
-    public Terminator(long maxDiffTime) {
+    public Terminator(long maxDiffTime, Runnable callback) {
         _maxDiffTime = maxDiffTime;
         _terminationType = TerminatorType.Time;
+        _callback = callback;
     }
     
-    public void startRun() {
+    public void observe() {
+        System.out.println("///////////////// " + _terminationType);
         switch (_terminationType) {
             case Coverage:
                 int maxExplored = Map.DIM_I * Map.DIM_J;
@@ -35,7 +37,15 @@ public class Terminator {
                     @Override
                     public void run() {
                         int[][] explored = ExplorationSolver.getMapViewer().getExplored();
-                        // do stuff
+                        int exploredCount = 0;
+                        for (int[] row : explored) {
+                            for (int exploreState : row) {
+                                exploredCount += (exploreState >= 1) ? 1 : 0;
+                            }
+                        }
+                        if (((float) exploredCount) / ((float) maxExplored) >= _maxCoverage) {
+                            _callback.run();
+                        }
                     }
                 }, 0, 50);
                 break;
@@ -44,9 +54,9 @@ public class Terminator {
                 _thread.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        Main.getGUI().trigger(IGUIUpdatable.ManualTrigger.Stop);
+                        _callback.run();
                     }
-                }, _maxDiffTime);
+                }, _maxDiffTime * 1000);
                 break;
         }
     }
