@@ -57,7 +57,10 @@ public class ExplorationSolver {
             goal = mapViewer.filterVirtualObstacle(goal);
             System.out.print("Goal:" + goal.toString());
             AStarSolverResult astarSolverResult = astarSolver.solve(mapViewer.getSubjectiveMap(), _robot, goal);
+            if(astarSolverResult.shortestPath.isEmpty())
+            		break;
             robotActions = RobotAction.fromPath(_robot, astarSolverResult.shortestPath);
+            
             for (RobotAction action : robotActions) {
                 view(_robot);
 
