@@ -45,6 +45,7 @@ public class Terminator {
                         }
                         if (((float) exploredCount) / ((float) maxExplored) >= _maxCoverage) {
                             _callback.run();
+                            _thread.cancel();
                         }
                     }
                 }, 0, 50);

@@ -96,9 +96,9 @@ public class EventHandler {
             public void mouseClicked(MouseEvent e) {
                 try {
                     String filePath = _gui.getMainFrame()
-                        .getMainPanel()
-                        .getDescCtrlPanel()
-                        .getFilePathTextField().getText();
+                            .getMainPanel()
+                            .getDescCtrlPanel()
+                            .getFilePathTextField().getText();
                     /////// for testing
                     boolean[][] explored = new boolean[Map.DIM_I][Map.DIM_J];
                     for (int i = 0; i < Map.DIM_I; i++) {
@@ -124,9 +124,9 @@ public class EventHandler {
                 try {
                     _gui.reset();
                     String filePath = _gui.getMainFrame()
-                        .getMainPanel()
-                        .getDescCtrlPanel()
-                        .getFilePathTextField().getText();
+                            .getMainPanel()
+                            .getDescCtrlPanel()
+                            .getFilePathTextField().getText();
                     System.out.println(filePath);
                     _gui.update(Descriptor.parseFromFile(filePath));
                 } catch (IOException ex) {
@@ -164,43 +164,14 @@ public class EventHandler {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                isShortestPath = false;
+                int exePeriod = Integer.parseInt(
+                        _gui.getMainFrame()
+                                .getMainPanel()
+                                .getRunCtrlPanel()
+                                .getExePeriod().getText()
+                );
                 _explorationThread = new Thread(() -> {
-                    try {
-                        int exePeriod = Integer.parseInt(
-                                _gui.getMainFrame()
-                                        .getMainPanel()
-                                        .getRunCtrlPanel()
-                                        .getExePeriod().getText()
-                        );
-                        int termCoverage = Integer.parseInt(_gui
-                            .getMainFrame()
-                            .getMainPanel()
-                            .getIntrCtrlPanel()
-                            .getTermCoverageText().getText()
-                        );
-                        int termTime = Integer.parseInt(_gui
-                            .getMainFrame()
-                            .getMainPanel()
-                            .getIntrCtrlPanel()
-                            .getTermTimeText().getText()
-                        );
-                        System.out.println("coverage = " + termCoverage);
-                        System.out.println("time = " + termTime);
-                        Runnable stopCallback = () -> {
-                            System.out.println(">> STOP <<");
-                            _explorationThread.interrupt();
-                        };
-                        if (termCoverage != 0) {
-                            new Terminator(termCoverage / 100f, stopCallback).observe();
-                        } else if (termTime != 0) {
-                            new Terminator(termTime, stopCallback).observe();
-                        }
-                        ExplorationSolver.main(_gui.getMap(), exePeriod);
-                        System.out.println("Exploration completed.");
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    _explorationProcedure(exePeriod, () -> {});
                 });
                 _explorationThread.start();
             }
@@ -211,34 +182,13 @@ public class EventHandler {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                isShortestPath = true;
-                AStarSolver solver = new AStarSolver();
-                AStarSolverResult solveResult = solver.solve(_gui.getMap(), _gui.getRobot());
-                _gui.getMap().highlight(solveResult.openedPoints, WPSpecialState.IsOpenedPoint);
-                _gui.getMap().highlight(solveResult.closedPoints, WPSpecialState.IsClosedPoint);
-                _gui.getMap().highlight(solveResult.shortestPath, WPSpecialState.IsPathPoint);
-                LinkedList<RobotAction> actions = RobotAction
-                        .fromPath(_gui.getRobot(), solveResult.shortestPath);
-
                 int exePeriod = Integer.parseInt(
                         _gui.getMainFrame()
                                 .getMainPanel()
                                 .getRunCtrlPanel()
                                 .getExePeriod().getText()
                 );
-                _shortestPathThread = new Timer();
-                _shortestPathThread.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (!actions.isEmpty()) {
-                            _gui.getRobot().execute(actions.pop());
-                            _gui.update(_gui.getMap(), _gui.getRobot());
-                        } else {
-                            System.out.println("Shortest path completed.");
-                            this.cancel();
-                        }
-                    }
-                }, exePeriod, exePeriod);
+                _shortestPathProcedure(exePeriod);
             }
         };
     }
@@ -247,45 +197,18 @@ public class EventHandler {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                int exePeriod = Integer.parseInt(
+                        _gui.getMainFrame()
+                                .getMainPanel()
+                                .getRunCtrlPanel()
+                                .getExePeriod().getText()
+                );
                 _explorationThread = new Thread(() -> {
-                    try {
-                        // exloration
-                        isShortestPath = false;
-                        int exePeriod = Integer.parseInt(
-                                _gui.getMainFrame()
-                                        .getMainPanel()
-                                        .getRunCtrlPanel()
-                                        .getExePeriod().getText()
-                        );
-                        ExplorationSolver.main(_gui.getMap(), exePeriod);
-                        System.out.println("Exploration completed.");
-                        
+                    // exploration
+                    _explorationProcedure(exePeriod, () -> {
                         // shortest path
-                        isShortestPath = true;
-                        AStarSolver solver = new AStarSolver();
-                        AStarSolverResult solveResult = solver.solve(_gui.getMap(), _gui.getRobot());
-                        _gui.getMap().highlight(solveResult.openedPoints, WPSpecialState.IsOpenedPoint);
-                        _gui.getMap().highlight(solveResult.closedPoints, WPSpecialState.IsClosedPoint);
-                        _gui.getMap().highlight(solveResult.shortestPath, WPSpecialState.IsPathPoint);
-                        LinkedList<RobotAction> actions = RobotAction
-                                .fromPath(_gui.getRobot(), solveResult.shortestPath);
-
-                        _shortestPathThread = new Timer();
-                        _shortestPathThread.schedule(new TimerTask() {
-                            @Override
-                            public void run() {
-                                if (!actions.isEmpty()) {
-                                    _gui.getRobot().execute(actions.pop());
-                                    _gui.update(_gui.getMap(), _gui.getRobot());
-                                } else {
-                                    System.out.println("Shortest path completed.");
-                                    this.cancel();
-                                }
-                            }
-                        }, exePeriod, exePeriod);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                        _shortestPathProcedure(exePeriod);
+                    });
                 });
                 _explorationThread.start();
             }
@@ -300,7 +223,7 @@ public class EventHandler {
                     _shortestPathThread.cancel();
                 }
                 if (_explorationThread != null) {
-                    _explorationThread.interrupt();
+                    _explorationThread.stop();
                 }
                 _gui.getMap().clearAllHighlight();
                 _gui.update(_gui.getMap(), new Robot());
@@ -318,7 +241,7 @@ public class EventHandler {
                     _shortestPathThread.cancel();
                 }
                 if (_explorationThread != null) {
-                    _explorationThread.interrupt();
+                    _explorationThread.stop();
                 }
                 _gui.reset();
 
@@ -346,4 +269,68 @@ public class EventHandler {
         };
     }
 
+    // shared procedures
+    private void _explorationProcedure(int exePeriod, Runnable callback) {
+        System.out.println("Starting Exploration");
+        try {
+            int termCoverage = Integer.parseInt(_gui
+                    .getMainFrame()
+                    .getMainPanel()
+                    .getIntrCtrlPanel()
+                    .getTermCoverageText().getText()
+            );
+            int termTime = Integer.parseInt(_gui
+                    .getMainFrame()
+                    .getMainPanel()
+                    .getIntrCtrlPanel()
+                    .getTermTimeText().getText()
+            );
+            System.out.println("coverage = " + termCoverage);
+            System.out.println("time = " + termTime);
+            Runnable stopCallback = () -> {
+                System.out.println(">> STOP <<");
+
+                // save info before terminating thread
+                Robot curRobot = ExplorationSolver.getRobot();
+                int[][] explored = ExplorationSolver.getMapViewer().getExplored();
+                _explorationThread.stop();
+                ExplorationSolver.goBackToStart(new Map(explored), curRobot, callback);
+            };
+            if (termCoverage != 0) {
+                new Terminator(termCoverage / 100f, stopCallback).observe();
+            } else if (termTime != 0) {
+                new Terminator(termTime, stopCallback).observe();
+            }
+            ExplorationSolver.main(_gui.getMap(), exePeriod);
+            System.out.println("Exploration completed.");
+        } catch (InterruptedException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    private void _shortestPathProcedure(int exePeriod) {
+        System.out.println("Starting Shortest Path");
+        isShortestPath = true;
+        AStarSolver solver = new AStarSolver();
+        AStarSolverResult solveResult = solver.solve(_gui.getMap(), _gui.getRobot());
+        _gui.getMap().highlight(solveResult.openedPoints, WPSpecialState.IsOpenedPoint);
+        _gui.getMap().highlight(solveResult.closedPoints, WPSpecialState.IsClosedPoint);
+        _gui.getMap().highlight(solveResult.shortestPath, WPSpecialState.IsPathPoint);
+        LinkedList<RobotAction> actions = RobotAction
+                .fromPath(_gui.getRobot(), solveResult.shortestPath);
+
+        _shortestPathThread = new Timer();
+        _shortestPathThread.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (!actions.isEmpty()) {
+                    _gui.getRobot().execute(actions.pop());
+                    _gui.update(_gui.getMap(), _gui.getRobot());
+                } else {
+                    System.out.println("Shortest path completed.");
+                    this.cancel();
+                }
+            }
+        }, exePeriod, exePeriod);
+    }
 }

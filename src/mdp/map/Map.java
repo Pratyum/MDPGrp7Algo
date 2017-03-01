@@ -39,6 +39,41 @@ public class Map {
         }
     }
     
+    public Map(int[][] explored) {
+        _wpMap = new Waypoint[DIM_I][DIM_J];
+        List<Vector2> obstacles = new ArrayList<>();
+        for (int i = 0; i < DIM_I; i++) {
+            for (int j = 0; j < DIM_J; j++) {
+                // init default values
+                Vector2 curPos = new Vector2(i, j);
+                WPSpecialState curSpecState = WPSpecialState.NA;
+                WPObstacleState curObsState = WPObstacleState.IsWalkable;
+                
+                // change special state if applicable
+                if (START_POS.equals(curPos)) {
+                    curSpecState = WPSpecialState.IsStart;
+                } else if (GOAL_POS.equals(curPos)) {
+                    curSpecState = WPSpecialState.IsGoal;
+                } else {
+                    switch (explored[i][j]) {
+                        case 0:
+                        case 2:
+                            obstacles.add(curPos);
+                            break;
+                        case 1:
+                            curSpecState = WPSpecialState.IsExplored;
+                            break;
+                        
+                    }
+                }
+                
+                // create point
+                _wpMap[i][j] = new Waypoint(curPos, curSpecState, curObsState);
+            }
+        }
+        addObstacle(obstacles);
+    }
+    
     private void _setObstacle(Vector2 pos, WPObstacleState obsState) {
         _wpMap[pos.i()][pos.j()].obstacleState(obsState);
     }

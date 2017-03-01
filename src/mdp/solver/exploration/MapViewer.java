@@ -73,10 +73,6 @@ public class MapViewer {
 
     }
 
-    public Map getSubjectiveMap() {
-        return map;
-    }
-
     private void insertExploredIntoMap() {
         LinkedList<Vector2> listOfObserved = new LinkedList<>();
         for (int i = 0; i < Map.DIM_I; i++) {

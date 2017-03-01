@@ -22,7 +22,7 @@ public class InterruptControlPanel extends JPanel {
         // children
         _stopBtn = new JButton("Stop");
         _resetBtn = new JButton("Reset");
-        _termCoverageText = new JTextField("90", 3);
+        _termCoverageText = new JTextField("100", 3);
         _termTimeText = new JTextField("0", 3);
         JLabel termLabel = new JLabel("Terminate after: ");
         JLabel coverageLabel = new JLabel("% or");
