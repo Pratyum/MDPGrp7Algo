@@ -109,7 +109,6 @@ public class ExplorationSolver {
     public static void goBackToStart(Map map, Robot robot, Runnable callback) {
         System.out.println("Going back to start with the following map");
         System.out.println(map.toString(robot));
-        Main.getGUI().update(map, robot);
         AStarSolverResult result = new AStarSolver().solve(map, robot, Map.START_POS);
         LinkedList<RobotAction> actions = RobotAction.fromPath(robot, result.shortestPath);
         Timer timer = new Timer();
