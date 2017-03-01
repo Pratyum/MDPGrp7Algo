@@ -54,6 +54,7 @@ public class ExplorationSolver {
 
         while (!mapViewer.checkIfNavigationComplete()) {
             Vector2 goal = mapViewer.findFurthestUnexplored(_robot);
+            goal = mapViewer.filterVirtualObstacle(goal);
             System.out.print("Goal:" + goal.toString());
             AStarSolverResult astarSolverResult = astarSolver.solve(mapViewer.getSubjectiveMap(), _robot, goal);
             robotActions = RobotAction.fromPath(_robot, astarSolverResult.shortestPath);
