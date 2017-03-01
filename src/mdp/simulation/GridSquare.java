@@ -1,6 +1,8 @@
 package mdp.simulation;
 
 import java.awt.Color;
+import java.awt.Font;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -14,6 +16,7 @@ public class GridSquare extends JPanel {
         _position = position;
         JLabel label = new JLabel(_position.toString());
         label.setForeground(Color.white);
+        label.setFont(new Font(Font.SERIF, Font.PLAIN, 11));
         this.add(label); 
     }
 

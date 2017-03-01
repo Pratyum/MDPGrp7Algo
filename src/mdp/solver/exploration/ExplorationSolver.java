@@ -31,12 +31,14 @@ public class ExplorationSolver {
         _exePeriod = exePeriod;
         objective_map = map;
         simulator = new Simulator(objective_map);
-
+        
         Vector2 robotPos = new Vector2(1, 1);
         Direction robotDir = Direction.Down;
         Robot robot = new Robot(robotPos, robotDir);
         actionFormulator = new ActionFormulator(mapViewer, simulator);
-
+        
+        AStarSolver astarSolver = new AStarSolver();
+        LinkedList<RobotAction> robotActions;
         // put some blockers into the map
         System.out.println(objective_map.toString(robot));
 
@@ -49,8 +51,26 @@ public class ExplorationSolver {
             actionFormulator.rightWallFollower(robot);
 
         }
+        
+        while(!mapViewer.checkIfNavigationComplete()){
+        		Vector2 goal =mapViewer.findFurthestUnexplored(robot);
+        		System.out.print("Goal:" +goal.toString());
+        		AStarSolverResult astarSolverResult = astarSolver.solve(mapViewer.getSubjectiveMap(), robot , goal );
+        		robotActions = RobotAction.fromPath(robot, astarSolverResult.shortestPath);
+        		for (RobotAction action: robotActions){
+        				view(robot);
+        				
+        				if(!mapViewer.validate(robot,action)){
+        					actionFormulator.circumvent(robot);  
+        					// in circumvent, stop circumventing when the obstacle is fully identified
+        					break;
+        				}
+        				robot.bufferAction(action);
+            }
+        }
+        
       
-        ArrayList<Vector2> unexplored = mapViewer.getUnExplored();
+        /*(ArrayList<Vector2> unexplored = mapViewer.getUnExplored();
         //Print unexplored
         System.out.println("/////UnExplored////////");
         for(Vector2 coord: unexplored){
@@ -89,7 +109,7 @@ public class ExplorationSolver {
        }
         System.out.println("i:" + robot.position().i());
         System.out.println("j:" + robot.position().j());
-
+		*/
     }
 
     public static int getExePeriod() {

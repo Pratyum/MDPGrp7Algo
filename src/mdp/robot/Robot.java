@@ -50,7 +50,7 @@ public class Robot {
     }
     public void executeBufferActions(int sleepPeriod) throws InterruptedException {
         for (RobotAction action: bufferedActions) {
-            execute(action);
+            execute(action); // here for RPI
             Main.getGUI().update(this);
             Thread.sleep(sleepPeriod);
         }

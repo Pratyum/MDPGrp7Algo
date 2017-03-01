@@ -87,7 +87,7 @@ public class AStarSolver {
                 curPoint = lowestFvalPoint;
             } else {
                 // path to goal is blocked
-                System.out.println("NO SOLUTION");
+                //System.out.println("NO SOLUTION");
                 return result;
             }
         }
