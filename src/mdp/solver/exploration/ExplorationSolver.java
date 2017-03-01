@@ -9,25 +9,28 @@ import mdp.common.Direction;
 import mdp.map.Map;
 import mdp.robot.Robot;
 import mdp.common.Vector2;
-import mdp.map.WPSpecialState;
 import mdp.robot.RobotAction;
 import mdp.solver.shortestpath.AStarSolver;
 import mdp.solver.shortestpath.AStarSolverResult;
 
 public class ExplorationSolver {
+    
+//    public enum EndType { Normal, Interrupt }
 
     private static Map objective_map; // generated from map solver
 
     private static Simulator simulator;
 
-    private static MapViewer mapViewer = new MapViewer();
+    private static MapViewer mapViewer;
     private static ActionFormulator actionFormulator;
-    private static GoalFormulator goalFormulator = new GoalFormulator(mapViewer);
+    private static GoalFormulator goalFormulator;
 
     private static int _exePeriod;
     private static Robot _robot;
 
-    public static void main(Map map, int exePeriod) throws InterruptedException {
+    public static void solve(Map map, int exePeriod) throws InterruptedException {
+        mapViewer = new MapViewer();
+        goalFormulator = new GoalFormulator(mapViewer);
         _exePeriod = exePeriod;
         objective_map = map;
         simulator = new Simulator(objective_map);
@@ -43,6 +46,7 @@ public class ExplorationSolver {
         System.out.println(objective_map.toString(_robot));
 
         //data = getDataFromRPI();
+        System.out.println(_robot.position());
         while (!goalFormulator.checkIfReachFinalGoal(_robot.position())) {
             actionFormulator.rightWallFollower(_robot);
         }
@@ -57,10 +61,11 @@ public class ExplorationSolver {
             goal = mapViewer.filterVirtualObstacle(goal);
             System.out.print("Goal:" + goal.toString());
             AStarSolverResult astarSolverResult = astarSolver.solve(mapViewer.getSubjectiveMap(), _robot, goal);
-            if(astarSolverResult.shortestPath.isEmpty())
-            		break;
+            if (astarSolverResult.shortestPath.isEmpty()) {
+                break;
+            }
             robotActions = RobotAction.fromPath(_robot, astarSolverResult.shortestPath);
-            
+
             for (RobotAction action : robotActions) {
                 view(_robot);
 
@@ -122,5 +127,8 @@ public class ExplorationSolver {
                 }
             }
         }, _exePeriod, _exePeriod);
+    }
+
+    public static void restart() {
     }
 }

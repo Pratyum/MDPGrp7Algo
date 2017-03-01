@@ -2,6 +2,7 @@ package mdp.simulation;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import mdp.Main;
 import mdp.common.Vector2;
 import mdp.map.Descriptor;
 import mdp.map.Map;
@@ -27,7 +29,11 @@ public class EventHandler {
     private IGUIControllable _gui;
     private Timer _shortestPathThread;
     private Thread _explorationThread;
-    public static boolean isShortestPath = false;
+    private static boolean _isShortestPath = true;
+
+    public static boolean isShortestPath() {
+        return _isShortestPath;
+    }
 
     public EventHandler(IGUIControllable gui) {
         _gui = gui;
@@ -71,14 +77,18 @@ public class EventHandler {
                 .getCombinedBtn().addMouseListener(_onCombined());
 
         // run control event
+//        _gui.getMainFrame()
+//                .getMainPanel()
+//                .getIntrCtrlPanel()
+//                .getResetBtn().addMouseListener(_onReset());
+//        _gui.getMainFrame()
+//                .getMainPanel()
+//                .getIntrCtrlPanel()
+//                .getStopBtn().addMouseListener(_onStop());
         _gui.getMainFrame()
                 .getMainPanel()
                 .getIntrCtrlPanel()
-                .getResetBtn().addMouseListener(_onReset());
-        _gui.getMainFrame()
-                .getMainPanel()
-                .getIntrCtrlPanel()
-                .getStopBtn().addMouseListener(_onStop());
+                .getRestartBtn().addMouseListener(_onRestart());
     }
 
     private WindowAdapter _onClose() {
@@ -98,7 +108,7 @@ public class EventHandler {
                     String filePath = _gui.getMainFrame()
                             .getMainPanel()
                             .getDescCtrlPanel()
-                            .getFilePathTextField().getText();
+                            .getFilePathTextField().getText() + ".txt";
                     /////// for testing
                     boolean[][] explored = new boolean[Map.DIM_I][Map.DIM_J];
                     for (int i = 0; i < Map.DIM_I; i++) {
@@ -126,7 +136,7 @@ public class EventHandler {
                     String filePath = _gui.getMainFrame()
                             .getMainPanel()
                             .getDescCtrlPanel()
-                            .getFilePathTextField().getText();
+                            .getFilePathTextField().getText() + ".txt";
                     System.out.println(filePath);
                     _gui.update(Descriptor.parseFromFile(filePath));
                 } catch (IOException ex) {
@@ -171,7 +181,12 @@ public class EventHandler {
                                 .getExePeriod().getText()
                 );
                 _explorationThread = new Thread(() -> {
-                    _explorationProcedure(exePeriod, () -> {});
+                    try {
+                        _explorationProcedure(exePeriod, () -> {
+                        });
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 });
                 _explorationThread.start();
             }
@@ -204,48 +219,66 @@ public class EventHandler {
                                 .getExePeriod().getText()
                 );
                 _explorationThread = new Thread(() -> {
-                    // exploration
-                    _explorationProcedure(exePeriod, () -> {
-                        // shortest path
-                        _shortestPathProcedure(exePeriod);
-                    });
+                    try {
+                        // exploration
+                        _explorationProcedure(exePeriod, () -> {
+                            System.out.println("Is at COMBINED callback");
+                            // shortest path
+                            _shortestPathProcedure(exePeriod);
+                        });
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 });
                 _explorationThread.start();
             }
         };
     }
 
-    private MouseAdapter _onStop() {
+//    private MouseAdapter _onStop() {
+//        return new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                if (_shortestPathThread != null) {
+//                    _shortestPathThread.cancel();
+//                }
+//                if (_explorationThread != null) {
+//                    _explorationThread.stop();
+//                }
+//                _gui.getMap().clearAllHighlight();
+//                _gui.update(_gui.getMap(), new Robot());
+//
+//                System.out.println("Stop completed.");
+//            }
+//        };
+//    }
+//
+//    private MouseAdapter _onReset() {
+//        return new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                if (_shortestPathThread != null) {
+//                    _shortestPathThread.cancel();
+//                }
+//                if (_explorationThread != null) {
+//                    _explorationThread.stop();
+//                }
+//                _gui.reset();
+//
+//                System.out.println("Reset completed.");
+//            }
+//        };
+//    }
+
+    private MouseListener _onRestart() {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (_shortestPathThread != null) {
-                    _shortestPathThread.cancel();
-                }
-                if (_explorationThread != null) {
-                    _explorationThread.stop();
-                }
-                _gui.getMap().clearAllHighlight();
-                _gui.update(_gui.getMap(), new Robot());
-
-                System.out.println("Stop completed.");
-            }
-        };
-    }
-
-    private MouseAdapter _onReset() {
-        return new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (_shortestPathThread != null) {
-                    _shortestPathThread.cancel();
-                }
-                if (_explorationThread != null) {
-                    _explorationThread.stop();
-                }
-                _gui.reset();
-
-                System.out.println("Reset completed.");
+                _gui.getMainFrame().dispose();
+                Main.restartGUI();
+                ExplorationSolver.restart();
+                _isShortestPath = true;
+                System.out.println("Restart completed.");
             }
         };
     }
@@ -270,47 +303,47 @@ public class EventHandler {
     }
 
     // shared procedures
-    private void _explorationProcedure(int exePeriod, Runnable callback) {
+    private void _explorationProcedure(int exePeriod, Runnable callback) throws InterruptedException {
         System.out.println("Starting Exploration");
-        try {
-            int termCoverage = Integer.parseInt(_gui
-                    .getMainFrame()
-                    .getMainPanel()
-                    .getIntrCtrlPanel()
-                    .getTermCoverageText().getText()
-            );
-            int termTime = Integer.parseInt(_gui
-                    .getMainFrame()
-                    .getMainPanel()
-                    .getIntrCtrlPanel()
-                    .getTermTimeText().getText()
-            );
-            System.out.println("coverage = " + termCoverage);
-            System.out.println("time = " + termTime);
-            Runnable stopCallback = () -> {
-                System.out.println(">> STOP <<");
-
-                // save info before terminating thread
-                Robot curRobot = ExplorationSolver.getRobot();
-                int[][] explored = ExplorationSolver.getMapViewer().getExplored();
-                _explorationThread.stop();
-                ExplorationSolver.goBackToStart(new Map(explored), curRobot, callback);
-            };
-            if (termCoverage != 0) {
-                new Terminator(termCoverage / 100f, stopCallback).observe();
-            } else if (termTime != 0) {
-                new Terminator(termTime, stopCallback).observe();
-            }
-            ExplorationSolver.main(_gui.getMap(), exePeriod);
-            System.out.println("Exploration completed.");
-        } catch (InterruptedException e) {
-            System.err.println(e.getMessage());
+        _isShortestPath = false;
+        int termCoverage = Integer.parseInt(_gui
+                .getMainFrame()
+                .getMainPanel()
+                .getIntrCtrlPanel()
+                .getTermCoverageText().getText()
+        );
+        int termTime = Integer.parseInt(_gui
+                .getMainFrame()
+                .getMainPanel()
+                .getIntrCtrlPanel()
+                .getTermTimeText().getText()
+        );
+        
+        Runnable interruptCallback = () -> {
+            System.out.println(">> STOP <<");
+            Robot curRobot = ExplorationSolver.getRobot();
+            int[][] explored = ExplorationSolver.getMapViewer().getExplored();
+            _explorationThread.stop();
+            ExplorationSolver.goBackToStart(new Map(explored), curRobot, callback);
+        };
+        Runnable nonInterruptCallback = () -> {
+            Robot curRobot = ExplorationSolver.getRobot();
+            int[][] explored = ExplorationSolver.getMapViewer().getExplored();
+            ExplorationSolver.goBackToStart(new Map(explored), curRobot, callback);
+        };
+        if (termCoverage != 0) {
+            new Terminator(termCoverage / 100f, interruptCallback).observe();
+        } else if (termTime != 0) {
+            new Terminator(termTime, interruptCallback).observe();
         }
+        ExplorationSolver.solve(_gui.getMap(), exePeriod);
+        System.out.println("Exploration completed.");
+        nonInterruptCallback.run();
     }
 
     private void _shortestPathProcedure(int exePeriod) {
         System.out.println("Starting Shortest Path");
-        isShortestPath = true;
+        _isShortestPath = true;
         AStarSolver solver = new AStarSolver();
         AStarSolverResult solveResult = solver.solve(_gui.getMap(), _gui.getRobot());
         _gui.getMap().highlight(solveResult.openedPoints, WPSpecialState.IsOpenedPoint);

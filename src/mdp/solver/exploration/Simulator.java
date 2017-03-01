@@ -13,12 +13,12 @@ import mdp.map.Waypoint;
 
 public class Simulator {
 
-    private static Map objective_map;
-    private static SensingData s = new SensingData();
+    private Map objective_map;
+    private SensingData s;
 
     public Simulator(Map map) {
         objective_map = map;
-
+        s = new SensingData();
     }
 
     public SensingData getSensingData(Robot robot) {
@@ -42,7 +42,7 @@ public class Simulator {
 
     }
 
-    private static int detect(Vector2 position, Direction dir) {
+    private int detect(Vector2 position, Direction dir) {
         Vector2 tmp = new Vector2(position.i(), position.j());
         Waypoint wp;
         Vector2 unit;
@@ -85,5 +85,4 @@ public class Simulator {
         objective_map.addObstacle(_genBlockers(obstacleMap));
     }
 
-    
 }

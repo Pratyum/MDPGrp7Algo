@@ -10,9 +10,9 @@ import mdp.map.Map;
 
 public class ActionFormulator {
 
-    private static MapViewer mapViewer;
+    private MapViewer mapViewer;
 
-    private static Simulator simulator;
+    private Simulator simulator;
 
     public ActionFormulator(MapViewer mapV, Simulator s) {
         mapViewer = mapV;
@@ -76,7 +76,7 @@ public class ActionFormulator {
     }
 
     // look through map and update 
-    public static Map view(Robot robot) throws InterruptedException {
+    public Map view(Robot robot) throws InterruptedException {
         if (robot.checkIfHavingBufferActions()) {
             robot.executeBufferActions(ExplorationSolver.getExePeriod());
         }
@@ -97,7 +97,7 @@ public class ActionFormulator {
     				rightWallFollower(robot);
     			}
     }
-    public static void turnLeftTillEmpty(Robot robot) throws InterruptedException {
+    public void turnLeftTillEmpty(Robot robot) throws InterruptedException {
 
         Know check = mapViewer.checkWalkable(robot, Direction.Up);
 

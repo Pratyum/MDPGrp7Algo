@@ -1,6 +1,7 @@
 package mdp;
 
 import java.io.IOException;
+import javax.swing.SwingUtilities;
 
 import mdp.communication.Translator;
 import mdp.communication.ITranslatable;
@@ -16,12 +17,18 @@ public class Main {
                 
         // run simulation
         System.out.println("Initiating GUI...");
-        _gui = new GUI();
+        restartGUI();
 //        _rpi = new Translator();
         
         // connect & send string to RPi
 //        _listenToRPi();
 
+    }
+    
+    public static void restartGUI() {
+        SwingUtilities.invokeLater(() -> {
+            _gui = new GUI();
+        });
     }
     
     public static IGUIUpdatable getGUI() {

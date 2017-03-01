@@ -90,6 +90,17 @@ public class GridContainer extends JPanel {
         return true;
     }
     
+    private void _applyMouseAdapter() {
+        for (GridSquare[] row : _grid) {
+            for (GridSquare square : row) {
+                for (MouseListener mouseListener : square.getMouseListeners()) {
+                    square.removeMouseListener(mouseListener);
+                }
+                square.addMouseListener(_gridMouseAdapter);
+            }
+        }
+    }
+    
     private HashMap<String, Color> _genSpecialColor(Map map, Robot robot) {
         HashMap<String, Color> result = new HashMap<>();
         map.toList().forEach((curPoint) -> {
@@ -99,7 +110,7 @@ public class GridContainer extends JPanel {
             curKey = curPoint.position().toString();
             
             boolean isUnexplored = false;
-            if (!EventHandler.isShortestPath) {
+            if (!EventHandler.isShortestPath()) {
                 if (!curPoint.specialState().equals(WPSpecialState.IsExplored) &&
                     !curPoint.specialState().equals(WPSpecialState.IsStart) &&
                     !curPoint.specialState().equals(WPSpecialState.IsGoal)) {
@@ -160,17 +171,6 @@ public class GridContainer extends JPanel {
         });
         
         return result;
-    }
-    
-    private void _applyMouseAdapter() {
-        for (GridSquare[] row : _grid) {
-            for (GridSquare square : row) {
-                for (MouseListener mouseListener : square.getMouseListeners()) {
-                    square.removeMouseListener(mouseListener);
-                }
-                square.addMouseListener(_gridMouseAdapter);
-            }
-        }
     }
     
     public void fillGrid(Map map, Robot robot) {

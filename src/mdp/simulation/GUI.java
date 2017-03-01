@@ -69,9 +69,9 @@ public class GUI implements IGUIControllable {
             case Combined:
                 runCtrlPanel.getCombinedBtn().doClick();
                 break;
-            case Stop:
-                intrtCtrlPanel.getStopBtn().doClick();
-                break;
+//            case Stop:
+//                intrtCtrlPanel.getStopBtn().doClick();
+//                break;
         }
     }
     

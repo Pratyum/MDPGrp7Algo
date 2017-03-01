@@ -1,7 +1,9 @@
 package mdp.simulation;
 
 import java.awt.Color;
+import java.awt.Font;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -19,11 +21,15 @@ public class DescControlPanel extends JPanel {
         this.setBackground(_BG_COLOR);
         
         // children
-        _filePathBtn = new JTextField("descriptor.txt", 30);
+        _filePathBtn = new JTextField("", 10);
         _openDescBtn = new JButton("Open");
         _saveDescBtn = new JButton("Save");
         _getHexBtn = new JButton("Get Hex");
+        _filePathBtn.setHorizontalAlignment(JTextField.RIGHT);
+        JLabel pathLabel = new JLabel(".txt");
+        pathLabel.setForeground(Color.WHITE);
         this.add(_filePathBtn);
+        this.add(pathLabel);
         this.add(_openDescBtn);
         this.add(_saveDescBtn);
         this.add(_getHexBtn);

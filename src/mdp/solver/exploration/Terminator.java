@@ -36,16 +36,20 @@ public class Terminator {
                 _thread.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        int[][] explored = ExplorationSolver.getMapViewer().getExplored();
-                        int exploredCount = 0;
-                        for (int[] row : explored) {
-                            for (int exploreState : row) {
-                                exploredCount += (exploreState >= 1) ? 1 : 0;
+                        MapViewer mapViewer = ExplorationSolver.getMapViewer();
+                        if (mapViewer != null) {
+                            int[][] explored = mapViewer.getExplored();
+                            int exploredCount = 0;
+                            for (int[] row : explored) {
+                                for (int exploreState : row) {
+                                    exploredCount += (exploreState >= 1) ? 1 : 0;
+                                }
                             }
-                        }
-                        if (((float) exploredCount) / ((float) maxExplored) >= _maxCoverage) {
-                            _callback.run();
-                            _thread.cancel();
+                            if (((float) exploredCount) / ((float) maxExplored) >= _maxCoverage) {
+                                System.out.println("Coverage Terminator activated");
+                                _thread.cancel();
+                                _callback.run();
+                            }
                         }
                     }
                 }, 0, 50);
@@ -55,6 +59,7 @@ public class Terminator {
                 _thread.schedule(new TimerTask() {
                     @Override
                     public void run() {
+                        System.out.println("Time Terminator activated");
                         _callback.run();
                     }
                 }, _maxDiffTime * 1000);

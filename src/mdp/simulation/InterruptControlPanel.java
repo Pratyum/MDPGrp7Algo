@@ -10,8 +10,9 @@ public class InterruptControlPanel extends JPanel {
     
     private static final Color _BG_COLOR = new Color(128, 128, 128);
     
-    private JButton _stopBtn;
-    private JButton _resetBtn;
+//    private JButton _stopBtn;
+//    private JButton _resetBtn;
+    private JButton _restartBtn;
     private JTextField _termCoverageText;
     private JTextField _termTimeText;
     
@@ -20,8 +21,9 @@ public class InterruptControlPanel extends JPanel {
         this.setBackground(_BG_COLOR);
         
         // children
-        _stopBtn = new JButton("Stop");
-        _resetBtn = new JButton("Reset");
+//        _stopBtn = new JButton("Stop");
+//        _resetBtn = new JButton("Reset");
+        _restartBtn = new JButton("Restart");
         _termCoverageText = new JTextField("100", 3);
         _termTimeText = new JTextField("0", 3);
         JLabel termLabel = new JLabel("Terminate after: ");
@@ -30,21 +32,26 @@ public class InterruptControlPanel extends JPanel {
         termLabel.setForeground(Color.WHITE);
         coverageLabel.setForeground(Color.WHITE);
         timeLabel.setForeground(Color.WHITE);
-        this.add(_stopBtn);
-        this.add(_resetBtn);
+//        this.add(_stopBtn);
+//        this.add(_resetBtn);
         this.add(termLabel);
         this.add(_termCoverageText);
         this.add(coverageLabel);
         this.add(_termTimeText);
         this.add(timeLabel);
+        this.add(_restartBtn);
     }
 
-    public JButton getStopBtn() {
-        return _stopBtn;
-    }
+//    public JButton getStopBtn() {
+//        return _stopBtn;
+//    }
+//
+//    public JButton getResetBtn() {
+//        return _resetBtn;
+//    }
 
-    public JButton getResetBtn() {
-        return _resetBtn;
+    public JButton getRestartBtn() {
+        return _restartBtn;
     }
 
     public JTextField getTermCoverageText() {
