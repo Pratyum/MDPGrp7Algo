@@ -58,6 +58,7 @@ public class GUI implements IGUIControllable {
     @Override
     public void trigger(ManualTrigger trigger) {
         RunControlPanel runCtrlPanel = _mainFrame.getMainPanel().getRunCtrlPanel();
+        InterruptControlPanel intrtCtrlPanel = _mainFrame.getMainPanel().getIntrCtrlPanel();
         switch (trigger) {
             case Exploration:
                 runCtrlPanel.getExplorationBtn().doClick();
@@ -67,6 +68,9 @@ public class GUI implements IGUIControllable {
                 break;
             case Combined:
                 runCtrlPanel.getCombinedBtn().doClick();
+                break;
+            case Stop:
+                intrtCtrlPanel.getStopBtn().doClick();
                 break;
         }
     }

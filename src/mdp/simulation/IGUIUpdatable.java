@@ -5,7 +5,7 @@ import mdp.robot.Robot;
 
 public interface IGUIUpdatable {
     
-    public enum ManualTrigger { Exploration, ShortestPath, Combined }
+    public enum ManualTrigger { Exploration, ShortestPath, Combined, Stop }
 
     void trigger(ManualTrigger trigger);
 

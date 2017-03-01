@@ -36,8 +36,6 @@ public class ExplorationSolver {
         Direction robotDir = Direction.Down;
         Robot robot = new Robot(robotPos, robotDir);
         actionFormulator = new ActionFormulator(mapViewer, simulator);
-        SensingData s;
-        int x;
 
         // put some blockers into the map
         System.out.println(objective_map.toString(robot));
@@ -51,6 +49,7 @@ public class ExplorationSolver {
             actionFormulator.rightWallFollower(robot);
 
         }
+      
         ArrayList<Vector2> unexplored = mapViewer.getUnExplored();
         //Print unexplored
         System.out.println("/////UnExplored////////");
@@ -115,6 +114,4 @@ public class ExplorationSolver {
 
         return subjective_map;
     }
-
-    
 }
