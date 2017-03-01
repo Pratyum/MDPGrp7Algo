@@ -5,6 +5,7 @@ import mdp.robot.Robot;
 import mdp.robot.RobotAction;
 
 import mdp.common.Direction;
+import mdp.common.Vector2;
 import mdp.map.Map;
 
 public class ActionFormulator {
@@ -89,6 +90,13 @@ public class ActionFormulator {
         return subjective_map;
     }
 
+    public void circumvent(Robot robot) throws InterruptedException{
+    		Vector2 initialPosition = robot.position();
+    		while(robot.position().i()!= initialPosition.i() && robot.position().j()!= initialPosition.j())
+    			{	
+    				rightWallFollower(robot);
+    			}
+    }
     public static void turnLeftTillEmpty(Robot robot) throws InterruptedException {
 
         Know check = mapViewer.checkWalkable(robot, Direction.Up);

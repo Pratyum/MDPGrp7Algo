@@ -8,9 +8,11 @@ import javafx.util.Pair;
 import mdp.map.Map;
 import mdp.map.WPSpecialState;
 import mdp.robot.Robot;
+import mdp.robot.RobotAction;
 import mdp.common.Vector2;
 import mdp.common.Direction;
 import mdp.Main;
+import mdp.map.WPObstacleState;
 
 public class MapViewer {
 
@@ -43,7 +45,7 @@ public class MapViewer {
         return explored;
     }
 
-    public Map getMap() {
+    public Map getSubjectiveMap() {
         return map;
     }
 
@@ -72,7 +74,20 @@ public class MapViewer {
         return explored[v.i()][v.j()];
 
     }
-
+    
+    public boolean checkIfNavigationComplete(){
+	    boolean complete= true;
+	        for (int i = 0; i < Map.DIM_I; i++) {
+	            for (int j = 0; j < Map.DIM_J; j++) {
+	                if (explored[i][j] == 0) {
+	                    complete = false;
+	                    break;
+	                }
+	            }
+	        }
+	   return complete;
+    }
+    
     private void insertExploredIntoMap() {
         LinkedList<Vector2> listOfObserved = new LinkedList<>();
         for (int i = 0; i < Map.DIM_I; i++) {
@@ -136,10 +151,10 @@ public class MapViewer {
 
     // 1 walkable, 0 not walkable, 2 need further exploration
     public Know checkWalkable(Robot robot, Direction d) throws InterruptedException {
-        if (robot.checkIfHavingBufferActions()) {
-            robot.executeBufferActions(ExplorationSolver.getExePeriod());
-        }
-
+    	 	if (robot.checkIfHavingBufferActions()) {
+             robot.executeBufferActions(ExplorationSolver.getExePeriod());
+         }
+    	 	
         Vector2 edge1, edge2, edge3;
         int s1, s2, s3;
         Direction dir = Direction.Up;
@@ -282,6 +297,77 @@ public class MapViewer {
         return map;
     }
 
+    public Vector2 findFurthestUnexplored(Robot robot){
+    		int i = 20;
+    		Vector2 v;
+    		do{
+    			 v = IdentifyAround(i,robot.position());
+    			 i--;
+    		}while(v.i()==-1 && v.j() == -1);
+    		return v;
+    }
+    
+    private Vector2 IdentifyAround(int width, Vector2 center){
+    		Vector2 traverse = center.fnAdd(new Vector2(width, -width));
+    		int i;
+    		for(i=0; i<width*2;i++){
+    			if(checkValidExploredRange(traverse)){
+    				if(explored[traverse.i()][traverse.j()]==0)
+    					return traverse;		
+    			}
+    			traverse.add(new Vector2(0,1));
+    		}
+    		
+    		for(i=0; i<width*2;i++){
+    			if(checkValidExploredRange(traverse)){
+    				if(explored[traverse.i()][traverse.j()]==0)
+    					return traverse;		
+    			}
+    			traverse.add(new Vector2(-1,0));
+    		}
+    		
+    		for(i=0; i<width*2;i++){
+    			if(checkValidExploredRange(traverse)){
+    				if(explored[traverse.i()][traverse.j()]==0)
+    					return traverse;		
+    			}
+    			traverse.add(new Vector2(0,-1));
+    		}
+    		
+    		for(i=0; i<width*2;i++){
+    			if(checkValidExploredRange(traverse)){
+    				if(explored[traverse.i()][traverse.j()]==0)
+    					return traverse;		
+    			}
+    			traverse.add(new Vector2(1,0));
+    		}
+    		
+    		return new Vector2(-1,-1); // the special vector marks no vector found
+    		
+    }
+    
+    private boolean checkValidExploredRange(Vector2 v){
+    		
+    		return v.i() >=0  && v.i() < (map.DIM_I-1) &&  v.j() >=0  && v.j() < (map.DIM_J-1);
+    }
+    
+    public boolean validate(Robot robot, RobotAction action) throws InterruptedException{
+    		Vector2 position;
+    		switch(action){
+    		case MoveForward:  
+    				if(checkWalkable(robot, Direction.Up)==Know.No){
+    					return false;
+    				}
+    				break;
+    			default: return true;
+    		}
+    		
+    		return true;
+    }
+    
+
+    
+    
     public ArrayList<Vector2> getUnExplored(){
         ArrayList<Vector2> unexplored = new ArrayList<Vector2>() ;
         for(int row=0;row<Map.DIM_I;++row){

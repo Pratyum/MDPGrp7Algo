@@ -37,6 +37,8 @@ public class ExplorationSolver {
         _robot = new Robot(robotPos, robotDir);
         actionFormulator = new ActionFormulator(mapViewer, simulator);
 
+        AStarSolver astarSolver = new AStarSolver();
+        LinkedList<RobotAction> robotActions;
         // put some blockers into the map
         System.out.println(objective_map.toString(_robot));
 
@@ -49,47 +51,23 @@ public class ExplorationSolver {
             actionFormulator.rightWallFollower(_robot);
 
         }
-      
-        ArrayList<Vector2> unexplored = mapViewer.getUnExplored();
-        //Print unexplored
-        System.out.println("/////UnExplored////////");
-        unexplored.forEach((coord) -> {
-            System.out.println(coord);
-        });
-        System.out.println("//////////////////////");
-        Vector2 start_coord = new Vector2(1,1);
-        for(Vector2 coord: unexplored){
-            coord.j(coord.j()+2);
-            System.out.println("x "+ String.valueOf(coord.i())+" y "+ String.valueOf(coord.j()));
-            AStarSolver solver = new AStarSolver();
-            AStarSolverResult result = solver.solve(objective_map, _robot, coord);
-            if(!result.shortestPath.isEmpty()){
-//            System.out.println("///////////////");
-//            System.out.println(objective_map.toString(robot));
-//            System.out.println(coord);
-                Map hlMap = mapViewer.getMap();
-                hlMap.highlight(result.shortestPath, WPSpecialState.IsPathPoint);
-                Main.getGUI().update(hlMap, _robot);
-                LinkedList<RobotAction> robotactions = RobotAction.fromPath(_robot,result.shortestPath);
-                for (RobotAction action: robotactions){
-                    _robot.bufferAction(action);
-                    view(_robot);
-                }
-            }else{
-                coord.j(coord.j()+1);
-            }
-       }
-       AStarSolver solver = new AStarSolver();
-       AStarSolverResult result = solver.solve(objective_map, _robot, start_coord);
-       LinkedList<RobotAction> robotactions = RobotAction.fromPath(_robot,result.shortestPath);
-       for (RobotAction action: robotactions){
-            System.out.println(action);
-            _robot.bufferAction(action);
-            view(_robot);
-       }
-        System.out.println("i:" + _robot.position().i());
-        System.out.println("j:" + _robot.position().j());
 
+        while (!mapViewer.checkIfNavigationComplete()) {
+            Vector2 goal = mapViewer.findFurthestUnexplored(_robot);
+            System.out.print("Goal:" + goal.toString());
+            AStarSolverResult astarSolverResult = astarSolver.solve(mapViewer.getSubjectiveMap(), _robot, goal);
+            robotActions = RobotAction.fromPath(_robot, astarSolverResult.shortestPath);
+            for (RobotAction action : robotActions) {
+                view(_robot);
+
+                if (!mapViewer.validate(_robot, action)) {
+                    actionFormulator.circumvent(_robot);
+                    // in circumvent, stop circumventing when the obstacle is fully identified
+                    break;
+                }
+                _robot.bufferAction(action);
+            }
+        }
     }
 
     public static int getExePeriod() {
@@ -103,8 +81,8 @@ public class ExplorationSolver {
     public static Robot getRobot() {
         return _robot;
     }
-    
-        // look through map and update 
+
+    // look through map and update 
     public static Map view(Robot robot) throws InterruptedException {
         if (robot.checkIfHavingBufferActions()) {
             robot.executeBufferActions(ExplorationSolver.getExePeriod());
@@ -118,7 +96,7 @@ public class ExplorationSolver {
 
         return subjective_map;
     }
-    
+
     public static void goBackToStart(Map map, Robot robot, Runnable callback) {
         System.out.println("Going back to start with the following map");
         System.out.println(map.toString(robot));

@@ -142,7 +142,7 @@ public class EventHandler {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Map map = ExplorationSolver.getMapViewer().getMap();
+                Map map = ExplorationSolver.getMapViewer().getSubjectiveMap();
                 int[][] explored = ExplorationSolver.getMapViewer().getExplored();
 
                 String descStr = Descriptor.stringify(map, explored);
