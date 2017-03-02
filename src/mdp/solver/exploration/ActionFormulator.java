@@ -85,7 +85,7 @@ public class ActionFormulator {
             robot.executeBufferActions(ExplorationSolver.getExePeriod());
         }
 
-        SensingData s;
+        SensingData s = null; // otherwise s may not have been initialized
         if(simulation_mode)
         		s = simulator.getSensingData(robot);
         else{
