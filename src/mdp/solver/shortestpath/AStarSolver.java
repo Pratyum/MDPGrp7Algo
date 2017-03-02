@@ -11,29 +11,50 @@ import mdp.map.Waypoint;
 
 public class AStarSolver {
 
-    public Vector2 solveSingleHeuristic(Map map, Robot robot, Vector2 goalPos) {
+    public Vector2 solveSingle(Map map, Robot robot, Vector2 goalPos) {
         Vector2 diff = goalPos.fnAdd(robot.position().fnMultiply(-1));
-        Vector2 result;
-        if (diff.j() > diff.i()) {
-            // move horizontally
-            if (diff.j() > 0) {
-                // move down
-                result = robot.position().fnAdd(Direction.Down.toVector2());
+        Vector2 horizontalResult;
+        Vector2 verticalResult;
+        if (diff.j() > 0) {
+            // move down
+            horizontalResult = robot.position().fnAdd(Direction.Down.toVector2());
+        } else {
+            // move up
+            horizontalResult = robot.position().fnAdd(Direction.Up.toVector2());
+        }
+        if (diff.i() > 0) {
+            // move right
+            verticalResult = robot.position().fnAdd(Direction.Right.toVector2());
+        } else {
+            // move left
+            verticalResult = robot.position().fnAdd(Direction.Left.toVector2());
+        }
+        
+        boolean horizontallyWalkable = false;
+        boolean verticallyWalkable = false;
+        if (map.getPoint(horizontalResult).obstacleState()
+                                        .equals(WPObstacleState.IsWalkable)) {
+            horizontallyWalkable = true;
+        }
+        if (map.getPoint(verticalResult).obstacleState()
+                                        .equals(WPObstacleState.IsWalkable)) {
+            verticallyWalkable = true;
+        }
+        
+        if (horizontallyWalkable) {
+            if (verticallyWalkable) {
+                return diff.i() > diff.j() ? verticalResult : horizontalResult;
             } else {
-                // move up
-                result = robot.position().fnAdd(Direction.Up.toVector2());
+                return horizontalResult;
             }
         } else {
-            // move vertically
-            if (diff.i() > 0) {
-                // move right
-                result = robot.position().fnAdd(Direction.Right.toVector2());
+            if (verticallyWalkable) {
+                return verticalResult;
             } else {
-                // move left
-                result = robot.position().fnAdd(Direction.Left.toVector2());
+                 System.out.println("No possible solution found.");
+                 return new Vector2(-1, -1);
             }
         }
-        return result;
     }
 
     public AStarSolverResult solve(Map map, Robot robot, Vector2 goalPos) {
