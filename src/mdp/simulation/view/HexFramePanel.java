@@ -1,4 +1,4 @@
-package mdp.simulation;
+package mdp.simulation.view;
 
 import javax.swing.JPanel;
 import javax.swing.JTextArea;

@@ -8,6 +8,8 @@ import mdp.robot.RobotAction;
 public interface ITranslatable {
 
     String getInputBuffer();
+    
+    void connect(Runnable callback);
 
     void listen(Runnable handler);
 

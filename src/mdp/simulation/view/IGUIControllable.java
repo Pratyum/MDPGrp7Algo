@@ -1,4 +1,4 @@
-package mdp.simulation;
+package mdp.simulation.view;
 
 import mdp.map.Map;
 import mdp.robot.Robot;

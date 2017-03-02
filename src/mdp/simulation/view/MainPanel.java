@@ -1,4 +1,4 @@
-package mdp.simulation;
+package mdp.simulation.view;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;

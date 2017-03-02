@@ -1,4 +1,4 @@
-package mdp.simulation;
+package mdp.simulation.view;
 
 import java.awt.Dimension;
 import javax.swing.JFrame;

@@ -28,8 +28,12 @@ public class Translator implements ITranslatable {
     private String _inputBuffer;
     
     public Translator() throws IOException {
-        _socketCommunicator = new SocketCommunicator();
         _inputBuffer = "";
+    }
+
+    @Override
+    public void connect(Runnable callback) {
+        _socketCommunicator = new SocketCommunicator(callback);
     }
 
     @Override
@@ -92,13 +96,15 @@ public class Translator implements ITranslatable {
                 probingTimer.schedule(new TimerTask() {
                     @Override
                     public void run() {
+                        System.out.println("listening...");
                         try {
                             String readResult = _readAsString();
                             _inputBuffer = "";
                             if (!readResult.isEmpty()) {
                                 _inputBuffer = readResult;
                                 handler.run();
-                                probingTimer.cancel();
+                                System.out.println();
+//                                probingTimer.cancel();
                             }
                         } catch (IOException ex) {
                             Logger.getLogger(ITranslatable.class.getName()).log(Level.SEVERE, null, ex);

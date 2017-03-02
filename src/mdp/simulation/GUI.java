@@ -1,7 +1,11 @@
 package mdp.simulation;
 
+import mdp.simulation.view.MainFrame;
+import mdp.simulation.view.IGUIControllable;
+import mdp.simulation.event.EventHandler;
 import mdp.map.Map;
 import mdp.robot.Robot;
+import mdp.simulation.event.GUIClickEvent;
 
 public class GUI implements IGUIControllable {
     
@@ -55,24 +59,29 @@ public class GUI implements IGUIControllable {
         update(_map, robot);
     }
     
-    @Override
-    public void trigger(ManualTrigger trigger) {
-        RunControlPanel runCtrlPanel = _mainFrame.getMainPanel().getRunCtrlPanel();
-        InterruptControlPanel intrtCtrlPanel = _mainFrame.getMainPanel().getIntrCtrlPanel();
-        switch (trigger) {
-            case Exploration:
-                runCtrlPanel.getExplorationBtn().doClick();
-                break;
-            case ShortestPath:
-                runCtrlPanel.getShortestPathBtn().doClick();
-                break;
-            case Combined:
-                runCtrlPanel.getCombinedBtn().doClick();
-                break;
-//            case Stop:
-//                intrtCtrlPanel.getStopBtn().doClick();
+//    @Override
+//    public void trigger(ManualTrigger trigger) {
+//        RunControlPanel runCtrlPanel = _mainFrame.getMainPanel().getRunCtrlPanel();
+//        InterruptControlPanel intrtCtrlPanel = _mainFrame.getMainPanel().getIntrCtrlPanel();
+//        switch (trigger) {
+//            case Exploration:
+//                runCtrlPanel.getExplorationBtn().doClick();
 //                break;
-        }
+//            case ShortestPath:
+//                runCtrlPanel.getShortestPathBtn().doClick();
+//                break;
+//            case Combined:
+//                runCtrlPanel.getCombinedBtn().doClick();
+//                break;
+////            case Stop:
+////                intrtCtrlPanel.getStopBtn().doClick();
+////                break;
+//        }
+//    }
+
+    @Override
+    public void trigger(GUIClickEvent hdlr) {
+        _eventHandler.resolveBtnHandler(hdlr, null);
     }
     
 }
