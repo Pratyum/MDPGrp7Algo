@@ -26,18 +26,18 @@ public class Simulator {
 
         edge = robot.position().fnAdd(robot.orientation().toVector2());
         s.front_m = detect(edge, robot.orientation());
-        System.out.println("s.front_m " + s.front_m);
+        //System.out.println("s.front_m " + s.front_m);
         edge_l = edge.fnAdd(robot.orientation().getLeft().toVector2());
         s.front_l = detect(edge_l, robot.orientation());
-        System.out.println("s.front_l" + s.front_l);
+        //System.out.println("s.front_l" + s.front_l);
         edge_r = edge.fnAdd(robot.orientation().getRight().toVector2());
         s.front_r = detect(edge_r, robot.orientation());
-        System.out.println("s.front_r " + s.front_r);
+        //System.out.println("s.front_r " + s.front_r);
 
         s.left = detect(edge_l, robot.orientation().getLeft());
-        System.out.println("s.left " + s.left);
+        //System.out.println("s.left " + s.left);
         s.right = detect(edge_r, robot.orientation().getRight());
-        System.out.println("s.right " + s.right);
+        //System.out.println("s.right " + s.right);
         return s;
 
     }

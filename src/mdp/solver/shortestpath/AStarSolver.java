@@ -155,7 +155,7 @@ public class AStarSolver {
 
             // set cur to parent
             curPoint = closedPoints.get(parentPos.toString());
-        } while (AStarUtil.getMDistance(curPoint.position(), robot.position()) != 0);
+        } while (curPoint != null && AStarUtil.getMDistance(curPoint.position(), robot.position()) != 0);
         Collections.reverse(result.shortestPath);
 
         // add opened & closed to result

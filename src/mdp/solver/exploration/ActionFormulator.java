@@ -8,8 +8,12 @@ import mdp.common.Direction;
 import mdp.common.Vector2;
 import mdp.map.Map;
 
+
+
 public class ActionFormulator {
 
+	private static boolean simulation_mode = true;
+	
     private MapViewer mapViewer;
 
     private Simulator simulator;
@@ -82,7 +86,11 @@ public class ActionFormulator {
         }
 
         SensingData s;
-        s = simulator.getSensingData(robot);
+        if(simulation_mode)
+        		s = simulator.getSensingData(robot);
+        else{
+        		//RPI call here
+        }
         Map subjective_map = mapViewer.updateMap(robot, s);
         System.out.println(mapViewer.exploredAreaToString());
         System.out.println(subjective_map.toString(robot));
@@ -95,6 +103,7 @@ public class ActionFormulator {
     		while(robot.position().i()!= initialPosition.i() && robot.position().j()!= initialPosition.j())
     			{	
     				rightWallFollower(robot);
+    				//System.out.println("Loop");
     			}
     }
     public void turnLeftTillEmpty(Robot robot) throws InterruptedException {
