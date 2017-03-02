@@ -344,7 +344,7 @@ public class EventHandler implements IHandleable {
         _gui.getMap().highlight(solveResult.shortestPath, WPSpecialState.IsPathPoint);
         LinkedList<RobotAction> actions = RobotAction
                 .fromPath(_gui.getRobot(), solveResult.shortestPath);
-
+        
         _shortestPathThread = new Timer();
         _shortestPathThread.schedule(new TimerTask() {
             @Override

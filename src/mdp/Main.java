@@ -10,14 +10,17 @@ import mdp.communication.ITranslatable;
 import mdp.simulation.GUI;
 import mdp.simulation.event.GUIClickEvent;
 import mdp.simulation.view.IGUIUpdatable;
+import mdp.solver.shortestpath.AStarSolver;
 
 public class Main {
     
-    public static IGUIUpdatable _gui;
-    public static ITranslatable _rpi;
+    private static IGUIUpdatable _gui;
+    private static ITranslatable _rpi;
     
     public static void main(String[] args) throws IOException {
                 
+        AStarSolver solver = new AStarSolver();
+        
         // run simulation
         System.out.println("Initiating GUI...");
         restartGUI();
@@ -41,14 +44,18 @@ public class Main {
 
     }
     
+    public static IGUIUpdatable getGUI() {
+        return _gui;
+    }
+
+    public static ITranslatable getRpi() {
+        return _rpi;
+    }
+    
     public static void restartGUI() {
         SwingUtilities.invokeLater(() -> {
             _gui = new GUI();
         });
-    }
-    
-    public static IGUIUpdatable getGUI() {
-        return _gui;
     }
     
     private static void _listenToRPi() throws IOException {
