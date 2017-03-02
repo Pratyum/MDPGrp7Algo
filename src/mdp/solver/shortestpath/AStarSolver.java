@@ -22,6 +22,12 @@ public class AStarSolver {
         // record robot position as cur point
         AStarWaypoint curPoint = new AStarWaypoint(new Waypoint(robot.position()));
         
+        // check if cur point is goal
+        if (curPoint.position().equals(goal)) {
+            System.out.println("Robot already at goal.");
+            return result;
+        }
+        
         // loop until a point next tp goal is found
         while (AStarUtil.getMDistance(curPoint.position(), goal) != 1) {
 //            System.out.println("Cur:");
@@ -87,7 +93,7 @@ public class AStarSolver {
                 curPoint = lowestFvalPoint;
             } else {
                 // path to goal is blocked
-                System.out.println("NO SOLUTION");
+                System.out.println("No possible path to goal found.");
                 return result;
             }
         }
