@@ -8,6 +8,8 @@ import mdp.map.Map;
 import mdp.map.WPSpecialState;
 import mdp.robot.Robot;
 import mdp.robot.RobotAction;
+import mdp.solver.shortestpath.AStarSolver;
+import mdp.solver.shortestpath.AStarSolverResult;
 import mdp.common.Vector2;
 import mdp.common.Direction;
 import mdp.Main;
@@ -85,6 +87,7 @@ public class MapViewer {
 	                }
 	            }
 	        }
+	        
 	   return complete;
     }
     
@@ -309,6 +312,7 @@ public class MapViewer {
     		do{
     			 v = IdentifyUnexploredAround(i,robot.position());
     			 i--;
+    			 
     		}while(v.i()==-1 && v.j() == -1);
     		return v;
     }
@@ -371,28 +375,47 @@ public class MapViewer {
     		return true;
     }
     
-    public Vector2 filterVirtualObstacle(Vector2 position){
-    	
+    public Vector2 findWalkableGoal(Vector2 position, Robot robot){
+    		
+    		AStarSolver astarSolver = new AStarSolver();
+    		AStarSolverResult astarSolverResult ;
+    		
     		if(map.getPoint(position).obstacleState() == WPObstacleState.IsWalkable)
-    			return position;
+    			{
+    				astarSolverResult = astarSolver.solve(getSubjectiveMap(), robot, position);
+    				if (!astarSolverResult.shortestPath.isEmpty())
+    					return position;
+    			}
     	
     		int i = 1;
-		Vector2 v;
-			do{
-				 v = IdentifyWalkableSquareAround(i,position);
-				 i--;
-			}while(v.i()==-1 && v.j() == -1);
-		return v;
+		LinkedList<Vector2> list;
+		int num;
+			while(i<=5){
+				 list = IdentifyWalkableSquareAround(i,position);
+				 num = 0;
+				 
+				 for(num = 0; num < list.size();num++){
+					 astarSolverResult = astarSolver.solve(getSubjectiveMap(), robot, list.get(num));
+					 if (!astarSolverResult.shortestPath.isEmpty())
+						 return position;
+					 
+				 } 
+				 list.clear();
+				 i++;
+			};
+			
+		return new Vector2(-1,-1);
     		
     }
     
-    private Vector2 IdentifyWalkableSquareAround(int width, Vector2 center ){
+    private LinkedList<Vector2> IdentifyWalkableSquareAround(int width, Vector2 center ){
 		Vector2 traverse = center.fnAdd(new Vector2(width, -width));
 		int i;
+		LinkedList<Vector2> traversingList = new LinkedList<Vector2>();
 		for(i=0; i<width*2;i++){
 			if(checkValidExploredRange(traverse)){
 				if( map.getPoint(traverse).obstacleState() == WPObstacleState.IsWalkable )
-					return traverse;		
+					traversingList.add(traverse);		
 			}
 			traverse.add(new Vector2(0,1));
 		}
@@ -400,7 +423,7 @@ public class MapViewer {
 		for(i=0; i<width*2;i++){
 			if(checkValidExploredRange(traverse)){
 				if(map.getPoint(traverse).obstacleState() == WPObstacleState.IsWalkable )
-					return traverse;		
+					traversingList.add(traverse);
 			}
 			traverse.add(new Vector2(-1,0));
 		}
@@ -408,7 +431,7 @@ public class MapViewer {
 		for(i=0; i<width*2;i++){
 			if(checkValidExploredRange(traverse)){
 				if(map.getPoint(traverse).obstacleState() == WPObstacleState.IsWalkable)
-					return traverse;		
+					traversingList.add(traverse);	
 			}
 			traverse.add(new Vector2(0,-1));
 		}
@@ -416,12 +439,12 @@ public class MapViewer {
 		for(i=0; i<width*2;i++){
 			if(checkValidExploredRange(traverse)){
 				if(map.getPoint(traverse).obstacleState() == WPObstacleState.IsWalkable)
-					return traverse;		
+					traversingList.add(traverse);	
 			}
 			traverse.add(new Vector2(1,0));
 		}
 		
-		return new Vector2(-1,-1); // the special vector marks no vector found
+		return traversingList; // the special vector marks no vector found
 		
 }
     

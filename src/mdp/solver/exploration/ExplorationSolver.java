@@ -59,25 +59,29 @@ public class ExplorationSolver {
 
         while (!mapViewer.checkIfNavigationComplete()) {
             Vector2 goal = mapViewer.findFurthestUnexplored(_robot);
-            goal = mapViewer.filterVirtualObstacle(goal);
+            goal = mapViewer.findWalkableGoal(goal, _robot);
+            if(goal.i()==-1 && goal.j()==-1) //means cannot find a walkablePoint in 
+            		break;
             System.out.print("Goal:" + goal.toString());
             AStarSolverResult astarSolverResult = astarSolver.solve(mapViewer.getSubjectiveMap(), _robot, goal);
-            if (astarSolverResult.shortestPath.isEmpty()) {
-                break;
-            }
+            
             robotActions = RobotAction.fromPath(_robot, astarSolverResult.shortestPath);
-
+            //System.out.println("Action size: " + robotActions.size());
             for (RobotAction action : robotActions) {
                 view(_robot);
 
                 if (!mapViewer.validate(_robot, action)) {
                     actionFormulator.circumvent(_robot);
+                    //System.out.println("Here2");
                     // in circumvent, stop circumventing when the obstacle is fully identified
                     break;
                 }
+                //System.out.println("Here3");
                 _robot.bufferAction(action);
             }
         }
+        
+        System.out.println("Here3");
     }
 
     public static int getExePeriod() {

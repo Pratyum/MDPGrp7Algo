@@ -31,16 +31,21 @@ public class Robot {
         Vector2 dirVector = _orientation.toVector2();
         switch (action) {
             case MoveForward:
+            		// RPI call
                 _position.add(dirVector);
                 break;
             case MoveBackward:
+            		// RPI call
                 dirVector.multiply(-1);
+                
                 _position.add(dirVector);
                 break;
             case RotateLeft:
+            		// RPI call
                 _orientation = _orientation.getLeft();
                 break;
             case RotateRight:
+            		// RPI call
                 _orientation = _orientation.getRight();
                 break;
         }
