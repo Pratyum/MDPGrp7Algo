@@ -12,7 +12,9 @@ public class Descriptor {
     private static String _getFilePath(String fileName) throws IOException {
         String rootPath = new File(".").getCanonicalPath() + "//src//";
         String packagePath = Descriptor.class.getPackage().getName().replace(".", "//") + "//";
-        return rootPath + packagePath + fileName;
+        String mapDirPath = "test//";
+        String fileExtension = ".txt";
+        return rootPath + packagePath + mapDirPath + fileName + fileExtension;
     }
     
     private static String _binToHex(String bin) {

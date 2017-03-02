@@ -48,10 +48,11 @@ public class ExplorationSolver {
         //data = getDataFromRPI();
         System.out.println(_robot.position());
         while (!goalFormulator.checkIfReachFinalGoal(_robot.position())) {
+            System.out.println("following right wall");
             actionFormulator.rightWallFollower(_robot);
         }
         while (!goalFormulator.checkIfReachStartZone(_robot.position())) {
-
+            System.out.println("following right wall");
             actionFormulator.rightWallFollower(_robot);
 
         }

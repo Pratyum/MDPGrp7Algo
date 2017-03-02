@@ -57,8 +57,11 @@ public class Map {
                 } else {
                     switch (explored[i][j]) {
                         case 0:
+                            obstacles.add(curPos);
+                            break;
                         case 2:
                             obstacles.add(curPos);
+                            curSpecState = WPSpecialState.IsExplored;
                             break;
                         case 1:
                             curSpecState = WPSpecialState.IsExplored;

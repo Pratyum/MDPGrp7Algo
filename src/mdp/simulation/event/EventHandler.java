@@ -140,7 +140,7 @@ public class EventHandler implements IHandleable {
             String filePath = _gui.getMainFrame()
                     .getMainPanel()
                     .getDescCtrlPanel()
-                    .getFilePathTextField().getText() + ".txt";
+                    .getFilePathTextField().getText();
             /////// for testing
             boolean[][] explored = new boolean[Map.DIM_I][Map.DIM_J];
             for (int i = 0; i < Map.DIM_I; i++) {
@@ -162,7 +162,7 @@ public class EventHandler implements IHandleable {
             String filePath = _gui.getMainFrame()
                     .getMainPanel()
                     .getDescCtrlPanel()
-                    .getFilePathTextField().getText() + ".txt";
+                    .getFilePathTextField().getText();
             System.out.println(filePath);
             _gui.update(Descriptor.parseFromFile(filePath));
             System.out.println("Open desc completed.");
@@ -317,12 +317,16 @@ public class EventHandler implements IHandleable {
             Robot curRobot = ExplorationSolver.getRobot();
             int[][] explored = ExplorationSolver.getMapViewer().getExplored();
             _explorationThread.stop();
-            ExplorationSolver.goBackToStart(new Map(explored), curRobot, callback);
+            Map finalMap = new Map(explored);
+            ExplorationSolver.goBackToStart(finalMap, curRobot, callback);
+            Main.getGUI().update(finalMap);
         };
         Runnable nonInterruptCallback = () -> {
             Robot curRobot = ExplorationSolver.getRobot();
             int[][] explored = ExplorationSolver.getMapViewer().getExplored();
-            ExplorationSolver.goBackToStart(new Map(explored), curRobot, callback);
+            Map finalMap = new Map(explored);
+            ExplorationSolver.goBackToStart(finalMap, curRobot, callback);
+            Main.getGUI().update(finalMap);
         };
         if (termCoverage != 0) {
             new Terminator(termCoverage / 100f, interruptCallback).observe();
