@@ -69,16 +69,16 @@ public class Translator implements ITranslatable {
 //            System.out.println("result = " + result);
 //            System.out.println("nextActionStr = " + nextActionStr);
             if (result.length() != 0) {
-            		lastAction = Character.toString(result.charAt(result.length() - 1));
-        			//System.out.println(lastAction);
+                lastAction = Character.toString(result.charAt(result.length() - 1));
+                //System.out.println(lastAction);
 //                System.out.println("lastAction = " + lastAction);
                 if (lastAction.equals(nextActionStr)) {
-                		boolean isRotating = lastAction.equals(_ROTATE_LEFT_STR) || lastAction.equals(_ROTATE_RIGHT_STR);
-                		if (isRotating) {
-                			result += _TRAILER + lastAction;
-                		} else {
-                			count++;
-                		}
+                    boolean isRotating = lastAction.equals(_ROTATE_LEFT_STR) || lastAction.equals(_ROTATE_RIGHT_STR);
+                    if (isRotating) {
+                        result += _TRAILER + lastAction;
+                    } else {
+                        count++;
+                    }
 //                    System.out.println("Counting up");
                     //count++;
                 } else {
@@ -94,11 +94,11 @@ public class Translator implements ITranslatable {
         System.out.println("result = " + result);
         boolean isRotating;
         if (result.length() != 1) {
-        		isRotating = lastAction.equals(_ROTATE_LEFT_STR) || lastAction.equals(_ROTATE_RIGHT_STR);
+            isRotating = lastAction.equals(_ROTATE_LEFT_STR) || lastAction.equals(_ROTATE_RIGHT_STR);
         } else {
-        		isRotating = result.equals(_ROTATE_LEFT_STR) || result.equals(_ROTATE_RIGHT_STR);
+            isRotating = result.equals(_ROTATE_LEFT_STR) || result.equals(_ROTATE_RIGHT_STR);
         }
-        
+
         result += (isRotating ? "" : count) + _TRAILER;
         System.out.println("Sending out: " + result);
         return result;
