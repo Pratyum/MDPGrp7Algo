@@ -63,10 +63,15 @@ public class Robot {
     }
     public void executeBufferActions(int sleepPeriod) throws IOException {
         try {
+        		if(Main.getSimulationMode() == false){
+        			
+        			Main.getRpi().sendMoveCommand(bufferedActions);
+            		while(actionCompleted != true){}
+            		
+            		System.out.println("Actions completed");
+            		actionCompleted = false;
+        		}
         	
-        		Main.getRpi().sendMoveCommand(bufferedActions);
-        		while(actionCompleted != true){}
-            
         		for (RobotAction action: bufferedActions) {
                 execute(action);
                 
@@ -74,7 +79,7 @@ public class Robot {
                 Thread.sleep(sleepPeriod);
             }
             bufferedActions.clear();
-            actionCompleted = false;
+            
         } catch (InterruptedException e) {
             System.out.println("Robot execution interrupted");
         }

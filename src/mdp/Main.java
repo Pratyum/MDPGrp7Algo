@@ -18,7 +18,11 @@ public class Main {
 
     private static IGUIUpdatable _gui;
     private static ITranslatable _rpi;
-
+    private static boolean simulation_mode= false;
+    
+    public static boolean getSimulationMode(){
+    		return simulation_mode;
+    }
     public static void main(String[] args) throws IOException {
 
         AStarSolver solver = new AStarSolver();

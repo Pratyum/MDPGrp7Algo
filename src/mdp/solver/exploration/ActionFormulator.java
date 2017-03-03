@@ -100,20 +100,21 @@ public class ActionFormulator {
         }
         
         SensingData s = new SensingData(); // otherwise s may not have been initialized
-        if(simulation_mode)
+        if(Main.getSimulationMode())
         		s = simulator.getSensingData(robot);
         else{
         		//RPI call here
         		Main.getRpi().sendSensingRequest();
-        		
+        		while(isSensingDataArrived != true){ }
+        			
+                s.front_l= Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(0)));
+                s.front_m= Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(1)));
+                s.front_r= Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(2)));
+                s.right_f= Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(3)));
+                s.right_b= Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(4)));
+                s.left= Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(5)));
         }
-        while(isSensingDataArrived != true){}
-        s.front_l= sensingDataFromRPI.charAt(0);
-        s.front_m= sensingDataFromRPI.charAt(1);
-        s.front_r= sensingDataFromRPI.charAt(2);
-        s.right_f= sensingDataFromRPI.charAt(3);
-        s.right_b= sensingDataFromRPI.charAt(4);
-        s.left= sensingDataFromRPI.charAt(5);
+        
         
         
         Map subjective_map = mapViewer.updateMap(robot, s);

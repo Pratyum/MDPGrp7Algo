@@ -35,7 +35,7 @@ public class ExplorationSolver {
         _exePeriod = exePeriod;
         objective_map = map;
         simulator = new Simulator(objective_map);
-
+        
         Vector2 robotPos = new Vector2(1, 1);
         Direction robotDir = Direction.Down;
         _robot = new Robot(robotPos, robotDir);
