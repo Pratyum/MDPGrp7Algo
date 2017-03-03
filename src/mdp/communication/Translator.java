@@ -95,7 +95,7 @@ public class Translator implements ITranslatable {
 
     // Arduino
     @Override
-    public void sendShortestPath(List<RobotAction> actions) throws IOException {
+    public void sendMoveCommand(List<RobotAction> actions) throws IOException {
         String message = _TO_ARDUINO_MARKER + _compileActions(actions);
         _socketCommunicator.echo(message);
     }

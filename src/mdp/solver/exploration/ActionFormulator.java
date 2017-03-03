@@ -4,20 +4,27 @@ import mdp.map.Waypoint;
 import mdp.robot.Robot;
 import mdp.robot.RobotAction;
 
+import java.io.IOException;
+
+import mdp.Main;
 import mdp.common.Direction;
 import mdp.common.Vector2;
 import mdp.map.Map;
-
+import mdp.communication.*;
 
 
 public class ActionFormulator {
 
-	private static boolean simulation_mode = true;
+	private static boolean simulation_mode = false;
 	
     private MapViewer mapViewer;
 
     private Simulator simulator;
 
+    private static volatile boolean isSensingDataArrived = false;
+    private static volatile String sensingDataFromRPI;
+    
+    
     public ActionFormulator(MapViewer mapV, Simulator s) {
         mapViewer = mapV;
         simulator = s;
@@ -32,7 +39,7 @@ public class ActionFormulator {
 
     }
 
-    public void rightWallFollower(Robot robot) throws InterruptedException {
+    public void rightWallFollower(Robot robot) throws InterruptedException, IOException {
 
         view(robot); // for scanning purpose
 
@@ -78,27 +85,45 @@ public class ActionFormulator {
         }
 
     }
+    
+    
 
+    public static void sensingDataCallback(String input){
+    		sensingDataFromRPI = input;
+    		isSensingDataArrived = true;
+    }
+    
     // look through map and update 
-    public Map view(Robot robot) throws InterruptedException {
+    public Map view(Robot robot) throws InterruptedException, IOException {
         if (robot.checkIfHavingBufferActions()) {
             robot.executeBufferActions(ExplorationSolver.getExePeriod());
         }
-
+        
         SensingData s = null; // otherwise s may not have been initialized
         if(simulation_mode)
         		s = simulator.getSensingData(robot);
         else{
         		//RPI call here
+        		Main.getRpi().sendSensingRequest();
+        		
         }
+        while(isSensingDataArrived != true){}
+        s.front_l= sensingDataFromRPI.charAt(0);
+        s.front_m= sensingDataFromRPI.charAt(1);
+        s.front_r= sensingDataFromRPI.charAt(2);
+        s.right_f= sensingDataFromRPI.charAt(3);
+        s.right_b= sensingDataFromRPI.charAt(4);
+        s.left= sensingDataFromRPI.charAt(5);
+        
+        
         Map subjective_map = mapViewer.updateMap(robot, s);
         System.out.println(mapViewer.exploredAreaToString());
         System.out.println(subjective_map.toString(robot));
-
+        isSensingDataArrived = false;
         return subjective_map;
     }
 
-    public void circumvent(Robot robot) throws InterruptedException{
+    public void circumvent(Robot robot) throws InterruptedException, IOException{
     		Vector2 initialPosition = robot.position();
     		while(robot.position().i()!= initialPosition.i() && robot.position().j()!= initialPosition.j())
     			{	
@@ -106,7 +131,7 @@ public class ActionFormulator {
     				//System.out.println("Loop");
     			}
     }
-    public void turnLeftTillEmpty(Robot robot) throws InterruptedException {
+    public void turnLeftTillEmpty(Robot robot) throws InterruptedException, IOException {
 
         Know check = mapViewer.checkWalkable(robot, Direction.Up);
 

@@ -1,17 +1,19 @@
 package mdp.robot;
 
+import java.io.IOException;
 import java.util.LinkedList;
 
 import mdp.Main;
 import mdp.common.Direction;
 import mdp.common.Vector2;
 import mdp.map.Map;
-
+import mdp.Main;
 public class Robot {    
     private Vector2 _position;
     private Direction _orientation;
     private Direction _direction;
     private Map pathMap;
+    private static volatile boolean actionCompleted =  false;
     private static LinkedList<RobotAction> bufferedActions= new LinkedList<>() ;
     
     public Robot() {
@@ -32,6 +34,7 @@ public class Robot {
         switch (action) {
             case MoveForward:
             		// RPI call
+            		
                 _position.add(dirVector);
                 break;
             case MoveBackward:
@@ -53,14 +56,25 @@ public class Robot {
     public boolean bufferAction(RobotAction action){
         return bufferedActions.add(action);
     }
-    public void executeBufferActions(int sleepPeriod) {
+    
+    public static void actionCompletedCallBack(){
+    		actionCompleted= true;
+    		
+    }
+    public void executeBufferActions(int sleepPeriod) throws IOException {
         try {
-            for (RobotAction action: bufferedActions) {
+        	
+        		Main.getRpi().sendMoveCommand(bufferedActions);
+        		while(actionCompleted != true){}
+            
+        		for (RobotAction action: bufferedActions) {
                 execute(action);
+                
                 Main.getGUI().update(this);
                 Thread.sleep(sleepPeriod);
             }
             bufferedActions.clear();
+            actionCompleted = false;
         } catch (InterruptedException e) {
             System.out.println("Robot execution interrupted");
         }

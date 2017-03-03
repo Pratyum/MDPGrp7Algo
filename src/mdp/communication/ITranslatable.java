@@ -17,6 +17,6 @@ public interface ITranslatable {
     
     void sendSensingRequest();
 
-    void sendShortestPath(List<RobotAction> actions) throws IOException;
+    void sendMoveCommand(List<RobotAction> actions) throws IOException;
     
 }

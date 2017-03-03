@@ -22,8 +22,8 @@ public class Simulator {
     }
 
     public SensingData getSensingData(Robot robot) {
-        Vector2 edge, edge_l, edge_r;
-
+        Vector2 edge, edge_l, edge_r,edge_b;
+        
         edge = robot.position().fnAdd(robot.orientation().toVector2());
         s.front_m = detect(edge, robot.orientation());
         //System.out.println("s.front_m " + s.front_m);
@@ -34,9 +34,12 @@ public class Simulator {
         s.front_r = detect(edge_r, robot.orientation());
         //System.out.println("s.front_r " + s.front_r);
 
-        s.left = detect(edge_l, robot.orientation().getLeft());
+        s.left = detectLong(edge_l, robot.orientation().getLeft());
         //System.out.println("s.left " + s.left);
-        s.right = detect(edge_r, robot.orientation().getRight());
+        s.right_f = detect(edge_r, robot.orientation().getRight());
+        
+        edge_b = robot.position().fnAdd(robot.orientation().getRight().toVector2()).fnAdd(robot.orientation().getBehind().toVector2());
+        s.right_b = detect(edge_b, robot.orientation().getRight());
         //System.out.println("s.right " + s.right);
         return s;
 
@@ -68,6 +71,42 @@ public class Simulator {
 
     }
 
+    
+    private int detectLong(Vector2 position, Direction dir) {
+        Vector2 tmp = new Vector2(position.i(), position.j());
+        Waypoint wp;
+        Vector2 unit;
+        unit = dir.toVector2();
+
+        tmp.add(unit);
+
+        //seeing range is not relevant to virtual obstacle
+        if (!objective_map.checkValidBoundary(tmp) || objective_map.getPoint(tmp).obstacleState() == WPObstacleState.IsActualObstacle) {
+            return 1;
+        }
+        tmp.add(unit);
+
+        if (!objective_map.checkValidBoundary(tmp) || objective_map.getPoint(tmp).obstacleState() == WPObstacleState.IsActualObstacle) {
+            return 2;
+        }
+        tmp.add(unit);
+
+        if (!objective_map.checkValidBoundary(tmp) || objective_map.getPoint(tmp).obstacleState() == WPObstacleState.IsActualObstacle) {
+            return 3;
+        }
+        
+        tmp.add(unit);
+        if (!objective_map.checkValidBoundary(tmp) || objective_map.getPoint(tmp).obstacleState() == WPObstacleState.IsActualObstacle) {
+            return 4;
+        }
+        tmp.add(unit);
+        if (!objective_map.checkValidBoundary(tmp) || objective_map.getPoint(tmp).obstacleState() == WPObstacleState.IsActualObstacle) {
+            return 5;
+        }
+        
+        return 0; // no obstacle in front
+
+    }
     private static List<Vector2> _genBlockers(int[][] obstacleMap) {
         List<Vector2> blockers = new ArrayList<>();
         for (int i = 0; i < obstacleMap.length; i++) {
