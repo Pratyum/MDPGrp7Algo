@@ -82,8 +82,12 @@ public class Main {
                     Robot.actionCompletedCallBack();
                     break;
                 default:
-                    ActionFormulator.sensingDataCallback(inStr);
-                    System.out.println("Unrecognized input");
+                    if (inStr.length() == 6) {
+                        System.out.println("Analyzing sensing information");
+                        ActionFormulator.sensingDataCallback(inStr);
+                    } else {
+                        System.out.println("Unrecognized input");
+                    }
                     break;
             }
         });

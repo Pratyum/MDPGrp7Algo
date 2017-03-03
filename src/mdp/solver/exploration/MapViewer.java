@@ -53,8 +53,9 @@ public class MapViewer {
     }
 
     private void markExploredEmpty(Vector2 v) {
-
-        explored[v.i()][v.j()] = 1;
+        if(map.checkValidBoundary(v)) {
+            explored[v.i()][v.j()] = 1;
+        }
     }
 
     private void markExploredObstacle(Vector2 v) {
