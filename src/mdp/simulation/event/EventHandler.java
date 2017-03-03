@@ -201,7 +201,10 @@ public class EventHandler implements IHandleable {
                 });
             } catch (InterruptedException ex) {
                 Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            } catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
         });
         _explorationThread.start();
     }
@@ -233,6 +236,8 @@ public class EventHandler implements IHandleable {
                 });
             } catch (InterruptedException ex) {
                 Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+            		Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
         _explorationThread.start();
@@ -296,7 +301,7 @@ public class EventHandler implements IHandleable {
     }
 
     // shared procedures
-    private void _explorationProcedure(int exePeriod, Runnable callback) throws InterruptedException {
+    private void _explorationProcedure(int exePeriod, Runnable callback) throws InterruptedException, IOException {
         System.out.println("Starting Exploration");
         _isShortestPath = false;
         int termCoverage = Integer.parseInt(_gui
