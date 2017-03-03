@@ -7,6 +7,7 @@ public class SensingData {
     public int front_r = 0;
 
     public int left = 0;
-    public int right = 0;
+    public int right_f = 0;
+    public int right_b = 0;
 
 }

@@ -6,10 +6,12 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 import mdp.communication.Translator;
+import mdp.robot.Robot;
 import mdp.communication.ITranslatable;
 import mdp.simulation.GUI;
 import mdp.simulation.event.GUIClickEvent;
 import mdp.simulation.view.IGUIUpdatable;
+import mdp.solver.exploration.ActionFormulator;
 import mdp.solver.shortestpath.AStarSolver;
 
 public class Main {
@@ -75,7 +77,11 @@ public class Main {
                     System.out.println("Triggering Combined");
                     _gui.trigger(GUIClickEvent.OnCombined);
                     break;
+                case "D":
+                		Robot.actionCompletedCallBack();
+                		break;
                 default:
+                		ActionFormulator.sensingDataCallback(inStr);
                     System.out.println("Unrecognized input");
                     break;
             }

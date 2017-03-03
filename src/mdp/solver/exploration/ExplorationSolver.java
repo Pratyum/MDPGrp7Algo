@@ -1,5 +1,6 @@
 package mdp.solver.exploration;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Timer;
@@ -97,7 +98,7 @@ public class ExplorationSolver {
     }
 
     // look through map and update 
-    public static Map view(Robot robot) throws InterruptedException {
+    public static Map view(Robot robot) throws InterruptedException, IOException {
         if (robot.checkIfHavingBufferActions()) {
             robot.executeBufferActions(ExplorationSolver.getExePeriod());
         }

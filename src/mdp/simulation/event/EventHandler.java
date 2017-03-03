@@ -353,7 +353,7 @@ public class EventHandler implements IHandleable {
             /////////////////////////////
             // messaging arduino
             System.out.println("Sending sensing request to rpi (-> arduino) ");
-            Main.getRpi().sendShortestPath(actions);
+            Main.getRpi().sendMoveCommand(actions);
             /////////////////////////////
             
             _shortestPathThread = new Timer();

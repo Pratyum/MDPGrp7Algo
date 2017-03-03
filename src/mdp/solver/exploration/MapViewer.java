@@ -1,6 +1,7 @@
 package mdp.solver.exploration;
 
 import java.util.List;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -129,7 +130,7 @@ public class MapViewer {
 
     }
 
-    public Know checkAllAroundEmpty(Robot robot) throws InterruptedException {
+    public Know checkAllAroundEmpty(Robot robot) throws InterruptedException, IOException {
         if (robot.checkIfHavingBufferActions()) {
             robot.executeBufferActions(ExplorationSolver.getExePeriod());
         }
@@ -153,7 +154,7 @@ public class MapViewer {
     }
 
     // 1 walkable, 0 not walkable, 2 need further exploration
-    public Know checkWalkable(Robot robot, Direction d) throws InterruptedException {
+    public Know checkWalkable(Robot robot, Direction d) throws InterruptedException, IOException {
     	 	if (robot.checkIfHavingBufferActions()) {
              robot.executeBufferActions(ExplorationSolver.getExePeriod());
          }
@@ -201,7 +202,7 @@ public class MapViewer {
     public Map updateMap(Robot robot, SensingData s) {
         List<Vector2> obstaclePositions = new ArrayList<>();
         Vector2 obstaclePosition;
-        Vector2 edge, edge_l, edge_r;
+        Vector2 edge, edge_l, edge_r , edge_b;
         int i = 1;
         Vector2 robotPosition = robot.position();
         markExploredEmpty(robotPosition);
@@ -217,7 +218,7 @@ public class MapViewer {
         edge = robot.position().fnAdd(robot.orientation().toVector2());
         edge_l = edge.fnAdd(robot.orientation().getLeft().toVector2());
         edge_r = edge.fnAdd(robot.orientation().getRight().toVector2());
-
+        edge_b = robot.position().fnAdd(robot.orientation().getRight().toVector2()).fnAdd(robot.orientation().getBehind().toVector2());
         if (s.front_m != 0) {
             obstaclePosition = edge.fnAdd(robot.orientation().toVector2().fnMultiply(s.front_m));
             if (map.checkValidBoundary(obstaclePosition)) {
@@ -278,25 +279,43 @@ public class MapViewer {
             }
             
         } else {
-            for (i = 1; i <= 3; i++) {
+            for (i = 1; i <= 5; i++) {
                 markExploredEmpty(edge_l.fnAdd(robot.orientation().getLeft().toVector2().fnMultiply(i)));
             }
         }
 
-        if (s.right != 0) {
-            obstaclePosition = edge_r.fnAdd(robot.orientation().getRight().toVector2().fnMultiply(s.right));
+        if (s.right_f != 0) {
+            obstaclePosition = edge_r.fnAdd(robot.orientation().getRight().toVector2().fnMultiply(s.right_f));
             if (map.checkValidBoundary(obstaclePosition)) {
                 obstaclePositions.add(obstaclePosition);
                 markExploredObstacle(obstaclePosition);
             
             }
-            for (i = 1; i < s.right; i++) {
+            for (i = 1; i < s.right_f; i++) {
                 markExploredEmpty(edge_r.fnAdd(robot.orientation().getRight().toVector2().fnMultiply(i)));
             }
             
         } else {
             for (i = 1; i <= 3; i++) {
                 markExploredEmpty(edge_r.fnAdd(robot.orientation().getRight().toVector2().fnMultiply(i)));
+            }
+        }
+        
+        if (s.right_b != 0) {
+        		
+            obstaclePosition = edge_b.fnAdd(robot.orientation().getRight().toVector2().fnMultiply(s.right_b));
+            if (map.checkValidBoundary(obstaclePosition)) {
+                obstaclePositions.add(obstaclePosition);
+                markExploredObstacle(obstaclePosition);
+            
+            }
+            for (i = 1; i < s.right_b; i++) {
+                markExploredEmpty(edge_b.fnAdd(robot.orientation().getRight().toVector2().fnMultiply(i)));
+            }
+            
+        } else {
+            for (i = 1; i <= 3; i++) {
+                markExploredEmpty(edge_b.fnAdd(robot.orientation().getRight().toVector2().fnMultiply(i)));
             }
         }
 
@@ -361,7 +380,7 @@ public class MapViewer {
     		return v.i() >=0  && v.i() < (map.DIM_I-1) &&  v.j() >=0  && v.j() < (map.DIM_J-1);
     }
     
-    public boolean validate(Robot robot, RobotAction action) throws InterruptedException{
+    public boolean validate(Robot robot, RobotAction action) throws InterruptedException, IOException{
     		Vector2 position;
     		switch(action){
     		case MoveForward:  
