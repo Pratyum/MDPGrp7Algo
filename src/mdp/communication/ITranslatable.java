@@ -13,8 +13,10 @@ public interface ITranslatable {
 
     void listen(Runnable handler);
 
-    void sendToAndroid(Map map, boolean[][] explored) throws IOException;
+    void sendMapInfo(Map map, boolean[][] explored) throws IOException;
+    
+    void sendSensingRequest();
 
-    void sendToArduino(List<RobotAction> actions) throws IOException;
+    void sendShortestPath(List<RobotAction> actions) throws IOException;
     
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.Charset;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -54,14 +55,13 @@ public class SocketCommunicator {
         _inBuffer.asCharBuffer().put(str);
         _socketChannel.read(_inBuffer);
         String inputStr = new String(_inBuffer.array(), _ENCODING).trim();
-        System.out.println("_inBuffer = " + inputStr + " (" + inputStr.length() + ")");
-        return new String(_inBuffer.array(), _ENCODING).trim();
+        return inputStr;
     }
     
     public void echo(String message) throws IOException {
         System.out.println("Sending out message: " + message);
         _outBuffer.clear();
-        _outBuffer.asCharBuffer().put(message);
+        _outBuffer = ByteBuffer.wrap(message.getBytes(Charset.forName(_ENCODING)));
         _socketChannel.write(_outBuffer);
     }
     

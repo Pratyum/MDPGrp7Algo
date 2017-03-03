@@ -32,7 +32,7 @@ public class Main {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
-        
+                
         // connect & send string to RPi
 //        List<RobotAction> test = new ArrayList<>();
 //        test.add(RobotAction.RotateLeft);

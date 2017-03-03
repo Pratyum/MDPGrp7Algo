@@ -339,28 +339,38 @@ public class EventHandler implements IHandleable {
     }
 
     private void _shortestPathProcedure(int exePeriod) {
-        System.out.println("Starting Shortest Path");
-        _isShortestPath = true;
-        AStarSolver solver = new AStarSolver();
-        AStarSolverResult solveResult = solver.solve(_gui.getMap(), _gui.getRobot());
-        _gui.getMap().highlight(solveResult.openedPoints, WPSpecialState.IsOpenedPoint);
-        _gui.getMap().highlight(solveResult.closedPoints, WPSpecialState.IsClosedPoint);
-        _gui.getMap().highlight(solveResult.shortestPath, WPSpecialState.IsPathPoint);
-        LinkedList<RobotAction> actions = RobotAction
-                .fromPath(_gui.getRobot(), solveResult.shortestPath);
-        
-        _shortestPathThread = new Timer();
-        _shortestPathThread.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (!actions.isEmpty()) {
-                    _gui.getRobot().execute(actions.pop());
-                    _gui.update(_gui.getMap(), _gui.getRobot());
-                } else {
-                    System.out.println("Shortest path completed.");
-                    this.cancel();
+        try {
+            System.out.println("Starting Shortest Path");
+            _isShortestPath = true;
+            AStarSolver solver = new AStarSolver();
+            AStarSolverResult solveResult = solver.solve(_gui.getMap(), _gui.getRobot());
+            _gui.getMap().highlight(solveResult.openedPoints, WPSpecialState.IsOpenedPoint);
+            _gui.getMap().highlight(solveResult.closedPoints, WPSpecialState.IsClosedPoint);
+            _gui.getMap().highlight(solveResult.shortestPath, WPSpecialState.IsPathPoint);
+            LinkedList<RobotAction> actions = RobotAction
+                    .fromPath(_gui.getRobot(), solveResult.shortestPath);
+            
+            /////////////////////////////
+            // messaging arduino
+            System.out.println("Sending sensing request to rpi (-> arduino) ");
+            Main.getRpi().sendShortestPath(actions);
+            /////////////////////////////
+            
+            _shortestPathThread = new Timer();
+            _shortestPathThread.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (!actions.isEmpty()) {
+                        _gui.getRobot().execute(actions.pop());
+                        _gui.update(_gui.getMap(), _gui.getRobot());
+                    } else {
+                        System.out.println("Shortest path completed.");
+                        this.cancel();
+                    }
                 }
-            }
-        }, exePeriod, exePeriod);
+            }, exePeriod, exePeriod);
+        } catch (IOException ex) {
+            Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
