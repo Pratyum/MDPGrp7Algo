@@ -92,7 +92,13 @@ public class Translator implements ITranslatable {
 //            System.out.println();
         }
         System.out.println("result = " + result);
-        boolean isRotating = lastAction.equals(_ROTATE_LEFT_STR) || lastAction.equals(_ROTATE_RIGHT_STR);
+        boolean isRotating;
+        if (result.length() != 1) {
+        		isRotating = lastAction.equals(_ROTATE_LEFT_STR) || lastAction.equals(_ROTATE_RIGHT_STR);
+        } else {
+        		isRotating = result.equals(_ROTATE_LEFT_STR) || result.equals(_ROTATE_RIGHT_STR);
+        }
+        
         result += (isRotating ? "" : count) + _TRAILER;
         System.out.println("Sending out: " + result);
         return result;

@@ -45,18 +45,8 @@ public class ExplorationSolver {
         LinkedList<RobotAction> robotActions;
         // put some blockers into the map
         System.out.println(objective_map.toString(_robot));
-        int i=1;
-        LinkedList<RobotAction> actions = new LinkedList<RobotAction>();
-        actions.add(RobotAction.RotateLeft);
-        actions.add(RobotAction.MoveForward);
-        actions.add(RobotAction.RotateLeft);
-        actions.add(RobotAction.MoveForward);
-        actions.add(RobotAction.RotateLeft);
-        actions.add(RobotAction.MoveForward);
-        actions.add(RobotAction.RotateLeft);
-        actions.add(RobotAction.MoveForward);
-        Main.getRpi().sendMoveCommand(actions);
-        while(i==1){}
+        
+        
         //data = getDataFromRPI();
         System.out.println(_robot.position());
         while (!goalFormulator.checkIfReachFinalGoal(_robot.position())) {
