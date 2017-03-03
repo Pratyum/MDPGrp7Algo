@@ -46,6 +46,7 @@ public class Translator implements ITranslatable {
     private String _compileActions(List<RobotAction> actions) {
         String result = "";
         int count = 1;
+        String lastAction = "";
         for (RobotAction action : actions) {
             String nextActionStr;
             switch (action) {
@@ -68,14 +69,21 @@ public class Translator implements ITranslatable {
 //            System.out.println("result = " + result);
 //            System.out.println("nextActionStr = " + nextActionStr);
             if (result.length() != 0) {
-                String lastAction = Character.toString(result.charAt(result.length() - 1));
+            		lastAction = Character.toString(result.charAt(result.length() - 1));
+        			//System.out.println(lastAction);
 //                System.out.println("lastAction = " + lastAction);
                 if (lastAction.equals(nextActionStr)) {
+                		boolean isRotating = lastAction.equals(_ROTATE_LEFT_STR) || lastAction.equals(_ROTATE_RIGHT_STR);
+                		if (isRotating) {
+                			result += _TRAILER + lastAction;
+                		} else {
+                			count++;
+                		}
 //                    System.out.println("Counting up");
-                    count++;
+                    //count++;
                 } else {
-                    boolean noCount = lastAction.equals(_ROTATE_LEFT_STR) || lastAction.equals(_ROTATE_RIGHT_STR);
-                    result += (noCount ? "" : count) + _TRAILER + nextActionStr;
+                    boolean isRotating = lastAction.equals(_ROTATE_LEFT_STR) || lastAction.equals(_ROTATE_RIGHT_STR);
+                    result += (isRotating ? "" : count) + _TRAILER + nextActionStr;
                     count = 1;
                 }
             } else {
@@ -83,7 +91,9 @@ public class Translator implements ITranslatable {
             }
 //            System.out.println();
         }
-        result += count + _TRAILER;
+        System.out.println("result = " + result);
+        boolean isRotating = lastAction.equals(_ROTATE_LEFT_STR) || lastAction.equals(_ROTATE_RIGHT_STR);
+        result += (isRotating ? "" : count) + _TRAILER;
         System.out.println("Sending out: " + result);
         return result;
     }
