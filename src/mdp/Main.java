@@ -28,6 +28,7 @@ public class Main {
         _rpi.connect(() -> {
             try {
                 _listenToRPi();
+                
             } catch (IOException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -63,6 +64,7 @@ public class Main {
             String inStr = _rpi.getInputBuffer();
             System.out.println("inStr = " + inStr);
             switch (inStr) {
+                // Android start commands
                 case "e":
                     System.out.println("Triggering Exploration");
                     _gui.trigger(GUIClickEvent.OnExploration);
@@ -71,10 +73,11 @@ public class Main {
                     System.out.println("Triggering ShortestPath");
                     _gui.trigger(GUIClickEvent.OnShortestPath);
                     break;
-                case "c":
-                    System.out.println("Triggering Combined");
-                    _gui.trigger(GUIClickEvent.OnCombined);
-                    break;
+//                case "c":
+//                    System.out.println("Triggering Combined");
+//                    _gui.trigger(GUIClickEvent.OnCombined);
+//                    break;
+                // Android start commands
                 default:
                     System.out.println("Unrecognized input");
                     break;

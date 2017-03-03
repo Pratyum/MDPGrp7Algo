@@ -44,7 +44,7 @@ public class Translator implements ITranslatable {
     }
 
     private String _compileActions(List<RobotAction> actions) {
-        String result = "c|";
+        String result = "";
         int count = 1;
         for (RobotAction action : actions) {
             String nextActionStr;
@@ -65,13 +65,13 @@ public class Translator implements ITranslatable {
                     nextActionStr = " ";
                     break;
             }
-            System.out.println("result = " + result);
-            System.out.println("nextActionStr = " + nextActionStr);
+//            System.out.println("result = " + result);
+//            System.out.println("nextActionStr = " + nextActionStr);
             if (result.length() != 0) {
                 String lastAction = Character.toString(result.charAt(result.length() - 1));
-                System.out.println("lastAction = " + lastAction);
+//                System.out.println("lastAction = " + lastAction);
                 if (lastAction.equals(nextActionStr)) {
-                    System.out.println("Counting up");
+//                    System.out.println("Counting up");
                     count++;
                 } else {
                     boolean noCount = lastAction.equals(_ROTATE_LEFT_STR) || lastAction.equals(_ROTATE_RIGHT_STR);
@@ -81,9 +81,10 @@ public class Translator implements ITranslatable {
             } else {
                 result += nextActionStr;
             }
-            System.out.println();
+//            System.out.println();
         }
         result += count + _TRAILER;
+        System.out.println("Sending out: " + result);
         return result;
     }
 
