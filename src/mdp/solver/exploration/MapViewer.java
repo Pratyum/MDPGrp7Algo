@@ -22,7 +22,7 @@ public class MapViewer {
 
     //1 empty, 2 obstacle, 0 havent explored
     private int[][] explored;
-
+    private int[][] robotPosition;
     MapViewer() {
         map = new Map();
         explored = new int[][] {
@@ -42,8 +42,46 @@ public class MapViewer {
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
         };
+        robotPosition = new int[][] {
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+        };
     }
 
+    public boolean markRobotVisited(Vector2 v){
+    		if(map.checkValidPosition(v))
+    			{
+    				robotPosition[v.i()][v.j()] = 1;
+    				return true;
+    			}
+    		return false;
+    		
+    }
+    
+    public boolean checkRobotVisited(Vector2 v){
+		if(map.checkValidPosition(v))
+			{
+				if(robotPosition[v.i()][v.j()] ==1)
+					return true;
+			}
+		return false;
+		
+    }
+    
+    
     public int[][] getExplored() {
         return explored;
     }
@@ -52,7 +90,7 @@ public class MapViewer {
         return map;
     }
 
-    private void markExploredEmpty(Vector2 v) {
+    public void markExploredEmpty(Vector2 v) {
         if(map.checkValidBoundary(v)) {
             explored[v.i()][v.j()] = 1;
         }
@@ -131,6 +169,30 @@ public class MapViewer {
 
     }
 
+    public String robotVisitedPlaceToString() {
+        String result = "";
+        for (int i = -1; i <= Map.DIM_I; i++) {
+            for (int j = -1; j <= Map.DIM_J; j++) {
+                if (i == -1 || j == -1 || i == Map.DIM_I || j == Map.DIM_J) {
+                    result += "# ";
+                } else {
+                    switch (robotPosition[i][j]) {
+                        case 1:
+                            result += ": ";
+                            break;
+                        
+                        default:
+                            result += "  ";
+                            break;
+                    }
+                }
+            }
+            result += "\n";
+        }
+        return result;
+
+    }
+    
     public Know checkAllAroundEmpty(Robot robot) throws InterruptedException, IOException {
         if (robot.checkIfHavingBufferActions()) {
             robot.executeBufferActions(ExplorationSolver.getExePeriod());
@@ -326,24 +388,31 @@ public class MapViewer {
         return map;
     }
 
-    public Vector2 findFurthestUnexplored(Robot robot){
-    		int i = 20;
-    		Vector2 v;
+    public LinkedList<Vector2> findUnexploredInAscendingDistanceOrder(Robot robot){
+    		int i = 1;
+    		LinkedList<Vector2> total = new LinkedList<Vector2>();
+    		
     		do{
-    			 v = IdentifyUnexploredAround(i,robot.position());
-    			 i--;
+    			 total.addAll(IdentifyUnexploredAround(i,robot.position()));
+    			 i++;
     			 
-    		}while(v.i()==-1 && v.j() == -1);
-    		return v;
+    		}while(i !=20);
+    		return total;
     }
     
-    private Vector2 IdentifyUnexploredAround(int width, Vector2 center ){
+    private  List<Vector2> IdentifyUnexploredAround(int width, Vector2 center ){
     		Vector2 traverse = center.fnAdd(new Vector2(width, -width));
+    		List<Vector2> list = new ArrayList<>();
+    		
     		int i;
     		for(i=0; i<width*2;i++){
     			if(checkValidExploredRange(traverse)){
+    				
     				if(explored[traverse.i()][traverse.j()]==0 )
-    					return traverse;		
+    					{
+    					list.add( new Vector2(traverse.i(), traverse.j()));	
+    					
+    					}	
     			}
     			traverse.add(new Vector2(0,1));
     		}
@@ -351,7 +420,10 @@ public class MapViewer {
     		for(i=0; i<width*2;i++){
     			if(checkValidExploredRange(traverse)){
     				if(explored[traverse.i()][traverse.j()]==0 )
-    					return traverse;		
+    					{
+    					list.add( new Vector2(traverse.i(), traverse.j()));	
+    					
+    					}
     			}
     			traverse.add(new Vector2(-1,0));
     		}
@@ -359,7 +431,10 @@ public class MapViewer {
     		for(i=0; i<width*2;i++){
     			if(checkValidExploredRange(traverse)){
     				if(explored[traverse.i()][traverse.j()]==0)
-    					return traverse;		
+    					{
+    					list.add( new Vector2(traverse.i(), traverse.j()));	
+    					
+    					}
     			}
     			traverse.add(new Vector2(0,-1));
     		}
@@ -367,18 +442,76 @@ public class MapViewer {
     		for(i=0; i<width*2;i++){
     			if(checkValidExploredRange(traverse)){
     				if(explored[traverse.i()][traverse.j()]==0)
-    					return traverse;		
+    				{
+    					list.add( new Vector2(traverse.i(), traverse.j()));	
+    					
+    					}
     			}
     			traverse.add(new Vector2(1,0));
     		}
     		
-    		return new Vector2(-1,-1); // the special vector marks no vector found
+    		return list;
+    		 // the special vector marks no vector found
     		
     }
     
+    public boolean markGhostBlock(Vector2 center){
+    		Vector2 up, down, right, left;
+    		boolean upBlocked = false;
+    		boolean downBlocked = false;
+    		boolean rightBlocked = false;
+    		boolean leftBlocked = false;
+    		up = center.fnAdd(new Vector2(-1,0));
+    		down = center.fnAdd(new Vector2(1,0));
+    		right = center.fnAdd(new Vector2(0,1));
+    		left = center.fnAdd(new Vector2(0,-1));
+    		int i;
+    		
+    		for(i=0; i< 3; i++){
+    			if(map.checkValidBoundary(up) && map.getPoint(up).obstacleState() == WPObstacleState.IsActualObstacle){
+    				upBlocked = true;
+    				break;
+    			}
+    			up.fnAdd(new Vector2(-1,0));
+    		}
+    		
+    		for(i=0; i< 3; i++){
+    			if(map.checkValidBoundary(down) && map.getPoint(down).obstacleState() == WPObstacleState.IsActualObstacle){
+    				downBlocked = true;
+    				break;
+    			}
+    			down.fnAdd(new Vector2(1,0));
+    		}
+    		
+    		for(i=0; i< 3; i++){
+    			if(map.checkValidBoundary(right) && map.getPoint(right).obstacleState() == WPObstacleState.IsActualObstacle){
+    				rightBlocked = true;
+    				break;
+    			}
+    			right.fnAdd(new Vector2(0,1));
+    		}
+    		
+    		for(i=0; i< 3; i++){
+    			if(map.checkValidBoundary(left) && map.getPoint(left).obstacleState() == WPObstacleState.IsActualObstacle){
+    				leftBlocked = true;
+    				break;
+    			}
+    			left.fnAdd(new Vector2(0,-1));
+    		}
+    		
+    		if(upBlocked == true && downBlocked == true && leftBlocked == true && rightBlocked == true){
+    			markExploredEmpty(center);
+    			return true;
+    		}
+    		else
+    			return false;
+    	
+    }
+    
+    
     private boolean checkValidExploredRange(Vector2 v){
     		
-    		return v.i() >=0  && v.i() < (map.DIM_I-1) &&  v.j() >=0  && v.j() < (map.DIM_J-1);
+    		return v.i() >=0  && v.i() < (map.DIM_I) &&  v.j() >=0  && v.j() < (map.DIM_J);
     }
     
     public boolean validate(Robot robot, RobotAction action) throws InterruptedException, IOException{
@@ -395,78 +528,80 @@ public class MapViewer {
     		return true;
     }
     
-    public Vector2 findWalkableGoal(Vector2 position, Robot robot){
+    public LinkedList<Vector2> findScannableReachableFromGoal(Vector2 position, Robot robot){
     		
+    		LinkedList<Vector2> reachable = new LinkedList<Vector2>();
     		AStarSolver astarSolver = new AStarSolver();
     		AStarSolverResult astarSolverResult ;
     		
-    		if(map.getPoint(position).obstacleState() == WPObstacleState.IsWalkable)
+    		
+    		if(map.checkValidBoundary(position) && map.getPoint(position).obstacleState() == WPObstacleState.IsWalkable)
     			{
     				astarSolverResult = astarSolver.solve(getSubjectiveMap(), robot, position);
+    				
     				if (!astarSolverResult.shortestPath.isEmpty())
-    					return position;
+    				{
+    					reachable.add(position);
+    				}
     			}
     	
     		int i = 1;
 		LinkedList<Vector2> list;
 		int num;
-			while(i<=5){
-				 list = IdentifyWalkableSquareAround(i,position);
+			while(i<=3){
+				 list = IdentifyWalkableAround(i,position);
 				 num = 0;
 				 
 				 for(num = 0; num < list.size();num++){
 					 astarSolverResult = astarSolver.solve(getSubjectiveMap(), robot, list.get(num));
 					 if (!astarSolverResult.shortestPath.isEmpty())
-						 return position;
+						 reachable.add(new Vector2(list.get(num).i(), list.get(num).j()));
 					 
 				 } 
 				 list.clear();
 				 i++;
 			};
 			
-		return new Vector2(-1,-1);
+		return reachable;
     		
     }
     
-    private LinkedList<Vector2> IdentifyWalkableSquareAround(int width, Vector2 center ){
-		Vector2 traverse = center.fnAdd(new Vector2(width, -width));
-		int i;
+    private LinkedList<Vector2> IdentifyWalkableAround(int width, Vector2 center ){
+		Vector2 up = center.fnAdd(new Vector2(-width, 0));
+		Vector2 down = center.fnAdd(new Vector2(width, 0));
+		Vector2 left = center.fnAdd(new Vector2(0, -width));
+		Vector2 right = center.fnAdd(new Vector2(0, width));
+		
 		LinkedList<Vector2> traversingList = new LinkedList<Vector2>();
-		for(i=0; i<width*2;i++){
-			if(checkValidExploredRange(traverse)){
-				if( map.getPoint(traverse).obstacleState() == WPObstacleState.IsWalkable )
-					traversingList.add(traverse);		
-			}
-			traverse.add(new Vector2(0,1));
-		}
 		
-		for(i=0; i<width*2;i++){
-			if(checkValidExploredRange(traverse)){
-				if(map.getPoint(traverse).obstacleState() == WPObstacleState.IsWalkable )
-					traversingList.add(traverse);
-			}
-			traverse.add(new Vector2(-1,0));
-		}
 		
-		for(i=0; i<width*2;i++){
-			if(checkValidExploredRange(traverse)){
-				if(map.getPoint(traverse).obstacleState() == WPObstacleState.IsWalkable)
-					traversingList.add(traverse);	
-			}
-			traverse.add(new Vector2(0,-1));
-		}
+		addWalkableToList(traversingList, up);
+		addWalkableToList(traversingList, up.fnAdd(new Vector2(0,1)));
+		addWalkableToList(traversingList, up.fnAdd(new Vector2(0,-1)));
+		addWalkableToList(traversingList, down);
+		addWalkableToList(traversingList, down.fnAdd(new Vector2(0,1)));
+		addWalkableToList(traversingList, down.fnAdd(new Vector2(0,-1)));
+		addWalkableToList(traversingList, left);
+		addWalkableToList(traversingList, left.fnAdd(new Vector2(-1,0)));
+		addWalkableToList(traversingList, left.fnAdd(new Vector2(1,0)));
+		addWalkableToList(traversingList, right);
+		addWalkableToList(traversingList, right.fnAdd(new Vector2(1,0)));
+		addWalkableToList(traversingList, right.fnAdd(new Vector2(-1,0)));
 		
-		for(i=0; i<width*2;i++){
-			if(checkValidExploredRange(traverse)){
-				if(map.getPoint(traverse).obstacleState() == WPObstacleState.IsWalkable)
-					traversingList.add(traverse);	
-			}
-			traverse.add(new Vector2(1,0));
-		}
+		
+		//continue
+		
 		
 		return traversingList; // the special vector marks no vector found
 		
 }
+    
+    private void addWalkableToList(LinkedList<Vector2> traversingList, Vector2 v){
+    		if(checkValidExploredRange(v)){
+			if( map.getPoint(v).obstacleState() == WPObstacleState.IsWalkable )
+				traversingList.add(v);		
+		}
+    }
     
     
     public ArrayList<Vector2> getUnExplored(){

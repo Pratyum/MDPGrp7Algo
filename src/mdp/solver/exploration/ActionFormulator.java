@@ -119,6 +119,7 @@ public class ActionFormulator {
         
         Map subjective_map = mapViewer.updateMap(robot, s);
         System.out.println(mapViewer.exploredAreaToString());
+        System.out.println(mapViewer.robotVisitedPlaceToString());
         System.out.println(subjective_map.toString(robot));
         isSensingDataArrived = false;
         return subjective_map;

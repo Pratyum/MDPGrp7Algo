@@ -7,6 +7,7 @@ import mdp.Main;
 import mdp.common.Direction;
 import mdp.common.Vector2;
 import mdp.map.Map;
+import mdp.solver.exploration.MapViewer;
 import mdp.Main;
 public class Robot {    
     private Vector2 _position;
@@ -15,7 +16,7 @@ public class Robot {
     private Map pathMap;
     private static volatile boolean actionCompleted =  false;
     private static LinkedList<RobotAction> bufferedActions= new LinkedList<>() ;
-    
+    private MapViewer mapViewer;
     public Robot() {
         this(new Vector2(1, 1), Direction.Right);
     }
@@ -24,6 +25,13 @@ public class Robot {
         _position = position;
         _orientation = direction;
     }
+    
+    public Robot(Vector2 position, Direction direction , MapViewer mv) {
+        _position = position;
+        _orientation = direction;
+        mapViewer = mv;
+    }
+    
     
     public Vector2 position() { return _position; }
     public Direction orientation() { return _orientation; }
@@ -71,10 +79,10 @@ public class Robot {
             		System.out.println("Actions completed");
             		actionCompleted = false;
         		}
-        	
+        		
         		for (RobotAction action: bufferedActions) {
                 execute(action);
-                
+                mapViewer.markRobotVisited(_position);
                 Main.getGUI().update(this);
                 Thread.sleep(sleepPeriod);
             }

@@ -18,7 +18,7 @@ public class Main {
 
     private static IGUIUpdatable _gui;
     private static ITranslatable _rpi;
-    private static boolean simulation_mode= false;
+    private static boolean simulation_mode= true;
     
     public static boolean getSimulationMode(){
     		return simulation_mode;
