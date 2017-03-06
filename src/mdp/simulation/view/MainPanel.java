@@ -9,6 +9,7 @@ public class MainPanel extends JPanel {
     private DescControlPanel _descCtrlPanel;
     private RunControlPanel _runCtrlPanel;
     private InterruptControlPanel _intrCtrlPanel;
+    private SimControlPanel _simCtrlPanel;
 
     public GridPanel getGridPanel() {
         return _gridPanel;
@@ -26,6 +27,10 @@ public class MainPanel extends JPanel {
         return _intrCtrlPanel;
     }
 
+    public SimControlPanel getSimCtrlPanel() {
+        return _simCtrlPanel;
+    }
+
     public MainPanel() {
         // config
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -35,10 +40,12 @@ public class MainPanel extends JPanel {
         _descCtrlPanel = new DescControlPanel();
         _runCtrlPanel = new RunControlPanel();
         _intrCtrlPanel = new InterruptControlPanel();
+        _simCtrlPanel = new SimControlPanel();
         this.add(_gridPanel);
         this.add(_descCtrlPanel);
         this.add(_runCtrlPanel);
         this.add(_intrCtrlPanel);
+        this.add(_simCtrlPanel);
     }
     
 }

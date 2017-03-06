@@ -27,7 +27,7 @@ import mdp.solver.shortestpath.AStarSolver;
 import mdp.solver.shortestpath.AStarSolverResult;
 
 public class EventHandler implements IHandleable {
-    
+
     private IGUIControllable _gui;
     private Timer _shortestPathThread;
     private Thread _explorationThread;
@@ -91,28 +91,68 @@ public class EventHandler implements IHandleable {
                 .getMainPanel()
                 .getIntrCtrlPanel()
                 .getRestartBtn().addMouseListener(_wrapMouseAdapter(GUIClickEvent.OnRestart));
+
+        // simulation/non-simulation control event
+        _gui.getMainFrame()
+                .getMainPanel()
+                .getSimCtrlPanel()
+                .getSimCheckBox().addMouseListener(_wrapMouseAdapter(GUIClickEvent.OnToggleSim));
+        _gui.getMainFrame()
+                .getMainPanel()
+                .getSimCtrlPanel()
+                .getConnectBtn().addMouseListener(_wrapMouseAdapter(GUIClickEvent.OnConnectBtn));
     }
-        
+
     @Override
     public void resolveBtnHandler(GUIClickEvent hdlr, MouseEvent e) {
         switch (hdlr) {
-            case OnToggleObstacle: _onToggleObstacle(e); break;
-            case OnOpen: _onOpenDesc(e); break;
-            case OnSave: _onSaveDesc(e); break;
-            case OnGetHex: _onGetHex(e); break;
-            case OnExploration: _onExploration(e); break;
-            case OnShortestPath: _onShortestPath(e); break;
-            case OnCombined: _onCombined(e); break;
-            case OnRestart: _onRestart(e); break;
+            case OnToggleObstacle:
+                _onToggleObstacle(e);
+                break;
+            case OnOpen:
+                _onOpenDesc(e);
+                break;
+            case OnSave:
+                _onSaveDesc(e);
+                break;
+            case OnGetHex:
+                _onGetHex(e);
+                break;
+            case OnExploration:
+                _onExploration(e);
+                break;
+            case OnShortestPath:
+                _onShortestPath(e);
+                break;
+            case OnCombined:
+                _onCombined(e);
+                break;
+            case OnRestart:
+                _onRestart(e);
+                break;
+            case OnToggleSim:
+                _onToggleSim(e);
+                break;
+            case OnConnectBtn: {
+                try {
+                    _onConnect(e);
+                } catch (IOException ex) {
+                    Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            break;
         }
     }
+
     @Override
     public void resolveFrameHandler(GUIWindowEvent hdlr, WindowEvent e) {
         switch (hdlr) {
-            case OnClose: _onClose(e); break;
+            case OnClose:
+                _onClose(e);
+                break;
         }
     }
-    
+
     private MouseAdapter _wrapMouseAdapter(GUIClickEvent hdlr) {
         return new MouseAdapter() {
             @Override
@@ -120,8 +160,9 @@ public class EventHandler implements IHandleable {
                 resolveBtnHandler(hdlr, e);
             }
         };
-        
+
     }
+
     private WindowAdapter _wrapWindowAdapter(GUIWindowEvent hdlr) {
         return new WindowAdapter() {
             @Override
@@ -202,9 +243,9 @@ public class EventHandler implements IHandleable {
             } catch (InterruptedException ex) {
                 Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
         });
         _explorationThread.start();
     }
@@ -237,7 +278,7 @@ public class EventHandler implements IHandleable {
             } catch (InterruptedException ex) {
                 Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
-            		Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
         _explorationThread.start();
@@ -277,10 +318,9 @@ public class EventHandler implements IHandleable {
 //            }
 //        };
 //    }
-
     private void _onRestart(MouseEvent e) {
         _gui.getMainFrame().dispose();
-        Main.restartGUI();
+        Main.startGUI();
         ExplorationSolver.restart();
         _isShortestPath = true;
         System.out.println("Restart completed.");
@@ -300,6 +340,23 @@ public class EventHandler implements IHandleable {
         System.out.println("Toggled obstacle at " + clickedPos);
     }
 
+    private void _onToggleSim(MouseEvent e) {
+        boolean isSelected = _gui.getMainFrame()
+                .getMainPanel()
+                .getSimCtrlPanel()
+                .getSimCheckBox().isSelected();
+        Main.isSimulating(isSelected);
+        if (isSelected) {
+            System.out.println("Simulation mode enabled.");
+        } else {
+            System.out.println("Simulation mode disabled.");
+        }
+    }
+
+    private void _onConnect(MouseEvent e) throws IOException {
+        Main.connectToRpi();
+    }
+
     // shared procedures
     private void _explorationProcedure(int exePeriod, Runnable callback) throws InterruptedException, IOException {
         System.out.println("Starting Exploration");
@@ -316,7 +373,7 @@ public class EventHandler implements IHandleable {
                 .getIntrCtrlPanel()
                 .getTermTimeText().getText()
         );
-        
+
         Runnable interruptCallback = () -> {
             System.out.println(">> STOP <<");
             Robot curRobot = ExplorationSolver.getRobot();
@@ -354,13 +411,15 @@ public class EventHandler implements IHandleable {
             _gui.getMap().highlight(solveResult.shortestPath, WPSpecialState.IsPathPoint);
             LinkedList<RobotAction> actions = RobotAction
                     .fromPath(_gui.getRobot(), solveResult.shortestPath);
-            
+
             /////////////////////////////
-            // messaging arduino
-            System.out.println("Sending sensing request to rpi (-> arduino) ");
-            Main.getRpi().sendMoveCommand(actions);
+            if (!Main.isSimulating()) {
+                // messaging arduino
+                System.out.println("Sending sensing request to rpi (-> arduino) ");
+                Main.getRpi().sendMoveCommand(actions);
+            }
             /////////////////////////////
-            
+
             _shortestPathThread = new Timer();
             _shortestPathThread.schedule(new TimerTask() {
                 @Override

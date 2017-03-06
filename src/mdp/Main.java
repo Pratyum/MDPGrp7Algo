@@ -18,27 +18,23 @@ public class Main {
 
     private static IGUIUpdatable _gui;
     private static ITranslatable _rpi;
-    private static boolean simulation_mode= false;
-    
-    public static boolean getSimulationMode(){
-    		return simulation_mode;
+    private static boolean _isSimulating = true;
+
+    public static boolean isSimulating() {
+        return _isSimulating;
     }
+    
+    public static void isSimulating(boolean isSimulating) {
+        _isSimulating = isSimulating;
+    }
+
     public static void main(String[] args) throws IOException {
 
         AStarSolver solver = new AStarSolver();
 
         // run simulation
         System.out.println("Initiating GUI...");
-        restartGUI();
-        _rpi = new Translator();
-        _rpi.connect(() -> {
-            try {
-                _listenToRPi();
-
-            } catch (IOException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        });
+        startGUI();
 
         // connect & send string to RPi
 //        List<RobotAction> test = new ArrayList<>();
@@ -58,9 +54,21 @@ public class Main {
         return _rpi;
     }
 
-    public static void restartGUI() {
+    public static void startGUI() {
         SwingUtilities.invokeLater(() -> {
             _gui = new GUI();
+        });
+    }
+    
+    public static void connectToRpi() throws IOException {
+        _rpi = new Translator();
+        _rpi.connect(() -> {
+            try {
+                _listenToRPi();
+
+            } catch (IOException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
     }
 

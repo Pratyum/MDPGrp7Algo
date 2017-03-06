@@ -12,19 +12,17 @@ import mdp.common.Vector2;
 import mdp.map.Map;
 import mdp.communication.*;
 
-
 public class ActionFormulator {
 
-	private static boolean simulation_mode = false;
-	
+    private static boolean simulation_mode = false;
+
     private MapViewer mapViewer;
 
     private Simulator simulator;
 
     private static volatile boolean isSensingDataArrived = false;
     private static volatile String sensingDataFromRPI;
-    
-    
+
     public ActionFormulator(MapViewer mapV, Simulator s) {
         mapViewer = mapV;
         simulator = s;
@@ -85,38 +83,37 @@ public class ActionFormulator {
         }
 
     }
-    
-    
 
-    public static void sensingDataCallback(String input){
-    		sensingDataFromRPI = input;
-    		isSensingDataArrived = true;
+    public static void sensingDataCallback(String input) {
+        sensingDataFromRPI = input;
+        isSensingDataArrived = true;
     }
-    
+
     // look through map and update 
     public Map view(Robot robot) throws InterruptedException, IOException {
         if (robot.checkIfHavingBufferActions()) {
             robot.executeBufferActions(ExplorationSolver.getExePeriod());
         }
-        
+
         SensingData s = new SensingData(); // otherwise s may not have been initialized
-        if(Main.getSimulationMode())
-        		s = simulator.getSensingData(robot);
-        else{
-        		//RPI call here
-        		Main.getRpi().sendSensingRequest();
-        		while(isSensingDataArrived != true){ }
-        			
-                s.front_l= Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(0)));
-                s.front_m= Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(1)));
-                s.front_r= Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(2)));
-                s.right_f= Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(3)));
-                s.right_b= Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(4)));
-                s.left= Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(5)));
+        if (Main.isSimulating()) {
+            s = simulator.getSensingData(robot);
+        } else {
+            
+            if (!Main.isSimulating()) {
+                //RPI call here
+                Main.getRpi().sendSensingRequest();
+                while (isSensingDataArrived != true) {}
+            }
+
+            s.front_l = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(0)));
+            s.front_m = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(1)));
+            s.front_r = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(2)));
+            s.right_f = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(3)));
+            s.right_b = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(4)));
+            s.left = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(5)));
         }
-        
-        
-        
+
         Map subjective_map = mapViewer.updateMap(robot, s);
         System.out.println(mapViewer.exploredAreaToString());
         System.out.println(subjective_map.toString(robot));
@@ -124,14 +121,14 @@ public class ActionFormulator {
         return subjective_map;
     }
 
-    public void circumvent(Robot robot) throws InterruptedException, IOException{
-    		Vector2 initialPosition = robot.position();
-    		while(robot.position().i()!= initialPosition.i() && robot.position().j()!= initialPosition.j())
-    			{	
-    				rightWallFollower(robot);
-    				//System.out.println("Loop");
-    			}
+    public void circumvent(Robot robot) throws InterruptedException, IOException {
+        Vector2 initialPosition = robot.position();
+        while (robot.position().i() != initialPosition.i() && robot.position().j() != initialPosition.j()) {
+            rightWallFollower(robot);
+            //System.out.println("Loop");
+        }
     }
+
     public void turnLeftTillEmpty(Robot robot) throws InterruptedException, IOException {
 
         Know check = mapViewer.checkWalkable(robot, Direction.Up);
