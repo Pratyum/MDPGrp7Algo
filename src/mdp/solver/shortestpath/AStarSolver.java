@@ -62,7 +62,7 @@ public class AStarSolver {
         AStarSolverResult result = new AStarSolverResult();
         
         System.out.println("Solving shortest path on the following map:");
-        System.out.println(map.toString(robot));
+        //System.out.println(map.toString(robot));
 
         // save points in map in a lookup hashtable
         HashMap<String, AStarWaypoint> openedPoints = new HashMap();

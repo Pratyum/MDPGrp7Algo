@@ -38,11 +38,13 @@ public class ExplorationSolver {
         
         Vector2 robotPos = new Vector2(1, 1);
         Direction robotDir = Direction.Down;
-        _robot = new Robot(robotPos, robotDir);
+        _robot = new Robot(robotPos, robotDir, mapViewer);
         actionFormulator = new ActionFormulator(mapViewer, simulator);
-        
+        boolean reachablePointFound = false;
         AStarSolver astarSolver = new AStarSolver();
         LinkedList<RobotAction> robotActions;
+        LinkedList<Vector2> reachableList;
+        
         // put some blockers into the map
         System.out.println(objective_map.toString(_robot));
         
@@ -60,30 +62,64 @@ public class ExplorationSolver {
         }
 
         while (!mapViewer.checkIfNavigationComplete()) {
-            Vector2 goal = mapViewer.findFurthestUnexplored(_robot);
-            goal = mapViewer.findWalkableGoal(goal, _robot);
-            if(goal.i()==-1 && goal.j()==-1) //means cannot find a walkablePoint in 
+            LinkedList<Vector2> goalList = mapViewer.findUnexploredInAscendingDistanceOrder(_robot);
+            System.out.println("My goal list  "+goalList.toString());
+            Vector2 goal = new Vector2(-1,-1);
+            if(goalList.size()==0)
+            {
+            		System.out.println("Exploration completed");
             		break;
-            System.out.print("Goal:" + goal.toString());
-            AStarSolverResult astarSolverResult = astarSolver.solve(mapViewer.getSubjectiveMap(), _robot, goal);
-            
-            robotActions = RobotAction.fromPath(_robot, astarSolverResult.shortestPath);
-            //System.out.println("Action size: " + robotActions.size());
-            for (RobotAction action : robotActions) {
-                view(_robot);
-
-                if (!mapViewer.validate(_robot, action)) {
-                    actionFormulator.circumvent(_robot);
-                    //System.out.println("Here2");
-                    // in circumvent, stop circumventing when the obstacle is fully identified
-                    break;
-                }
-                //System.out.println("Here3");
-                _robot.bufferAction(action);
             }
+            for(int i=0 ; i< goalList.size(); i++){
+            		
+            		System.out.println("Processing goal "+goalList.get(i).toString());
+            		if(mapViewer.markGhostBlock(goalList.get(i)))
+            			continue;
+            		reachableList = mapViewer.findScannableReachableFromGoal(goalList.get(i), _robot);
+            		for(int j = 0 ; j < reachableList.size(); j++){
+            			if(!mapViewer.checkRobotVisited(reachableList.get(j)))
+            			{
+            				
+            				goal = reachableList.get(j);
+            				reachablePointFound = true;	
+            				System.out.println("Goal found "+goal);
+            				break;
+            			}
+            		}
+            		
+            		if(reachablePointFound)
+            			break; /// findFirst goal
+            		mapViewer.markExploredEmpty(goalList.get(i));
+            }
+            
+            if(reachablePointFound){
+
+                System.out.println("Current goal: "+goal.toString());
+                
+                AStarSolverResult astarSolverResult = astarSolver.solve(mapViewer.getSubjectiveMap(), _robot, goal);
+                
+                robotActions = RobotAction.fromPath(_robot, astarSolverResult.shortestPath);
+                //System.out.println("Action size: " + robotActions.size());
+                for (RobotAction action : robotActions) {
+                    view(_robot);
+
+                    if (!mapViewer.validate(_robot, action)) {
+                        //actionFormulator.circumvent(_robot);
+                        //System.out.println("Here2");
+                        // in circumvent, stop circumventing when the obstacle is fully identified
+                        actionFormulator.view(_robot); // take a look , update map
+                    		break;
+                    }
+                    //System.out.println("Here3");
+                    _robot.bufferAction(action);
+                }
+            }
+            
+            // prepare for next loop
+            reachablePointFound = false;
         }
         
-        System.out.println("Here3");
+        
     }
 
     public static int getExePeriod() {
