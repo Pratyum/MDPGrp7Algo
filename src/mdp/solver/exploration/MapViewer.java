@@ -96,6 +96,12 @@ public class MapViewer {
         }
     }
 
+    public void markUnreachable(Vector2 v) {
+        if(map.checkValidBoundary(v)) {
+            explored[v.i()][v.j()] = -1;
+        }
+    }
+    	
     private void markExploredObstacle(Vector2 v) {
 
         if (map.checkValidBoundary(v)) //prevent it being a wall , out of bound array
@@ -500,7 +506,7 @@ public class MapViewer {
     		}
     		
     		if(upBlocked == true && downBlocked == true && leftBlocked == true && rightBlocked == true){
-    			markExploredEmpty(center);
+    			markUnreachable(center);
     			return true;
     		}
     		else

@@ -35,6 +35,7 @@ public class EventHandler implements IHandleable {
     private Timer _shortestPathThread;
     private Thread _explorationThread;
     private static boolean _isShortestPath = true;
+    private volatile boolean _callbackCalled;
 
     public static boolean isShortestPath() {
         return _isShortestPath;
@@ -396,6 +397,7 @@ public class EventHandler implements IHandleable {
     private void _explorationProcedure(int exePeriod, Runnable callback) throws InterruptedException, IOException {
         System.out.println("Starting Exploration");
         _isShortestPath = false;
+        _callbackCalled = false;
         int termCoverage = Integer.parseInt(_gui
                 .getMainFrame()
                 .getMainPanel()
@@ -410,20 +412,26 @@ public class EventHandler implements IHandleable {
         );
 
         Runnable interruptCallback = () -> {
-            System.out.println(">> STOP <<");
-            Robot curRobot = ExplorationSolver.getRobot();
-            int[][] explored = ExplorationSolver.getMapViewer().getExplored();
-            _explorationThread.stop();
-            Map finalMap = new Map(explored);
-            ExplorationSolver.goBackToStart(finalMap, curRobot, callback);
-            Main.getGUI().update(finalMap);
+            if (!_callbackCalled) {
+	        		_callbackCalled = true;
+	            System.out.println(">> STOP <<");
+	            Robot curRobot = ExplorationSolver.getRobot();
+	            int[][] explored = ExplorationSolver.getMapViewer().getExplored();
+	            _explorationThread.stop();
+	            Map finalMap = new Map(explored);
+	            ExplorationSolver.goBackToStart(finalMap, curRobot, callback);
+	            Main.getGUI().update(finalMap);
+            }
         };
         Runnable nonInterruptCallback = () -> {
-            Robot curRobot = ExplorationSolver.getRobot();
-            int[][] explored = ExplorationSolver.getMapViewer().getExplored();
-            Map finalMap = new Map(explored);
-            ExplorationSolver.goBackToStart(finalMap, curRobot, callback);
-            Main.getGUI().update(finalMap);
+            if (!_callbackCalled) {
+        			_callbackCalled = true;
+	            Robot curRobot = ExplorationSolver.getRobot();
+	            int[][] explored = ExplorationSolver.getMapViewer().getExplored();
+	            Map finalMap = new Map(explored);
+	            ExplorationSolver.goBackToStart(finalMap, curRobot, callback);
+	            Main.getGUI().update(finalMap);
+            }
         };
         if (termCoverage != 0) {
             new Terminator(termCoverage / 100f, interruptCallback).observe();

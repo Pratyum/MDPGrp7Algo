@@ -89,7 +89,7 @@ public class ExplorationSolver {
             		
             		if(reachablePointFound)
             			break; /// findFirst goal
-            		mapViewer.markExploredEmpty(goalList.get(i));
+            		mapViewer.markUnreachable(goalList.get(i));
             }
             
             if(reachablePointFound){
