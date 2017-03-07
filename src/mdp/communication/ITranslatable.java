@@ -13,7 +13,7 @@ public interface ITranslatable {
 
     void listen(Runnable handler);
 
-    void sendMapInfo(Map map, boolean[][] explored) throws IOException;
+    void sendMapInfo(Map map, int[][] explored) throws IOException;
     
     void sendSensingRequest();
 

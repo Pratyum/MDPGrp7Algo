@@ -22,12 +22,14 @@ public class Descriptor {
         
         // ensure bin length is multiples of 4
         String fixedBin = bin;
+        System.out.println("before: " + fixedBin.length());
         while (fixedBin.length() % 4 != 0) {
-            fixedBin = "0" + fixedBin;
+            fixedBin += "0";
         }
+        System.out.println("after: " + fixedBin.length());
         
         // translate each blocks of 4 bits
-        for (int i = 0; i < bin.length(); i += 4) {
+        for (int i = 0; i < fixedBin.length(); i += 4) {
             String curSection = fixedBin.substring(i, i + 4);
             int sectionDec = 0;
             for (int j = 0; j < curSection.length(); j++) {
@@ -70,15 +72,9 @@ public class Descriptor {
         
         result += "11\n";
         
-        int[] descRowLength = new int[Map.DIM_J];
-        for (int descI = 0; descI < Map.DIM_J; descI++) {
-            descRowLength[descI] = 0;
-        }
-        
         for (int descI = 0; descI < Map.DIM_J; descI++) {
             for (int descJ = 0; descJ < Map.DIM_I; descJ++) {
                 result += explored[descJ][descI] >= 1 ? "1" : "0";
-                descRowLength[descI] += explored[descJ][descI] >= 1 ? 1 : 0;
             }
             result += "\n";
         }
@@ -86,13 +82,25 @@ public class Descriptor {
         result += "11\n";
         
         for (int descI = 0; descI < Map.DIM_J; descI++) {
-            for (int descJ = 0; descJ < descRowLength[descI]; descJ++) {
-                boolean isObstacle = explored[Map.DIM_I - 1 - descJ][Map.DIM_J - 1 - descI] == 2;
-                result += isObstacle ? "1" : "0";
+            for (int descJ = 0; descJ < Map.DIM_I; descJ++) {
+                int curPoint = explored[descJ][descI];
+                if (curPoint >= 1) {
+                    result += curPoint == 2 ? "1" : "0";
+                }
             }
             result += "\n";
         }
-        
+        System.out.println(result);
+//        System.out.println("EXPLORED");
+//        for (int i = 0; i < explored.length; i++) {
+//            int[] row = explored[i];
+//            for (int j = 0; j < row.length; j++) {
+//                int p = row[j];
+//                System.out.print(p + " ");
+//            }
+//            System.out.print("\n");
+//        }
+//        System.out.println();
         return result;
     }
     

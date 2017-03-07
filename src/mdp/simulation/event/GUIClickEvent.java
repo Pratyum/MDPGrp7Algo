@@ -2,7 +2,7 @@ package mdp.simulation.event;
 
 public enum GUIClickEvent {
     OnToggleObstacle,
-    OnOpen, OnSave, OnGetHex, 
+    OnOpen, OnSave, OnGetHex, OnCheckWeb,
     OnExploration, OnShortestPath, OnCombined,
     OnRestart,
     OnToggleSim, OnConnectBtn

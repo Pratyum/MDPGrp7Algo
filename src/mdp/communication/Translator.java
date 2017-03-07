@@ -104,7 +104,7 @@ public class Translator implements ITranslatable {
         return result;
     }
 
-    private String _compileMap(Map map, boolean[][] explored) {
+    private String _compileMap(Map map, int[][] explored) {
         String[] hexDesc = Descriptor.toHex(Descriptor.stringify(map, explored));
         return hexDesc[0] + hexDesc[1];
     }
@@ -128,8 +128,9 @@ public class Translator implements ITranslatable {
 
     // Android
     @Override
-    public void sendMapInfo(Map map, boolean[][] explored) throws IOException {
+    public void sendMapInfo(Map map, int[][] explored) throws IOException {
         String message = _TO_ANDROID_MARKER + _compileMap(map, explored) + _TRAILER;
+        System.out.println(message);
         _socketCommunicator.echo(message);
     }
 

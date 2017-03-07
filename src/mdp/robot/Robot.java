@@ -3,10 +3,8 @@ package mdp.robot;
 import java.io.IOException;
 import java.util.LinkedList;
 
-import mdp.Main;
 import mdp.common.Direction;
 import mdp.common.Vector2;
-import mdp.map.Map;
 import mdp.solver.exploration.MapViewer;
 import mdp.Main;
 
@@ -14,8 +12,6 @@ public class Robot {
 
     private Vector2 _position;
     private Direction _orientation;
-    private Direction _direction;
-    private Map pathMap;
 
     private static volatile boolean actionCompleted = false;
     private static LinkedList<RobotAction> bufferedActions = new LinkedList<>();
@@ -92,6 +88,12 @@ public class Robot {
                 Main.getRpi().sendMoveCommand(bufferedActions);
                 while (!actionCompleted) {
                 }
+
+                // send info to android
+                Main.getRpi().sendMapInfo(
+                        mapViewer.getSubjectiveMap(),
+                        mapViewer.getExplored()
+                );
 
                 System.out.println("Actions completed");
                 actionCompleted = false;

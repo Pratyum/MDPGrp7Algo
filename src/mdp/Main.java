@@ -36,15 +36,6 @@ public class Main {
         // run simulation
         System.out.println("Initiating GUI...");
         startGUI();
-
-        // connect & send string to RPi
-//        List<RobotAction> test = new ArrayList<>();
-//        test.add(RobotAction.RotateLeft);
-//        test.add(RobotAction.MoveForward);
-//        test.add(RobotAction.MoveForward);
-//        test.add(RobotAction.RotateRight);
-//        test.add(RobotAction.MoveForward);
-//        _rpi.sendToArduino(test); // lffrf
     }
 
     public static IGUIUpdatable getGUI() {

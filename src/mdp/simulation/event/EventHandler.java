@@ -1,10 +1,13 @@
 package mdp.simulation.event;
 
+import java.awt.Desktop;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -63,6 +66,10 @@ public class EventHandler implements IHandleable {
                 .getMainPanel()
                 .getDescCtrlPanel()
                 .getGetHexBtn().addMouseListener(_wrapMouseAdapter(GUIClickEvent.OnGetHex));
+        _gui.getMainFrame()
+                .getMainPanel()
+                .getDescCtrlPanel()
+                .getCheckWebBtn().addMouseListener(_wrapMouseAdapter(GUIClickEvent.OnCheckWeb));
 
         // run control event
         _gui.getMainFrame()
@@ -118,6 +125,14 @@ public class EventHandler implements IHandleable {
             case OnGetHex:
                 _onGetHex(e);
                 break;
+            case OnCheckWeb: {
+                try {
+                    _onCheckWeb(e);
+                } catch (URISyntaxException | IOException ex) {
+                    Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            break;
             case OnExploration:
                 _onExploration(e);
                 break;
@@ -219,14 +234,34 @@ public class EventHandler implements IHandleable {
         String descStr = Descriptor.stringify(map, explored);
         String content = String.join("\n", Descriptor.toHex(descStr));
 
-        System.out.println(map.toString(new Robot()));
-
         HexFrame hexFrame = new HexFrame();
         hexFrame
                 .getHexFramePanel()
                 .getHexTextArea().setText(content);
 
         System.out.println("Get hex completed.");
+    }
+
+    private void _onCheckWeb(MouseEvent e) throws URISyntaxException, IOException {
+        Map map = ExplorationSolver.getMapViewer().getSubjectiveMap();
+        int[][] explored = ExplorationSolver.getMapViewer().getExplored();
+        
+        String descStr = Descriptor.stringify(map, explored);
+        String[] content = Descriptor.toHex(descStr);
+        
+        String p1 = content[0];
+        String p2 = content[1];
+        String sampleArena = _gui
+                .getMainFrame()
+                .getMainPanel()
+                .getDescCtrlPanel()
+                .getFilePathTextField()
+                .getText();
+        Desktop.getDesktop().browse(new URI(
+                "http://mdpcx3004.sce.ntu.edu.sg/mapdescriptor.php?"
+                + "P1=" + p1 + "&"
+                + "P2=" + p2 + "&"
+                + "samplearena=" + sampleArena));
     }
 
     private void _onExploration(MouseEvent e) {

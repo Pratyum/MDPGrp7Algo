@@ -15,6 +15,7 @@ public class DescControlPanel extends JPanel {
     private JButton _openDescBtn;
     private JButton _saveDescBtn;
     private JButton _getHexBtn;
+    private JButton _checkWebBtn;
     
     public DescControlPanel() {
         // config
@@ -26,6 +27,7 @@ public class DescControlPanel extends JPanel {
         _saveDescBtn = new JButton("Save");
         _getHexBtn = new JButton("Get Hex");
         _filePathBtn.setHorizontalAlignment(JTextField.RIGHT);
+        _checkWebBtn = new JButton("Check @ mdpcx3004");
         JLabel pathLabel = new JLabel(".txt");
         pathLabel.setForeground(Color.WHITE);
         this.add(_filePathBtn);
@@ -33,6 +35,7 @@ public class DescControlPanel extends JPanel {
         this.add(_openDescBtn);
         this.add(_saveDescBtn);
         this.add(_getHexBtn);
+        this.add(_checkWebBtn);
     }
 
     public JTextField getFilePathTextField() {
@@ -49,6 +52,10 @@ public class DescControlPanel extends JPanel {
 
     public JButton getGetHexBtn() {
         return _getHexBtn;
+    }
+
+    public JButton getCheckWebBtn() {
+        return _checkWebBtn;
     }
     
 }
