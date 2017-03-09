@@ -39,7 +39,7 @@ public class Map {
         }
     }
     
-    public Map(int[][] explored) {
+    public Map(int[][] explored, boolean isStillExploring) {
         _wpMap = new Waypoint[DIM_I][DIM_J];
         List<Vector2> obstacles = new ArrayList<>();
         for (int i = 0; i < DIM_I; i++) {
@@ -57,7 +57,9 @@ public class Map {
                 } else {
                     switch (explored[i][j]) {
                         case 0:
-                            obstacles.add(curPos);
+                        		if (!isStillExploring) {
+                             	obstacles.add(curPos);
+                        		}
                             break;
                         case 2:
                             obstacles.add(curPos);

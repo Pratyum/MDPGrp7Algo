@@ -390,7 +390,7 @@ public class MapViewer {
         }
 
         //update map with proper obstacles
-        map = new Map(explored);
+        map = new Map(explored, true);
         map.addObstacle(obstaclePositions);
         insertExploredIntoMap();
         Main.getGUI().update(map);
@@ -654,26 +654,27 @@ public class MapViewer {
         right_down = robot.position().fnAdd(robot.orientation().getBehind().toVector2()).fnAdd(robot.orientation().getRight().toVector2().fnMultiply(2));
     
     
-        if(map.getPoint(right_up).obstacleState() == WPObstacleState.IsActualObstacle && 
+        /*if(map.getPoint(right_up).obstacleState() == WPObstacleState.IsActualObstacle && 
         		map.getPoint(right_down).obstacleState() == WPObstacleState.IsActualObstacle){
         		return CalibrationType.Right;
-        }
+        }*/
         
         
-        if(map.getPoint(front_r).obstacleState() == WPObstacleState.IsActualObstacle && 
-        		map.getPoint(front_l).obstacleState() == WPObstacleState.IsActualObstacle){
-        		return CalibrationType.Front_LR;
-        }
+	        if(!map.checkValidBoundary(front_r) || map.getPoint(front_r).obstacleState() == WPObstacleState.IsActualObstacle)
+	        		if(!map.checkValidBoundary(front_l) ||map.getPoint(front_l).obstacleState() == WPObstacleState.IsActualObstacle){
+	        		return CalibrationType.Front_LR;
+	        }
         
-        if(map.getPoint(front_l).obstacleState() == WPObstacleState.IsActualObstacle && 
-        		map.getPoint(front_m).obstacleState() == WPObstacleState.IsActualObstacle){
+	        if(!map.checkValidBoundary(front_m) || map.getPoint(front_m).obstacleState() == WPObstacleState.IsActualObstacle)
+        		if(!map.checkValidBoundary(front_l) ||map.getPoint(front_l).obstacleState() == WPObstacleState.IsActualObstacle){
         		return CalibrationType.Front_ML;
-        }
-        
-        if(map.getPoint(front_r).obstacleState() == WPObstacleState.IsActualObstacle && 
-        		map.getPoint(front_m).obstacleState() == WPObstacleState.IsActualObstacle){
-        		return CalibrationType.Front_MR;
-        }
+        		}
+	        
+	        if(!map.checkValidBoundary(front_r) || map.getPoint(front_r).obstacleState() == WPObstacleState.IsActualObstacle)
+	        		if(!map.checkValidBoundary(front_m) ||map.getPoint(front_m).obstacleState() == WPObstacleState.IsActualObstacle){
+	        		return CalibrationType.Front_MR;
+        		}
+	       
         
         return CalibrationType.NA;
         

@@ -3,6 +3,7 @@ package mdp.solver.exploration;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 import mdp.Main;
@@ -44,6 +45,9 @@ public class ExplorationSolver {
         AStarSolver astarSolver = new AStarSolver();
         LinkedList<RobotAction> robotActions;
         LinkedList<Vector2> reachableList;
+        Direction checkGoingBack = Direction.Down;
+        Direction before;
+        LinkedList<Direction> twoDirectionAway = new LinkedList<Direction>();
         
         // put some blockers into the map
         System.out.println(objective_map.toString(_robot));
@@ -57,13 +61,23 @@ public class ExplorationSolver {
         _robot.executeBufferActions(ExplorationSolver.getExePeriod());;
         ////////////
         //start exploration
+        
+        twoDirectionAway.add(Direction.Down);
+        twoDirectionAway.add(Direction.Down);
+   
         	while (!goalFormulator.checkIfReachFinalGoal(_robot.position())) {
-            System.out.println("following right wall");
+            //System.out.println("following right wall");
+
+            //System.out.println(mapViewer.getSubjectiveMap().toString(_robot));
             actionFormulator.rightWallFollower(_robot);
+            
+            
+  
         }
         while (!goalFormulator.checkIfReachStartZone(_robot.position())) {
-            System.out.println("following right wall");
+            //System.out.println("following right wall");
             actionFormulator.rightWallFollower(_robot);
+           
 
         }
 

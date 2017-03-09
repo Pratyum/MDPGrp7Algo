@@ -5,6 +5,7 @@ import mdp.robot.Robot;
 import mdp.robot.RobotAction;
 
 import java.io.IOException;
+import java.util.LinkedList;
 
 import mdp.Main;
 import mdp.common.Direction;
@@ -39,12 +40,15 @@ public class ActionFormulator {
 
     }
 
-    public void rightWallFollower(Robot robot) throws InterruptedException, IOException {
+    public void rightWallFollower(Robot robot ) throws InterruptedException, IOException {
 
         view(robot); // for scanning purpose
+        
 
+        
         if (null != mapViewer.checkWalkable(robot, Direction.Right)) {
-            switch (mapViewer.checkWalkable(robot, Direction.Right)) {
+        		
+        			switch (mapViewer.checkWalkable(robot, Direction.Right)) {
                 case Yes:
                     robot.bufferAction(RobotAction.RotateRight);
                     robot.bufferAction(RobotAction.MoveForward);
@@ -52,37 +56,48 @@ public class ActionFormulator {
                 case No:
                     turnLeftTillEmpty(robot); //now didnt turn left , so execute directly
                     break;
-                case Unsure:
-                    robot.bufferAction(RobotAction.RotateRight);
-                    view(robot);
-                    if (null == mapViewer.checkWalkable(robot, Direction.Up)) {
-                        System.out.println("Error1");
-                    } else {
-                        switch (mapViewer.checkWalkable(robot, Direction.Up)) {
-                            case Yes:
-                                robot.bufferAction(RobotAction.MoveForward);
-                                break;
-                            case No:
-                                robot.bufferAction(RobotAction.RotateLeft);
-                                turnLeftTillEmpty(robot);
-                                break;
-                            default:
-                                System.out.println("Error1");
-                                break;
-                        }
+                case Unsure:{
+	                    robot.bufferAction(RobotAction.RotateRight);
+	                    view(robot);
+	                    if (null == mapViewer.checkWalkable(robot, Direction.Up)) {
+	                        System.out.println("Error1");
+	                    } else {
+	                        switch (mapViewer.checkWalkable(robot, Direction.Up)) {
+	                            case Yes:
+	                                robot.bufferAction(RobotAction.MoveForward);
+	                                break;
+	                            case No:
+	                                robot.bufferAction(RobotAction.RotateLeft);
+	                                turnLeftTillEmpty(robot);
+	                                break;
+	                            default:
+	                                System.out.println("Error1");
+	                                break;
+	                        }
+	                    }
+	                    break;
                     }
+                	default:
                     break;
-                default:
-                    break;
-            }
+        				}
         }
+        		
+        			
+        	
+        		
+        
 
         // if all around empty, avoid turning in a loop, find the wall directly
-        if (mapViewer.checkAllAroundEmpty(robot) == Know.Yes) {
-
+        /*if (mapViewer.checkAllAroundEmpty(robot) == Know.Yes) {
+        		System.out.println("All around empty");
             robot.bufferAction(RobotAction.RotateRight);
-            robot.bufferAction(RobotAction.MoveForward);
-        }
+            
+            while(mapViewer.checkWalkable(robot, Direction.Up) == Know.Yes){
+            		robot.bufferAction(RobotAction.MoveForward);
+            }
+            robot.bufferAction(RobotAction.RotateLeft);
+            view(robot);
+        }*/
 
     }
 
@@ -123,12 +138,12 @@ public class ActionFormulator {
         }
 
         Map subjective_map = mapViewer.updateMap(robot, s);
-        System.out.println(mapViewer.exploredAreaToString());
-        System.out.println(mapViewer.robotVisitedPlaceToString());
-        System.out.println(subjective_map.toString(robot));
+        //System.out.println(mapViewer.exploredAreaToString());
+        //System.out.println(mapViewer.robotVisitedPlaceToString());
+        //System.out.println(subjective_map.toString(robot));
         isSensingDataArrived = false;
         
-        if (!Main.isSimulating()) {
+        /*if (!Main.isSimulating()) {
             if(robot.checkIfCalibrationCounterReached()){
             	
             		CalibrationType ct= mapViewer.checkCalibrationAvailable(robot);
@@ -150,7 +165,7 @@ public class ActionFormulator {
             
             calibrationCompleted = false;
         }
-        
+        */
         
         
         return subjective_map;
@@ -163,7 +178,7 @@ public class ActionFormulator {
     public void circumvent(Robot robot) throws InterruptedException, IOException {
         Vector2 initialPosition = robot.position();
         while (robot.position().i() != initialPosition.i() && robot.position().j() != initialPosition.j()) {
-            rightWallFollower(robot);
+            //rightWallFollower(robot);
             //System.out.println("Loop");
         }
     }
