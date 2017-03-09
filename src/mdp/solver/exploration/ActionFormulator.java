@@ -138,11 +138,13 @@ public class ActionFormulator {
                     	default:
                     		System.out.println("send calibration "+ ct.toString());
                     		Main.getRpi().sendCalibrationCommand(ct);
+                    		while(!calibrationCompleted){}
+                    		robot.clearCalibrationCounter();
                     		break;
-                    }
+                }
             		
-            		while(!calibrationCompleted){}
-            		robot.clearCalibrationCounter();
+            		
+   
             }
             ///
             

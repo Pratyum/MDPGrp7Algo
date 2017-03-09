@@ -237,4 +237,6 @@ public class Map {
     		return pos.i() >=0 && pos.i() < DIM_I &&
                 pos.j() >=0 && pos.j() < DIM_J;
     }
+    
+    
 }
