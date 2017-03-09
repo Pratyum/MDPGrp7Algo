@@ -19,7 +19,9 @@ public class ActionFormulator {
     private MapViewer mapViewer;
 
     private Simulator simulator;
-
+    
+    
+    private static volatile boolean calibrationCompleted = false;
     private static volatile boolean isSensingDataArrived = false;
     private static volatile String sensingDataFromRPI;
 
@@ -91,7 +93,9 @@ public class ActionFormulator {
 
     // look through map and update 
     public Map view(Robot robot) throws InterruptedException, IOException {
-        if (robot.checkIfHavingBufferActions()) {
+    		int calibirationType;
+    		
+    		if (robot.checkIfHavingBufferActions()) {
             robot.executeBufferActions(ExplorationSolver.getExePeriod());
         }
 
@@ -104,6 +108,7 @@ public class ActionFormulator {
                 //RPI call here
                 Main.getRpi().sendSensingRequest();
                 while (isSensingDataArrived != true) {}
+                      
             }
 
             s.front_l = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(0)));
@@ -119,9 +124,33 @@ public class ActionFormulator {
         System.out.println(mapViewer.robotVisitedPlaceToString());
         System.out.println(subjective_map.toString(robot));
         isSensingDataArrived = false;
+        
+        /*if (!Main.isSimulating()) {
+            if(robot.checkIfCalibrationCounterReached()){
+            		
+            		switch(mapViewer.checkCalibrationAvailable(robot)){
+                    case right:
+                    		
+                    		break;
+                    	default:
+                    		break;
+                    }
+            		robot.clearCalibrationCounter();
+            }
+            
+            while(!calibrationCompleted){}
+            calibrationCompleted = false;
+        }*/
+        
+        
+        
         return subjective_map;
     }
 
+    public static void calibrationCompletedCallBack(){
+    		calibrationCompleted = true;
+    }
+    
     public void circumvent(Robot robot) throws InterruptedException, IOException {
         Vector2 initialPosition = robot.position();
         while (robot.position().i() != initialPosition.i() && robot.position().j() != initialPosition.j()) {

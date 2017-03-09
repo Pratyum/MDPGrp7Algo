@@ -16,6 +16,7 @@ import mdp.common.Direction;
 import mdp.Main;
 import mdp.map.WPObstacleState;
 
+
 public class MapViewer {
 
     private Map map;
@@ -637,6 +638,43 @@ public class MapViewer {
         }
         
         return unexplored;
+    }
+    
+    
+    public CalibrationType checkCalibrationAvailable(Robot robot){
+        Vector2 front_l, front_r, front_m, right_up,right_down;
+        
+        front_m = robot.position().fnAdd(robot.orientation().toVector2().fnMultiply(2));
+        front_l = front_m.fnAdd(robot.orientation().getLeft().toVector2());
+        front_r = front_m.fnAdd(robot.orientation().getRight().toVector2());
+    		
+        right_up = robot.position().fnAdd(robot.orientation().toVector2()).fnAdd(robot.orientation().getRight().toVector2().fnMultiply(2));
+        right_down = robot.position().fnAdd(robot.orientation().getBehind().toVector2()).fnAdd(robot.orientation().getRight().toVector2().fnMultiply(2));
+    
+    
+        if(map.getPoint(right_up).obstacleState() == WPObstacleState.IsActualObstacle && 
+        		map.getPoint(right_down).obstacleState() == WPObstacleState.IsActualObstacle){
+        		return CalibrationType.right;
+        }
+        
+        
+        if(map.getPoint(front_r).obstacleState() == WPObstacleState.IsActualObstacle && 
+        		map.getPoint(front_l).obstacleState() == WPObstacleState.IsActualObstacle){
+        		return CalibrationType.front_lr;
+        }
+        
+        if(map.getPoint(front_l).obstacleState() == WPObstacleState.IsActualObstacle && 
+        		map.getPoint(front_m).obstacleState() == WPObstacleState.IsActualObstacle){
+        		return CalibrationType.front_ml;
+        }
+        
+        if(map.getPoint(front_r).obstacleState() == WPObstacleState.IsActualObstacle && 
+        		map.getPoint(front_m).obstacleState() == WPObstacleState.IsActualObstacle){
+        		return CalibrationType.front_mr;
+        }
+        
+        return CalibrationType.No;
+        
     }
     
     

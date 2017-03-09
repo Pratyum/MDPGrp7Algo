@@ -12,8 +12,10 @@ public class Robot {
 
     private Vector2 _position;
     private Direction _orientation;
-
+    
+    private static volatile int calibrationCounter = 0 ;
     private static volatile boolean actionCompleted = false;
+    
     private static LinkedList<RobotAction> bufferedActions = new LinkedList<>();
     private MapViewer mapViewer;
 
@@ -88,7 +90,7 @@ public class Robot {
                 Main.getRpi().sendMoveCommand(bufferedActions);
                 while (!actionCompleted) {
                 }
-
+                
                 // send info to android
                 Main.getRpi().sendMapInfo(
                         mapViewer.getSubjectiveMap(),
@@ -97,6 +99,8 @@ public class Robot {
 
                 System.out.println("Actions completed");
                 actionCompleted = false;
+                //increment calibrationCounter
+                calibrationCounter += bufferedActions.size();
             }
 
             for (RobotAction action : bufferedActions) {
@@ -112,7 +116,19 @@ public class Robot {
         }
     }
 
+   
+    
     public boolean checkIfHavingBufferActions() {
         return !bufferedActions.isEmpty();
     }
+  
+    public boolean checkIfCalibrationCounterReached(){
+    		return (calibrationCounter >= 6);
+    }
+    
+    public boolean clearCalibrationCounter(){
+    		calibrationCounter = 0;
+    		return true;
+    }
+    
 }
