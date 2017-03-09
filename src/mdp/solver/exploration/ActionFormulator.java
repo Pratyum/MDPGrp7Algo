@@ -130,18 +130,22 @@ public class ActionFormulator {
         
         if (!Main.isSimulating()) {
             if(robot.checkIfCalibrationCounterReached()){
-            		
-            		switch(mapViewer.checkCalibrationAvailable(robot)){
-                    case Right:
-                    		
+            	
+            		CalibrationType ct= mapViewer.checkCalibrationAvailable(robot);
+            		switch(ct){
+                    case NA:
                     		break;
                     	default:
+                    		System.out.println("send calibration "+ ct.toString());
+                    		Main.getRpi().sendCalibrationCommand(ct);
                     		break;
                     }
+            		
+            		while(!calibrationCompleted){}
             		robot.clearCalibrationCounter();
             }
+            ///
             
-            while(!calibrationCompleted){}
             calibrationCompleted = false;
         }
         

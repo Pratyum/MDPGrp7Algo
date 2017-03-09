@@ -84,9 +84,10 @@ public class Main {
                     break;
                 case "D":
                     //Robot.actionCompletedCallBack();
-                    break;
+                		ActionFormulator.calibrationCompletedCallBack();
+                		break;
                 case "a": //a for accuracy , calibration
-                		//ActionFormulator.calibrationCompletedCallBack();
+                		
                 		break;
                 default:
                 		
