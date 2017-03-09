@@ -18,7 +18,7 @@ public class Robot {
     private MapViewer mapViewer;
 
     public Robot() {
-        this(new Vector2(1, 1), Direction.Right);
+        this(new Vector2(1, 1), Direction.Down);
     }
 
     public Robot(Vector2 position, Direction direction) {

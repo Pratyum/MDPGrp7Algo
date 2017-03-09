@@ -1,14 +1,18 @@
 package mdp.communication;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import mdp.common.Vector2;
 import mdp.map.Descriptor;
 import mdp.map.Map;
+import mdp.map.WPObstacleState;
+import mdp.robot.Robot;
 import mdp.robot.RobotAction;
 
 public class Translator implements ITranslatable {
@@ -66,12 +70,8 @@ public class Translator implements ITranslatable {
                     nextActionStr = " ";
                     break;
             }
-//            System.out.println("result = " + result);
-//            System.out.println("nextActionStr = " + nextActionStr);
             if (result.length() != 0) {
                 lastAction = Character.toString(result.charAt(result.length() - 1));
-                //System.out.println(lastAction);
-//                System.out.println("lastAction = " + lastAction);
                 if (lastAction.equals(nextActionStr)) {
                     boolean isRotating = lastAction.equals(_ROTATE_LEFT_STR) || lastAction.equals(_ROTATE_RIGHT_STR);
                     if (isRotating) {
@@ -79,8 +79,6 @@ public class Translator implements ITranslatable {
                     } else {
                         count++;
                     }
-//                    System.out.println("Counting up");
-                    //count++;
                 } else {
                     boolean isRotating = lastAction.equals(_ROTATE_LEFT_STR) || lastAction.equals(_ROTATE_RIGHT_STR);
                     result += (isRotating ? "" : count) + _TRAILER + nextActionStr;
@@ -89,7 +87,6 @@ public class Translator implements ITranslatable {
             } else {
                 result += nextActionStr;
             }
-//            System.out.println();
         }
         System.out.println("result = " + result);
         boolean isRotating;
@@ -104,6 +101,71 @@ public class Translator implements ITranslatable {
         return result;
     }
 
+    private String _compileActions(Map map, List<Vector2> path) {
+        String result = "";
+        Vector2 lastSavedPos = null;
+        Vector2 prevPos = null;
+        List<Vector2> smoothPath = new ArrayList<>();
+        for (Vector2 curPos : path) {
+            if (lastSavedPos == null) {
+                lastSavedPos = curPos;
+                smoothPath.add(curPos);
+            } else {
+                // check existence of obstacle in rectangular area
+                int minI = Integer.min(lastSavedPos.i(), curPos.i());
+                int maxI = Integer.max(lastSavedPos.i(), curPos.i());
+                int minJ = Integer.min(lastSavedPos.j(), curPos.j());
+                int maxJ = Integer.max(lastSavedPos.j(), curPos.j());
+                boolean obsDetected = false;
+                for (int i = minI; i <= maxI; i++) {
+                    for (int j = minJ; j < maxJ; j++) {
+                        if (!map.getPoint(new Vector2(i, j)).obstacleState()
+                                .equals(WPObstacleState.IsWalkable)) {
+                            obsDetected = true;
+                            break;
+                        }
+                    }
+                    if (obsDetected) {
+                        break;
+                    }
+                }
+                // if there is, save the prev pos
+                if (obsDetected) {
+                    smoothPath.add(prevPos);
+                    lastSavedPos = prevPos;
+                }
+            }
+            prevPos = curPos;
+        }
+        // save goal
+        smoothPath.add(prevPos);
+        double orientation;
+        switch (new Robot().orientation()) {
+            case Up:
+                orientation = 90;
+                break;
+            case Down:
+                orientation = 270;
+                break;
+            case Left:
+                orientation = 180;
+                break;
+            case Right:
+                orientation = 0;
+                break;
+        }
+        for (int i = 0; i < smoothPath.size() - 1; i++) {
+            Vector2 diff = smoothPath.get(i + 1).fnAdd(smoothPath.get(i).fnMultiply(-1));
+            double distance = Math.sqrt(Math.pow(diff.i(), 2) + Math.pow(diff.j(), 2));
+            String distanceStr = "f" + distance + _TRAILER;
+            double rotation;
+//            double angle
+            String rotationStr = "";
+            result += rotationStr + distanceStr;
+        }
+        return result;
+    }
+
     private String _compileMap(Map map, int[][] explored) {
         String[] hexDesc = Descriptor.toHex(Descriptor.stringify(map, explored));
         return hexDesc[0] + hexDesc[1];
@@ -111,9 +173,23 @@ public class Translator implements ITranslatable {
 
     // Arduino
     @Override
-    public void sendMoveCommand(List<RobotAction> actions) throws IOException {
-        String message = _TO_ARDUINO_MARKER + _compileActions(actions);
-        _socketCommunicator.echo(message);
+    public void sendMoveCommand(List<RobotAction> actions) {
+        try {
+            String message = _TO_ARDUINO_MARKER + _compileActions(actions);
+            _socketCommunicator.echo(message);
+        } catch (IOException ex) {
+            Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Override
+    public void sendSmoothMoveCommand(Map map, List<Vector2> path) {
+        try {
+            String message = _TO_ARDUINO_MARKER + _compileActions(map, path);
+            _socketCommunicator.echo(message);
+        } catch (IOException ex) {
+            Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -128,14 +204,23 @@ public class Translator implements ITranslatable {
 
     // Android
     @Override
-    public void sendMapInfo(Map map, int[][] explored) throws IOException {
-        String message = _TO_ANDROID_MARKER + _compileMap(map, explored) + _TRAILER;
-        System.out.println(message);
-        _socketCommunicator.echo(message);
+    public void sendMapInfo(Map map, int[][] explored) {
+        try {
+            String message = _TO_ANDROID_MARKER + _compileMap(map, explored) + _TRAILER;
+            System.out.println(message);
+            _socketCommunicator.echo(message);
+        } catch (IOException ex) {
+            Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    private String _readAsString() throws IOException {
-        return _socketCommunicator.read();
+    private String _readAsString() {
+        try {
+            return _socketCommunicator.read();
+        } catch (IOException ex) {
+            Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "ERRR";
     }
 
     @Override
@@ -148,17 +233,13 @@ public class Translator implements ITranslatable {
                     @Override
                     public void run() {
                         System.out.println("listening...");
-                        try {
-                            String readResult = _readAsString();
-                            _inputBuffer = "";
-                            if (!readResult.isEmpty()) {
-                                _inputBuffer = readResult;
-                                handler.run();
-                                System.out.println();
+                        String readResult = _readAsString();
+                        _inputBuffer = "";
+                        if (!readResult.isEmpty()) {
+                            _inputBuffer = readResult;
+                            handler.run();
+                            System.out.println();
 //                                probingTimer.cancel();
-                            }
-                        } catch (IOException ex) {
-                            Logger.getLogger(ITranslatable.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 }, 0, _PROBING_PERIOD);

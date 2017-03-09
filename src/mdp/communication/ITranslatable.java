@@ -2,6 +2,7 @@ package mdp.communication;
 
 import java.io.IOException;
 import java.util.List;
+import mdp.common.Vector2;
 import mdp.map.Map;
 import mdp.robot.RobotAction;
 
@@ -13,10 +14,12 @@ public interface ITranslatable {
 
     void listen(Runnable handler);
 
-    void sendMapInfo(Map map, int[][] explored) throws IOException;
+    void sendMapInfo(Map map, int[][] explored);
     
     void sendSensingRequest();
 
-    void sendMoveCommand(List<RobotAction> actions) throws IOException;
+    void sendMoveCommand(List<RobotAction> actions);
+    
+    void sendSmoothMoveCommand(Map map, List<Vector2> path);
     
 }
