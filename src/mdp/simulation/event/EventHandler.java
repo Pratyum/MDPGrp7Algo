@@ -138,7 +138,12 @@ public class EventHandler implements IHandleable {
                 _onExploration(e);
                 break;
             case OnShortestPath:
-                _onShortestPath(e);
+			try {
+				_onShortestPath(e);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
                 break;
             case OnCombined:
                 _onCombined(e);
@@ -286,7 +291,7 @@ public class EventHandler implements IHandleable {
         _explorationThread.start();
     }
 
-    private void _onShortestPath(MouseEvent e) {
+    private void _onShortestPath(MouseEvent e) throws IOException {
         int exePeriod = Integer.parseInt(
                 _gui.getMainFrame()
                         .getMainPanel()
@@ -309,7 +314,12 @@ public class EventHandler implements IHandleable {
                 _explorationProcedure(exePeriod, () -> {
                     System.out.println("Is at COMBINED callback");
                     // shortest path
-                    _shortestPathProcedure(exePeriod);
+                    try {
+						_shortestPathProcedure(exePeriod);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
                 });
             } catch (InterruptedException ex) {
                 Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);

@@ -37,7 +37,7 @@ public class ExplorationSolver {
         simulator = new Simulator(objective_map);
         
         Vector2 robotPos = new Vector2(1, 1);
-        Direction robotDir = Direction.Down;
+        Direction robotDir = Direction.Right;
         _robot = new Robot(robotPos, robotDir, mapViewer);
         actionFormulator = new ActionFormulator(mapViewer, simulator);
         boolean reachablePointFound = false;

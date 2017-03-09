@@ -93,11 +93,11 @@ public class Robot {
                 }
                 
                 // send info to android
-                Main.getRpi().sendMapInfo(
+                /*Main.getRpi().sendMapInfo(
                         mapViewer.getSubjectiveMap(),
                         mapViewer.getExplored()
-                );
-
+                );*/
+                
                 System.out.println("Actions completed");
                 actionCompleted = false;
                 //increment calibrationCounter
@@ -108,7 +108,9 @@ public class Robot {
                 execute(action);
                 mapViewer.markRobotVisited(_position);
                 Main.getGUI().update(this);
-                Thread.sleep(sleepPeriod);
+                
+                if(Main.isSimulating())
+                		Thread.sleep(sleepPeriod);
             }
             bufferedActions.clear();
 
