@@ -443,41 +443,37 @@ public class EventHandler implements IHandleable {
         nonInterruptCallback.run();
     }
 
-    private void _shortestPathProcedure(int exePeriod) {
-        try {
-            System.out.println("Starting Shortest Path");
-            _isShortestPath = true;
-            AStarSolver solver = new AStarSolver();
-            AStarSolverResult solveResult = solver.solve(_gui.getMap(), _gui.getRobot());
-            _gui.getMap().highlight(solveResult.openedPoints, WPSpecialState.IsOpenedPoint);
-            _gui.getMap().highlight(solveResult.closedPoints, WPSpecialState.IsClosedPoint);
-            _gui.getMap().highlight(solveResult.shortestPath, WPSpecialState.IsPathPoint);
-            LinkedList<RobotAction> actions = RobotAction
-                    .fromPath(_gui.getRobot(), solveResult.shortestPath);
+    private void _shortestPathProcedure(int exePeriod) throws IOException {
+        System.out.println("Starting Shortest Path");
+		_isShortestPath = true;
+		AStarSolver solver = new AStarSolver();
+		AStarSolverResult solveResult = solver.solve(_gui.getMap(), _gui.getRobot());
+		_gui.getMap().highlight(solveResult.openedPoints, WPSpecialState.IsOpenedPoint);
+		_gui.getMap().highlight(solveResult.closedPoints, WPSpecialState.IsClosedPoint);
+		_gui.getMap().highlight(solveResult.shortestPath, WPSpecialState.IsPathPoint);
+		LinkedList<RobotAction> actions = RobotAction
+		        .fromPath(_gui.getRobot(), solveResult.shortestPath);
 
-            /////////////////////////////
-            if (!Main.isSimulating()) {
-                // messaging arduino
-                System.out.println("Sending sensing request to rpi (-> arduino) ");
-                Main.getRpi().sendMoveCommand(actions);
-            }
-            /////////////////////////////
+		/////////////////////////////
+		if (!Main.isSimulating()) {
+		    // messaging arduino
+		    System.out.println("Sending sensing request to rpi (-> arduino) ");
+		    Main.getRpi().sendMoveCommand(actions);
+		}
+		/////////////////////////////
 
-            _shortestPathThread = new Timer();
-            _shortestPathThread.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    if (!actions.isEmpty()) {
-                        _gui.getRobot().execute(actions.pop());
-                        _gui.update(_gui.getMap(), _gui.getRobot());
-                    } else {
-                        System.out.println("Shortest path completed.");
-                        this.cancel();
-                    }
-                }
-            }, exePeriod, exePeriod);
-        } catch (IOException ex) {
-            Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }
+		_shortestPathThread = new Timer();
+		_shortestPathThread.schedule(new TimerTask() {
+		    @Override
+		    public void run() {
+		        if (!actions.isEmpty()) {
+		            _gui.getRobot().execute(actions.pop());
+		            _gui.update(_gui.getMap(), _gui.getRobot());
+		        } else {
+		            System.out.println("Shortest path completed.");
+		            this.cancel();
+		        }
+		    }
+		}, exePeriod, exePeriod);
     }
 }

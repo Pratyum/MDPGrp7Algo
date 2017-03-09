@@ -88,7 +88,7 @@ public class ActionFormulator {
 
     public static void sensingDataCallback(String input) {
         sensingDataFromRPI = input;
-        isSensingDataArrived = true;
+        
     }
 
     // look through map and update 
@@ -104,19 +104,22 @@ public class ActionFormulator {
             s = simulator.getSensingData(robot);
         } else {
             
-            if (!Main.isSimulating()) {
-                //RPI call here
-                Main.getRpi().sendSensingRequest();
-                while (isSensingDataArrived != true) {}
-                      
-            }
 
-            s.front_l = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(0)));
-            s.front_m = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(1)));
-            s.front_r = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(2)));
-            s.right_f = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(3)));
-            s.right_b = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(4)));
-            s.left = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(5)));
+                //RPI call here
+                
+                //while (isSensingDataArrived != true) {}
+                
+        			if(sensingDataFromRPI.isEmpty())
+        				System.out.println("ERROR: empty sensing data");
+        				
+        	
+                    s.front_l = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(0)));
+                    s.front_m = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(1)));
+                    s.front_r = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(2)));
+                    s.right_f = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(3)));
+                    s.right_b = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(4)));
+                    s.left = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(5)));
+    
         }
 
         Map subjective_map = mapViewer.updateMap(robot, s);
@@ -125,7 +128,7 @@ public class ActionFormulator {
         System.out.println(subjective_map.toString(robot));
         isSensingDataArrived = false;
         
-        /*if (!Main.isSimulating()) {
+        if (!Main.isSimulating()) {
             if(robot.checkIfCalibrationCounterReached()){
             		
             		switch(mapViewer.checkCalibrationAvailable(robot)){
@@ -140,7 +143,7 @@ public class ActionFormulator {
             
             while(!calibrationCompleted){}
             calibrationCompleted = false;
-        }*/
+        }
         
         
         

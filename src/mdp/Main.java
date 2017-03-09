@@ -83,15 +83,17 @@ public class Main {
                     _gui.trigger(GUIClickEvent.OnCombined);
                     break;
                 case "D":
-                    Robot.actionCompletedCallBack();
+                    //Robot.actionCompletedCallBack();
                     break;
                 case "a": //a for accuracy , calibration
-                		ActionFormulator.calibrationCompletedCallBack();
+                		//ActionFormulator.calibrationCompletedCallBack();
                 		break;
                 default:
+                		
                     if (inStr.length() == 6) {
                         System.out.println("Analyzing sensing information");
                         ActionFormulator.sensingDataCallback(inStr);
+                        Robot.actionCompletedCallBack();
                     } else {
                         System.out.println("Unrecognized input");
                     }

@@ -51,7 +51,13 @@ public class ExplorationSolver {
         
         //data = getDataFromRPI();
         System.out.println(_robot.position());
-        while (!goalFormulator.checkIfReachFinalGoal(_robot.position())) {
+        
+        //default to rotate in order to get initial sensing data
+        _robot.bufferAction(RobotAction.RotateRight);
+        _robot.executeBufferActions(ExplorationSolver.getExePeriod());;
+        ////////////
+        //start exploration
+        	while (!goalFormulator.checkIfReachFinalGoal(_robot.position())) {
             System.out.println("following right wall");
             actionFormulator.rightWallFollower(_robot);
         }

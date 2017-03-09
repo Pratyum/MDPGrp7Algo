@@ -87,7 +87,8 @@ public class Robot {
     public void executeBufferActions(int sleepPeriod) throws IOException {
         try {
             if (!Main.isSimulating()) {
-                Main.getRpi().sendMoveCommand(bufferedActions);
+                
+            		Main.getRpi().sendMoveCommand(bufferedActions);
                 while (!actionCompleted) {
                 }
                 
