@@ -20,29 +20,29 @@ public class Descriptor {
     private static String _binToHex(String bin) {
         String result = "";
         
-        // ensure bin length is multiples of 4
-        String fixedBin = bin;
-        System.out.println("before: " + fixedBin.length());
-        while (fixedBin.length() % 4 != 0) {
-            fixedBin += "0";
-        }
-        System.out.println("after: " + fixedBin.length());
-        
-        // translate each blocks of 4 bits
-        for (int i = 0; i < fixedBin.length(); i += 4) {
-            String curSection = fixedBin.substring(i, i + 4);
-            int sectionDec = 0;
-            for (int j = 0; j < curSection.length(); j++) {
-                if (curSection.charAt(curSection.length() - 1 - j) == '1') {
-                    sectionDec += Math.pow(2, j);
-                }
+        if (!bin.isEmpty()) {
+            // ensure bin length is multiples of 4
+            String fixedBin = bin;
+            while (fixedBin.length() % 4 != 0) {
+                fixedBin += "0";
             }
-            if (sectionDec > 9) {
-                // A -> F
-                result += (char) (sectionDec % 9 + 64);
-            } else {
-                // 0 -> 9
-                result += sectionDec;
+
+            // translate each blocks of 4 bits
+            for (int i = 0; i < fixedBin.length(); i += 4) {
+                String curSection = fixedBin.substring(i, i + 4);
+                int sectionDec = 0;
+                for (int j = 0; j < curSection.length(); j++) {
+                    if (curSection.charAt(curSection.length() - 1 - j) == '1') {
+                        sectionDec += Math.pow(2, j);
+                    }
+                }
+                if (sectionDec > 9) {
+                    // A -> F
+                    result += (char) (sectionDec % 9 + 64);
+                } else {
+                    // 0 -> 9
+                    result += sectionDec;
+                }
             }
         }
         
@@ -63,7 +63,7 @@ public class Descriptor {
             }            
         }
         result[0] = _binToHex("11" + result[0] + "11");
-        result[1] = _binToHex(result[1]);
+        result[1] = _binToHex(result[1] != null ? result[1] : "");
         return result;
     }
     
@@ -90,17 +90,6 @@ public class Descriptor {
             }
             result += "\n";
         }
-        System.out.println(result);
-//        System.out.println("EXPLORED");
-//        for (int i = 0; i < explored.length; i++) {
-//            int[] row = explored[i];
-//            for (int j = 0; j < row.length; j++) {
-//                int p = row[j];
-//                System.out.print(p + " ");
-//            }
-//            System.out.print("\n");
-//        }
-//        System.out.println();
         return result;
     }
     
@@ -126,7 +115,6 @@ public class Descriptor {
         
         for (int descI = 0; descI < Map.DIM_J; descI++) {
             for (int descJ = 0; descJ < descRowLength[descI]; descJ++) {
-//                System.out.println(new Vector2(Map.DIM_J - 1 - descJ, Map.DIM_I - 1 - descI));
                 boolean isObstacle = map
                     .getPoint(new Vector2(Map.DIM_I - 1 - descJ, Map.DIM_J - 1 - descI))
                         .obstacleState().equals(WPObstacleState.IsActualObstacle);

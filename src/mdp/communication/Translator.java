@@ -2,6 +2,7 @@ package mdp.communication;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import java.util.List;
 import java.util.Timer;
@@ -28,7 +29,10 @@ public class Translator implements ITranslatable {
 
     private static final String _SENSING_REQUEST = "s";
     private static final String _TRAILER = "|";
-    
+
+    private static final String _DESC_SEPARATOR = "g";
+    private static final String _MSG_SEPARATOR = "_";
+
     private static final String _CAL_FRONT_LR = "x";
     private static final String _CAL_FRONT_ML = "y";
     private static final String _CAL_FRONT_MR = "z";
@@ -94,7 +98,6 @@ public class Translator implements ITranslatable {
                 result += nextActionStr;
             }
         }
-        System.out.println("result = " + result);
         boolean isRotating;
         if (result.length() != 1) {
             isRotating = lastAction.equals(_ROTATE_LEFT_STR) || lastAction.equals(_ROTATE_RIGHT_STR);
@@ -157,26 +160,46 @@ public class Translator implements ITranslatable {
                 orientation = 180;
                 break;
             case Right:
+            default:
                 orientation = 0;
                 break;
         }
         for (int i = 0; i < smoothPath.size() - 1; i++) {
-            Vector2 diff = smoothPath.get(i + 1).fnAdd(smoothPath.get(i).fnMultiply(-1));
-            double distance = Math.sqrt(Math.pow(diff.i(), 2) + Math.pow(diff.j(), 2));
+            Vector2 posDiff = smoothPath.get(i + 1).fnAdd(smoothPath.get(i).fnMultiply(-1));
+            double distance = Math.sqrt(Math.pow(posDiff.i(), 2) + Math.pow(posDiff.j(), 2));
             String distanceStr = "f" + distance + _TRAILER;
             double rotation;
-//            double angle
-            String rotationStr = "";
+            String rotateDirection;
+            double alpha = Math.atan(((double) posDiff.i()) / ((double) posDiff.j()));
+            double angle;
+            if (posDiff.i() > 0) {
+                rotateDirection = "r";
+                if (posDiff.j() > 0) {
+                    angle = alpha + 270;
+                } else {
+                    angle = alpha + 180;
+                }
+            } else {
+                rotateDirection = "l";
+                if (posDiff.j() > 0) {
+                    angle = alpha + 0;
+                } else {
+                    angle = alpha + 90;
+                }
+            }
+            rotation = angle - orientation;
+            String rotationStr = rotateDirection + rotation + _TRAILER;
             result += rotationStr + distanceStr;
         }
         return result;
     }
 
     private String _compileMap(Map map, int[][] explored) {
-        String[] hexDesc = Descriptor.toHex(Descriptor.stringify(map, explored));
-        return hexDesc[0] + hexDesc[1];
+        String strResult = Descriptor.stringify(map, explored);
+        String[] hexDesc = Descriptor.toHex(strResult);
+        return hexDesc[0] + _DESC_SEPARATOR + hexDesc[1];
     }
-    
+
     private String _compileCalibration(CalibrationType calType) {
         switch (calType) {
             case Right:
@@ -235,10 +258,12 @@ public class Translator implements ITranslatable {
 
     // Android
     @Override
-    public void sendMapInfo(Map map, int[][] explored) {
+    public void sendInfoToAndroid(Map map, int[][] explored, LinkedList<RobotAction> actions) {
         try {
-            String message = _TO_ANDROID_MARKER + _compileMap(map, explored) + _TRAILER;
-            System.out.println(message);
+            String message
+                    = _TO_ANDROID_MARKER + _compileMap(map, explored)
+                    + _MSG_SEPARATOR
+                    + _compileActions(actions);
             _socketCommunicator.echo(message);
         } catch (IOException ex) {
             Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex);

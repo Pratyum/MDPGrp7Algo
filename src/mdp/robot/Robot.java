@@ -1,26 +1,28 @@
 package mdp.robot;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 import mdp.common.Direction;
 import mdp.common.Vector2;
 import mdp.solver.exploration.MapViewer;
 import mdp.Main;
+import mdp.map.Map;
 
 public class Robot {
 
     private Vector2 _position;
     private Direction _orientation;
-    
-    private static volatile int calibrationCounter = 0 ;
+
+    private static volatile int calibrationCounter = 0;
     private static volatile boolean actionCompleted = false;
-    
+
     private static LinkedList<RobotAction> bufferedActions = new LinkedList<>();
     private MapViewer mapViewer;
 
     public Robot() {
-        this(new Vector2(1, 1), Direction.Down);
+        this(new Vector2(1, 1), Direction.Right);
     }
 
     public Robot(Vector2 position, Direction direction) {
@@ -87,17 +89,17 @@ public class Robot {
     public void executeBufferActions(int sleepPeriod) throws IOException {
         try {
             if (!Main.isSimulating()) {
-                
-            		Main.getRpi().sendMoveCommand(bufferedActions);
+
+                Main.getRpi().sendMoveCommand(bufferedActions);
                 while (!actionCompleted) {
                 }
-                
+
+                Map map = mapViewer.getSubjectiveMap();
+                int[][] explored = mapViewer.getExplored();
+
                 // send info to android
-                /*Main.getRpi().sendMapInfo(
-                        mapViewer.getSubjectiveMap(),
-                        mapViewer.getExplored()
-                );*/
-                
+                Main.getRpi().sendInfoToAndroid(map, explored, bufferedActions);
+
                 System.out.println("Actions completed");
                 actionCompleted = false;
                 //increment calibrationCounter
@@ -108,9 +110,10 @@ public class Robot {
                 execute(action);
                 mapViewer.markRobotVisited(_position);
                 Main.getGUI().update(this);
-                
-                if(Main.isSimulating())
-                		Thread.sleep(sleepPeriod);
+
+                if (Main.isSimulating()) {
+                    Thread.sleep(sleepPeriod);
+                }
             }
             bufferedActions.clear();
 
@@ -119,19 +122,17 @@ public class Robot {
         }
     }
 
-   
-    
     public boolean checkIfHavingBufferActions() {
         return !bufferedActions.isEmpty();
     }
-  
-    public boolean checkIfCalibrationCounterReached(){
-    		return (calibrationCounter >= 6);
+
+    public boolean checkIfCalibrationCounterReached() {
+        return (calibrationCounter >= 6);
     }
-    
-    public boolean clearCalibrationCounter(){
-    		calibrationCounter = 0;
-    		return true;
+
+    public boolean clearCalibrationCounter() {
+        calibrationCounter = 0;
+        return true;
     }
-    
+
 }

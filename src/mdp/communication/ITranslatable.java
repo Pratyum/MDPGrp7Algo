@@ -1,5 +1,6 @@
 package mdp.communication;
 
+import java.util.LinkedList;
 import java.util.List;
 import mdp.common.Vector2;
 import mdp.map.Map;
@@ -14,7 +15,7 @@ public interface ITranslatable {
 
     void listen(Runnable handler);
 
-    void sendMapInfo(Map map, int[][] explored);
+    void sendInfoToAndroid(Map map, int[][] explored, LinkedList<RobotAction> actions);
     
     void sendSensingRequest();
 
