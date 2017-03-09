@@ -389,6 +389,8 @@ public class MapViewer {
             }
         }
 
+        //update map with proper obstacles
+        map = new Map(explored);
         map.addObstacle(obstaclePositions);
         insertExploredIntoMap();
         Main.getGUI().update(map);
