@@ -85,6 +85,9 @@ public class Main {
                 case "D":
                     Robot.actionCompletedCallBack();
                     break;
+                case "a": //a for accuracy , calibration
+                		ActionFormulator.calibrationCompletedCallBack();
+                		break;
                 default:
                     if (inStr.length() == 6) {
                         System.out.println("Analyzing sensing information");
