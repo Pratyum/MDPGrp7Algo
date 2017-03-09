@@ -14,6 +14,7 @@ import mdp.map.Map;
 import mdp.map.WPObstacleState;
 import mdp.robot.Robot;
 import mdp.robot.RobotAction;
+import mdp.solver.exploration.CalibrationType;
 
 public class Translator implements ITranslatable {
 
@@ -27,6 +28,11 @@ public class Translator implements ITranslatable {
 
     private static final String _SENSING_REQUEST = "s";
     private static final String _TRAILER = "|";
+    
+    private static final String _CAL_FRONT_LR = "x";
+    private static final String _CAL_FRONT_ML = "y";
+    private static final String _CAL_FRONT_MR = "z";
+    private static final String _CAL_RIGHT = "c";
 
     private static final int _PROBING_PERIOD = 200;
 
@@ -169,6 +175,31 @@ public class Translator implements ITranslatable {
     private String _compileMap(Map map, int[][] explored) {
         String[] hexDesc = Descriptor.toHex(Descriptor.stringify(map, explored));
         return hexDesc[0] + hexDesc[1];
+    }
+    
+    private String _compileCalibration(CalibrationType calType) {
+        switch (calType) {
+            case Right:
+                return _CAL_RIGHT;
+            case Front_LR:
+                return _CAL_FRONT_LR;
+            case Front_ML:
+                return _CAL_FRONT_ML;
+            case Front_MR:
+                return _CAL_FRONT_MR;
+            default:
+                return "";
+        }
+    }
+
+    @Override
+    public void sendCalibrationCommand(CalibrationType calType) {
+        try {
+            String message = _TO_ARDUINO_MARKER + _compileCalibration(calType) + _TRAILER;
+            _socketCommunicator.echo(message);
+        } catch (IOException ex) {
+            Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     // Arduino

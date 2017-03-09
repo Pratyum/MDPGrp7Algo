@@ -654,26 +654,26 @@ public class MapViewer {
     
         if(map.getPoint(right_up).obstacleState() == WPObstacleState.IsActualObstacle && 
         		map.getPoint(right_down).obstacleState() == WPObstacleState.IsActualObstacle){
-        		return CalibrationType.right;
+        		return CalibrationType.Right;
         }
         
         
         if(map.getPoint(front_r).obstacleState() == WPObstacleState.IsActualObstacle && 
         		map.getPoint(front_l).obstacleState() == WPObstacleState.IsActualObstacle){
-        		return CalibrationType.front_lr;
+        		return CalibrationType.Front_LR;
         }
         
         if(map.getPoint(front_l).obstacleState() == WPObstacleState.IsActualObstacle && 
         		map.getPoint(front_m).obstacleState() == WPObstacleState.IsActualObstacle){
-        		return CalibrationType.front_ml;
+        		return CalibrationType.Front_ML;
         }
         
         if(map.getPoint(front_r).obstacleState() == WPObstacleState.IsActualObstacle && 
         		map.getPoint(front_m).obstacleState() == WPObstacleState.IsActualObstacle){
-        		return CalibrationType.front_mr;
+        		return CalibrationType.Front_MR;
         }
         
-        return CalibrationType.No;
+        return CalibrationType.NA;
         
     }
     

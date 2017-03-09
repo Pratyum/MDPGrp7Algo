@@ -132,7 +132,7 @@ public class ActionFormulator {
             if(robot.checkIfCalibrationCounterReached()){
             		
             		switch(mapViewer.checkCalibrationAvailable(robot)){
-                    case right:
+                    case Right:
                     		
                     		break;
                     	default:

@@ -1,5 +1,5 @@
 package mdp.solver.exploration;
 
 public enum CalibrationType {
-	right , front_lr, front_ml,front_mr , No
+    Right, Front_LR, Front_ML, Front_MR, NA
 }
