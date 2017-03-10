@@ -62,7 +62,8 @@ public class Descriptor {
                 result[resultIndex] += curLine;
             }            
         }
-        result[0] = _binToHex("11" + result[0] + "11");
+        //result[0] = _binToHex("11" + result[0] + "11");
+        result[0]=_binToHex(result[0]);
         result[1] = _binToHex(result[1] != null ? result[1] : "");
         return result;
     }

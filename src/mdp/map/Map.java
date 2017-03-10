@@ -72,6 +72,9 @@ public class Map {
                     }
                 }
                 
+                
+                if(i == 0 || i== DIM_I-1 || j == 0 || j==DIM_J-1)
+                		curObsState = WPObstacleState.IsVirtualObstacle;
                 // create point
                 _wpMap[i][j] = new Waypoint(curPos, curSpecState, curObsState);
             }

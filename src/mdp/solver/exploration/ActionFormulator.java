@@ -110,6 +110,7 @@ public class ActionFormulator {
                     break;
         				}
         }
+        view(robot);
         		
         			
         	
