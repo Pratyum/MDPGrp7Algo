@@ -39,8 +39,9 @@ public class ExplorationSolver {
         
         Vector2 robotPos = new Vector2(1, 1);
         Direction robotDir = Direction.Right;
-        _robot = new Robot(robotPos, robotDir, mapViewer);
         actionFormulator = new ActionFormulator(mapViewer, simulator);
+        _robot = new Robot(robotPos, robotDir, mapViewer , actionFormulator);
+        
         boolean reachablePointFound = false;
         AStarSolver astarSolver = new AStarSolver();
         LinkedList<RobotAction> robotActions;
@@ -65,13 +66,28 @@ public class ExplorationSolver {
         twoDirectionAway.add(Direction.Down);
         twoDirectionAway.add(Direction.Down);
    
+        int counter=0;
+        Vector2 last_position;
         	while (!goalFormulator.checkIfReachFinalGoal(_robot.position())) {
             //System.out.println("following right wall");
 
             //System.out.println(mapViewer.getSubjectiveMap().toString(_robot));
-            actionFormulator.rightWallFollower(_robot);
+        		last_position =_robot.position();
+        		actionFormulator.rightWallFollower(_robot);
+            if(_robot.position().equals(last_position.fnAdd(_robot.orientation().toVector2()))){
+            		counter ++;
+            }
+            else
+            		counter =0;
             
-            
+            if(counter ==7)
+            		{
+            			_robot.bufferAction(RobotAction.RotateRight);
+            			_robot.bufferAction(RobotAction.RotateRight);
+            			_robot.bufferAction(RobotAction.MoveBackward);
+            			actionFormulator.view(_robot);
+            		}
+        
   
         }
         while (!goalFormulator.checkIfReachStartZone(_robot.position())) {

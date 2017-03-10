@@ -11,7 +11,9 @@ import mdp.Main;
 import mdp.common.Direction;
 import mdp.common.Vector2;
 import mdp.map.Map;
+import mdp.map.WPObstacleState;
 import mdp.communication.*;
+import mdp.solver.shortestpath.*;
 
 public class ActionFormulator {
 
@@ -40,10 +42,37 @@ public class ActionFormulator {
 
     }
 
+    public  void reverseToThePoint( RobotMovementHistory robotState , Robot robot) throws InterruptedException, IOException{
+    		AStarSolver astarsolver = new AStarSolver();
+    		AStarSolverResult astarSolverResult = astarsolver.solve(mapViewer.getSubjectiveMap(), robot, robotState._position);
+    		LinkedList<RobotAction> robotActions = RobotAction.fromPath(robot, astarSolverResult.shortestPath);
+            //System.out.println("Action size: " + robotActions.size());
+            for (RobotAction action : robotActions) {
+                //System.out.println("Here3");
+                robot.bufferAction(action);
+            }
+            view(robot);
+        
+        while(robot.orientation()!=robotState._direcition){
+        		robot.bufferAction(RobotAction.RotateLeft);
+        		view(robot);
+        }
+        
+           
+   }
+    
     public void rightWallFollower(Robot robot ) throws InterruptedException, IOException {
 
+    	
+    	
+    		
         view(robot); // for scanning purpose
         
+        /*while(mapViewer.checkIfRight5SquaresEmpty(robot)){
+        		robot.bufferAction(RobotAction.MoveBackward);
+        		view(robot);
+        }*/
+        		
 
         
         if (null != mapViewer.checkWalkable(robot, Direction.Right)) {
