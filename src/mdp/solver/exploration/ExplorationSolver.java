@@ -9,6 +9,7 @@ import java.util.TimerTask;
 import mdp.Main;
 import mdp.common.Direction;
 import mdp.map.Map;
+import mdp.map.WPObstacleState;
 import mdp.robot.Robot;
 import mdp.common.Vector2;
 import mdp.robot.RobotAction;
@@ -39,14 +40,15 @@ public class ExplorationSolver {
         
         Vector2 robotPos = new Vector2(1, 1);
         Direction robotDir = Direction.Right;
-        _robot = new Robot(robotPos, robotDir, mapViewer);
         actionFormulator = new ActionFormulator(mapViewer, simulator);
+        _robot = new Robot(robotPos, robotDir, mapViewer , actionFormulator);
+        
         boolean reachablePointFound = false;
         AStarSolver astarSolver = new AStarSolver();
         LinkedList<RobotAction> robotActions;
         LinkedList<Vector2> reachableList;
         Direction checkGoingBack = Direction.Down;
-        Direction before;
+        Direction before,last_orientation;
         LinkedList<Direction> twoDirectionAway = new LinkedList<Direction>();
         
         // put some blockers into the map
@@ -65,14 +67,42 @@ public class ExplorationSolver {
         twoDirectionAway.add(Direction.Down);
         twoDirectionAway.add(Direction.Down);
    
+        int counter=0;
+        Vector2 last_position = new Vector2(-1,-1);
         	while (!goalFormulator.checkIfReachFinalGoal(_robot.position())) {
             //System.out.println("following right wall");
 
             //System.out.println(mapViewer.getSubjectiveMap().toString(_robot));
-            actionFormulator.rightWallFollower(_robot);
+        		last_position =new Vector2(_robot.position().i(),_robot.position().j());
+        		last_orientation =  _robot.orientation();
+        		actionFormulator.rightWallFollower(_robot);
+        		
+        		System.out.println("Last position: "+ last_position.toString());
+        		System.out.println("Current position: "+ _robot.position().toString());
+        		System.out.println("last orientation: "+ last_orientation.toString());
+        		System.out.println(mapViewer.exploredAreaToString());
+            System.out.println(mapViewer.robotVisitedPlaceToString());
+            System.out.println(mapViewer.getSubjectiveMap().toString(_robot));
+        		
+        		
+            if(_robot.position().equals(last_position.fnAdd(last_orientation.getRight().toVector2()))){
+            		
+            		counter ++;
+            }
+            else
+            		counter =0;
             
+            if(counter ==7)
+            		{
+            			_robot.bufferAction(RobotAction.RotateRight);
+            			_robot.bufferAction(RobotAction.RotateRight);
+            			_robot.bufferAction(RobotAction.MoveForward);
+            			_robot.bufferAction(RobotAction.RotateRight);
+            			actionFormulator.view(_robot);
+            			counter =0;
+            		}
+            System.out.println("Counter is "+counter);
             
-  
         }
         while (!goalFormulator.checkIfReachStartZone(_robot.position())) {
             //System.out.println("following right wall");
@@ -97,7 +127,8 @@ public class ExplorationSolver {
             			continue;
             		reachableList = mapViewer.findScannableReachableFromGoal(goalList.get(i), _robot);
             		for(int j = 0 ; j < reachableList.size(); j++){
-            			if(!mapViewer.checkRobotVisited(reachableList.get(j)))
+            			if((!mapViewer.checkRobotVisited(reachableList.get(j))) 
+            					&& mapViewer.getSubjectiveMap().getPoint(reachableList.get(j)).obstacleState()!= WPObstacleState.IsVirtualObstacle)
             			{
             				
             				goal = reachableList.get(j);
@@ -182,6 +213,11 @@ public class ExplorationSolver {
                     RobotAction action = actions.pop();
                     robot.execute(action);
                     Main.getGUI().update(robot);
+                    if (!Main.isSimulating()) {
+                    		LinkedList<RobotAction> curAct = new LinkedList<RobotAction>();
+                    		curAct.add(action);
+                    		Main.getRpi().sendMoveCommand(curAct);
+                    }
                 } else {
                     timer.cancel();
                     System.out.println("Starting callback");

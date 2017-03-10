@@ -24,6 +24,7 @@ public class MapViewer {
     //1 empty, 2 obstacle, 0 havent explored
     private int[][] explored;
     private int[][] robotPosition;
+    public LinkedList<RobotMovementHistory> robotMovementHistory ;
     MapViewer() {
         map = new Map();
         explored = new int[][] {
@@ -43,6 +44,7 @@ public class MapViewer {
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
         };
+        robotMovementHistory = new LinkedList<RobotMovementHistory>();
         robotPosition = new int[][] {
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -123,6 +125,28 @@ public class MapViewer {
         return explored[v.i()][v.j()];
 
     }
+    
+    public void markRobotHistory(Vector2 p, Direction d){
+    
+    		robotMovementHistory.add(new RobotMovementHistory(p,d));	
+    }
+    
+    public int detectCircle(Vector2 p, Direction d){
+    		RobotMovementHistory tmp = new RobotMovementHistory(p,d);
+    		for(int i=0; i<robotMovementHistory.size();i++){
+    			if(RobotMovementHistory.compare(tmp,robotMovementHistory.get(i) )){
+    				return i-1;
+    			}
+    		}
+    		
+    		return -1;
+    	
+    }
+    
+    public LinkedList<RobotMovementHistory> getRobotMovementHistory(){
+    		return robotMovementHistory;
+    }
+    
     
     public boolean checkIfNavigationComplete(){
 	    boolean complete= true;
@@ -223,6 +247,22 @@ public class MapViewer {
 
     }
 
+    public boolean checkIfRight5SquaresEmpty(Robot robot) throws InterruptedException, IOException {
+    	
+    		Vector2 edge_up ,edge_mid , edge_down;
+    	   
+       return checkBackRightConnectingPoint(robot) != WPObstacleState.IsActualObstacle &&
+        	checkFrontRightConnectingPoint(robot) != WPObstacleState.IsActualObstacle &&
+        	checkWalkable(robot, Direction.Right) == Know.Yes; 
+    	   		//do sth
+    		
+
+    }
+    
+    public void markRobotHistory(){
+    	
+    }
+    
     // 1 walkable, 0 not walkable, 2 need further exploration
     public Know checkWalkable(Robot robot, Direction d) throws InterruptedException, IOException {
     	 	if (robot.checkIfHavingBufferActions()) {
@@ -678,6 +718,21 @@ public class MapViewer {
         
         return CalibrationType.NA;
         
+    }
+    
+    public WPObstacleState checkFrontRightConnectingPoint(Robot robot){
+    		
+    		if(!map.checkValidBoundary(robot.position().fnAdd(robot.orientation().toVector2().fnMultiply(2)).fnAdd(robot.orientation().getRight().toVector2().fnMultiply(2))))
+    			return WPObstacleState.IsActualObstacle;
+    					
+    		return map.getPoint(robot.position().fnAdd(robot.orientation().toVector2().fnMultiply(2)).fnAdd(robot.orientation().getRight().toVector2().fnMultiply(2))).obstacleState();  
+    }
+    
+    public WPObstacleState checkBackRightConnectingPoint(Robot robot){
+    		if(!map.checkValidBoundary(robot.position().fnAdd(robot.orientation().toVector2().fnMultiply(-2)).fnAdd(robot.orientation().getRight().toVector2().fnMultiply(2))))
+			return WPObstacleState.IsActualObstacle;
+    		
+		return map.getPoint(robot.position().fnAdd(robot.orientation().toVector2().fnMultiply(-2)).fnAdd(robot.orientation().getRight().toVector2().fnMultiply(2))).obstacleState();  
     }
     
     

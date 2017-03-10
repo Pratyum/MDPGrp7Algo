@@ -6,6 +6,7 @@ import java.util.LinkedList;
 
 import mdp.common.Direction;
 import mdp.common.Vector2;
+import mdp.solver.exploration.ActionFormulator;
 import mdp.solver.exploration.MapViewer;
 import mdp.Main;
 import mdp.map.Map;
@@ -20,6 +21,7 @@ public class Robot {
 
     private static LinkedList<RobotAction> bufferedActions = new LinkedList<>();
     private MapViewer mapViewer;
+    private ActionFormulator actionFormulator;
 
     public Robot() {
         this(new Vector2(1, 1), Direction.Right);
@@ -30,10 +32,11 @@ public class Robot {
         _orientation = direction;
     }
 
-    public Robot(Vector2 position, Direction direction, MapViewer mv) {
+    public Robot(Vector2 position, Direction direction, MapViewer mv , ActionFormulator ac) {
         _position = position;
         _orientation = direction;
         mapViewer = mv;
+        actionFormulator = ac;
     }
 
     public Vector2 position() {
@@ -74,6 +77,8 @@ public class Robot {
                 // RPI call
                 _orientation = _orientation.getRight();
                 break;
+                
+            
         }
     }
 
@@ -105,16 +110,39 @@ public class Robot {
                 //increment calibrationCounter
                 calibrationCounter += bufferedActions.size();
             }
-
+            int first = 0;
+            int index =0;
             for (RobotAction action : bufferedActions) {
                 execute(action);
                 mapViewer.markRobotVisited(_position);
+                
+                /*f(first == 0 && mapViewer.detectCircle(_position, _orientation)!=-1){
+                		first = 1;
+                		index = mapViewer.detectCircle(_position, _orientation);
+                }
+                mapViewer.markRobotHistory(_position, _orientation);*/
                 Main.getGUI().update(this);
-
+                
                 if (Main.isSimulating()) {
                     Thread.sleep(sleepPeriod);
                 }
             }
+            /*
+            if(first!= 0){
+            		
+            		
+            	    actionFormulator.reverseToThePoint(mapViewer.getRobotMovementHistory().get(index), this);
+            	    int i = mapViewer.robotMovementHistory.size()-index -1 ;
+            	    while( i >0 )
+            		{
+            			mapViewer.robotMovementHistory.removeLast();
+            			i--;
+            		}
+            	    
+            }
+            	*/	
+            
+            
             bufferedActions.clear();
 
         } catch (InterruptedException e) {
