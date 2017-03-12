@@ -29,18 +29,18 @@ public class AStarSolver {
             // move left
             verticalResult = robot.position().fnAdd(Direction.Left.toVector2());
         }
-        
+
         boolean horizontallyWalkable = false;
         boolean verticallyWalkable = false;
         if (map.getPoint(horizontalResult).obstacleState()
-                                        .equals(WPObstacleState.IsWalkable)) {
+                .equals(WPObstacleState.IsWalkable)) {
             horizontallyWalkable = true;
         }
         if (map.getPoint(verticalResult).obstacleState()
-                                        .equals(WPObstacleState.IsWalkable)) {
+                .equals(WPObstacleState.IsWalkable)) {
             verticallyWalkable = true;
         }
-        
+
         if (horizontallyWalkable) {
             if (verticallyWalkable) {
                 return diff.i() > diff.j() ? verticalResult : horizontalResult;
@@ -51,16 +51,16 @@ public class AStarSolver {
             if (verticallyWalkable) {
                 return verticalResult;
             } else {
-                 System.out.println("No possible solution found.");
-                 return new Vector2(-1, -1);
+                System.out.println("No possible solution found.");
+                return new Vector2(-1, -1);
             }
         }
     }
 
-    public AStarSolverResult solve(Map map, Robot robot, Vector2 goalPos) {
+    public AStarSolverResult solve(Map map, Robot robot, Vector2 goalPos, boolean isSmooth) {
 
         AStarSolverResult result = new AStarSolverResult();
-        
+
         System.out.println("Solving shortest path on the following map:");
         //System.out.println(map.toString(robot));
 
@@ -99,7 +99,9 @@ public class AStarSolver {
                     AStarWaypoint adjPoint = new AStarWaypoint(
                             adjMapPoint,
                             AStarUtil.getMDistance(adjPos, goalPos),
-                            AStarUtil.getMoveCost(robot, dir) + curPoint.gval(),
+                            !isSmooth
+                                    ? AStarUtil.getMoveCost(robot, dir) + curPoint.gval()
+                                    : AStarUtil.getSmoothMoveCost(robot, dir) + curPoint.gval(),
                             dir.getBehind()
                     );
 
@@ -173,8 +175,16 @@ public class AStarSolver {
 
     }
 
+    public AStarSolverResult solve(Map map, Robot robot, Vector2 goalPos) {
+        return solve(map, robot, goalPos, false);
+    }
+
     public AStarSolverResult solve(Map map, Robot robot) {
-        return solve(map, robot, map.GOAL_POS);
+        return solve(map, robot, map.GOAL_POS, false);
+    }
+
+    public AStarSolverResult solve(Map map, Robot robot, boolean isSmooth) {
+        return solve(map, robot, map.GOAL_POS, isSmooth);
     }
 
 }

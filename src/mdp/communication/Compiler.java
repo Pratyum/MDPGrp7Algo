@@ -1,11 +1,12 @@
 package mdp.communication;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.text.DecimalFormat;
 import java.util.List;
 import mdp.common.Vector2;
 import mdp.map.Descriptor;
 import mdp.map.Map;
-import mdp.map.WPObstacleState;
 import mdp.robot.Robot;
 import mdp.robot.RobotAction;
 import mdp.solver.exploration.CalibrationType;
@@ -25,7 +26,13 @@ public class Compiler {
     private static final String _SENSING_REQUEST = "s";
     private static final String _TRAILER = "|";
 
-    private static final String DESC_SEPARATOR = "g";
+    private static final String _DESC_SEPARATOR = "g";
+
+    private static final String _DECIMAL_FORMAT = "###.###";
+
+    private static String _roundToString(double target) {
+        return new DecimalFormat(_DECIMAL_FORMAT).format(target);
+    }
 
     static String compileActions(List<RobotAction> actions) {
         String result = "";
@@ -80,44 +87,8 @@ public class Compiler {
         return result;
     }
 
-    static String compileActions(Map map, List<Vector2> path) {
+    static String compileSmoothActions(List<Vector2> smoothPath) {
         String result = "";
-        Vector2 lastSavedPos = null;
-        Vector2 prevPos = null;
-        List<Vector2> smoothPath = new ArrayList<>();
-        for (Vector2 curPos : path) {
-            if (lastSavedPos == null) {
-                lastSavedPos = curPos;
-                smoothPath.add(curPos);
-            } else {
-                // check existence of obstacle in rectangular area
-                int minI = Integer.min(lastSavedPos.i(), curPos.i());
-                int maxI = Integer.max(lastSavedPos.i(), curPos.i());
-                int minJ = Integer.min(lastSavedPos.j(), curPos.j());
-                int maxJ = Integer.max(lastSavedPos.j(), curPos.j());
-                boolean obsDetected = false;
-                for (int i = minI; i <= maxI; i++) {
-                    for (int j = minJ; j < maxJ; j++) {
-                        if (!map.getPoint(new Vector2(i, j)).obstacleState()
-                                .equals(WPObstacleState.IsWalkable)) {
-                            obsDetected = true;
-                            break;
-                        }
-                    }
-                    if (obsDetected) {
-                        break;
-                    }
-                }
-                // if there is, save the prev pos
-                if (obsDetected) {
-                    smoothPath.add(prevPos);
-                    lastSavedPos = prevPos;
-                }
-            }
-            prevPos = curPos;
-        }
-        // save goal
-        smoothPath.add(prevPos);
         double orientation;
         switch (new Robot().orientation()) {
             case Up:
@@ -135,31 +106,25 @@ public class Compiler {
                 break;
         }
         for (int i = 0; i < smoothPath.size() - 1; i++) {
+            // calculate vector difference
             Vector2 posDiff = smoothPath.get(i + 1).fnAdd(smoothPath.get(i).fnMultiply(-1));
+            
+            // calculate rotation
+            double alpha = Math.toDegrees(
+                    Math.atan(((double) posDiff.i()) / ((double) posDiff.j()))
+            );
+            double angle = alpha + (posDiff.j() < 0 ? 90 : 0);
+            double rotation = Math.abs(angle - orientation);
+            String rotateDirection = posDiff.i() > 0 ? "r" : "l";
+            String rotationStr = rotateDirection + _roundToString(rotation) + _TRAILER;
+            
+            // calculate distance to travel
             double distance = Math.sqrt(Math.pow(posDiff.i(), 2) + Math.pow(posDiff.j(), 2));
-            String distanceStr = "f" + distance + _TRAILER;
-            double rotation;
-            String rotateDirection;
-            double alpha = Math.atan(((double) posDiff.i()) / ((double) posDiff.j()));
-            double angle;
-            if (posDiff.i() > 0) {
-                rotateDirection = "r";
-                if (posDiff.j() > 0) {
-                    angle = alpha + 270;
-                } else {
-                    angle = alpha + 180;
-                }
-            } else {
-                rotateDirection = "l";
-                if (posDiff.j() > 0) {
-                    angle = alpha + 0;
-                } else {
-                    angle = alpha + 90;
-                }
-            }
-            rotation = angle - orientation;
-            String rotationStr = rotateDirection + String.format("%.3f", rotation) + _TRAILER;
+            String distanceStr = "f" + _roundToString(distance) + _TRAILER;
+            
+            // wrapping up
             result += rotationStr + distanceStr;
+            orientation = angle;
         }
         return result;
     }
@@ -167,7 +132,7 @@ public class Compiler {
     static String compileMap(Map map, int[][] explored) {
         String strResult = Descriptor.stringify(map, explored);
         String[] hexDesc = Descriptor.toHex(strResult);
-        return hexDesc[0] + DESC_SEPARATOR + hexDesc[1];
+        return hexDesc[0] + _DESC_SEPARATOR + hexDesc[1];
     }
 
     static String compileCalibration(CalibrationType calType) {

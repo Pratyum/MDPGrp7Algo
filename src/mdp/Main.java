@@ -12,30 +12,29 @@ import mdp.simulation.GUI;
 import mdp.simulation.event.GUIClickEvent;
 import mdp.simulation.view.IGUIUpdatable;
 import mdp.solver.exploration.ActionFormulator;
-import mdp.solver.shortestpath.AStarSolver;
 
 public class Main {
 
     private static IGUIUpdatable _gui;
     private static ITranslatable _rpi;
-    
+
     private static boolean _isSimulating = true;
+
+    public static void main(String[] args) throws IOException {
+        // run simulation
+        System.out.println("Initiating GUI...");
+        startGUI();
+        
+        // testing (if needed)
+//        Test.run();
+    }
 
     public static boolean isSimulating() {
         return _isSimulating;
     }
-    
+
     public static void isSimulating(boolean isSimulating) {
         _isSimulating = isSimulating;
-    }
-
-    public static void main(String[] args) throws IOException {
-
-        AStarSolver solver = new AStarSolver();
-
-        // run simulation
-        System.out.println("Initiating GUI...");
-        startGUI();
     }
 
     public static IGUIUpdatable getGUI() {
@@ -51,7 +50,7 @@ public class Main {
             _gui = new GUI();
         });
     }
-    
+
     public static void connectToRpi() throws IOException {
         _rpi = new Translator();
         _rpi.connect(() -> {
@@ -84,13 +83,13 @@ public class Main {
                     break;
                 case "D":
                     //Robot.actionCompletedCallBack();
-                		ActionFormulator.calibrationCompletedCallBack();
-                		break;
+                    ActionFormulator.calibrationCompletedCallBack();
+                    break;
                 case "a": //a for accuracy , calibration
-                		
-                		break;
+
+                    break;
                 default:
-                		
+
                     if (inStr.length() == 6) {
                         System.out.println("Analyzing sensing information");
                         ActionFormulator.sensingDataCallback(inStr);

@@ -21,7 +21,7 @@ public interface ITranslatable {
 
     void sendMoveCommand(List<RobotAction> actions);
     
-    void sendSmoothMoveCommand(Map map, List<Vector2> path);
+    void sendSmoothMoveCommand(List<Vector2> path);
     
     void sendCalibrationCommand(CalibrationType calType);
     
