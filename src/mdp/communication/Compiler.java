@@ -58,7 +58,6 @@ public class Compiler {
                     break;
             }
             if (result.length() != 0) {
-                lastAction = Character.toString(result.charAt(result.length() - 1));
                 if (lastAction.equals(nextActionStr)) {
                     boolean isRotating = lastAction.equals(_ROTATE_LEFT) || lastAction.equals(_ROTATE_RIGHT);
                     if (isRotating) {
@@ -74,6 +73,7 @@ public class Compiler {
             } else {
                 result += nextActionStr;
             }
+            lastAction = nextActionStr;
         }
         boolean isRotating;
         if (result.length() != 1) {
