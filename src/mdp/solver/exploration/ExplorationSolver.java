@@ -42,16 +42,12 @@ public class ExplorationSolver {
         Direction robotDir = Direction.Right;
         actionFormulator = new ActionFormulator(mapViewer, simulator);
         _robot = new Robot(robotPos, robotDir, mapViewer , actionFormulator);
-        
-        boolean reachablePointFound = false;
-        AStarSolver astarSolver = new AStarSolver();
-        LinkedList<RobotAction> robotActions;
-        LinkedList<Vector2> reachableList;
-        Direction checkGoingBack = Direction.Down;
-        Direction before,last_orientation;
+                
+        Direction last_orientation;
         LinkedList<Direction> twoDirectionAway = new LinkedList<Direction>();
         
         // put some blockers into the map
+        System.out.println("For Simulation Purpose");
         System.out.println(objective_map.toString(_robot));
         
         
@@ -80,9 +76,9 @@ public class ExplorationSolver {
         		System.out.println("Last position: "+ last_position.toString());
         		System.out.println("Current position: "+ _robot.position().toString());
         		System.out.println("last orientation: "+ last_orientation.toString());
-        		System.out.println(mapViewer.exploredAreaToString());
-            System.out.println(mapViewer.robotVisitedPlaceToString());
-            System.out.println(mapViewer.getSubjectiveMap().toString(_robot));
+        		//System.out.println(mapViewer.exploredAreaToString());
+            //System.out.println(mapViewer.robotVisitedPlaceToString());
+            //System.out.println(mapViewer.getSubjectiveMap().toString(_robot));
         		
         		
             if(_robot.position().equals(last_position.fnAdd(last_orientation.getRight().toVector2()))){
@@ -105,71 +101,42 @@ public class ExplorationSolver {
             
         }
         while (!goalFormulator.checkIfReachStartZone(_robot.position())) {
-            //System.out.println("following right wall");
-            actionFormulator.rightWallFollower(_robot);
-           
+		        	last_position =new Vector2(_robot.position().i(),_robot.position().j());
+		    		last_orientation =  _robot.orientation();
+		    		actionFormulator.rightWallFollower(_robot);
+		    		
+		    		System.out.println("Last position: "+ last_position.toString());
+		    		System.out.println("Current position: "+ _robot.position().toString());
+		    		System.out.println("last orientation: "+ last_orientation.toString());
+		    		//System.out.println(mapViewer.exploredAreaToString());
+		        //System.out.println(mapViewer.robotVisitedPlaceToString());
+		        //System.out.println(mapViewer.getSubjectiveMap().toString(_robot));
+		    		
+		    		
+		        if(_robot.position().equals(last_position.fnAdd(last_orientation.getRight().toVector2()))){
+		        		
+		        		counter ++;
+		        }
+		        else
+		        		counter =0;
+		        
+		        if(counter ==7)
+		        		{
+		        			_robot.bufferAction(RobotAction.RotateRight);
+		        			_robot.bufferAction(RobotAction.RotateRight);
+		        			_robot.bufferAction(RobotAction.MoveForward);
+		        			_robot.bufferAction(RobotAction.RotateRight);
+		        			actionFormulator.view(_robot);
+		        			counter =0;
+		        		}
+		        System.out.println("Counter is "+counter);
+		           
 
         }
 
-        while (!mapViewer.checkIfNavigationComplete()) {
-            LinkedList<Vector2> goalList = mapViewer.findUnexploredInAscendingDistanceOrder(_robot);
-            System.out.println("My goal list  "+goalList.toString());
-            Vector2 goal = new Vector2(-1,-1);
-            if(goalList.size()==0)
-            {
-            		System.out.println("Exploration completed");
-            		break;
-            }
-            for(int i=0 ; i< goalList.size(); i++){
-            		
-            		System.out.println("Processing goal "+goalList.get(i).toString());
-            		if(mapViewer.markGhostBlock(goalList.get(i)))
-            			continue;
-            		reachableList = mapViewer.findScannableReachableFromGoal(goalList.get(i), _robot);
-            		for(int j = 0 ; j < reachableList.size(); j++){
-            			if((!mapViewer.checkRobotVisited(reachableList.get(j))) 
-            					&& mapViewer.getSubjectiveMap().getPoint(reachableList.get(j)).obstacleState()!= WPObstacleState.IsVirtualObstacle)
-            			{
-            				
-            				goal = reachableList.get(j);
-            				reachablePointFound = true;	
-            				System.out.println("Goal found "+goal);
-            				break;
-            			}
-            		}
-            		
-            		if(reachablePointFound)
-            			break; /// findFirst goal
-            		mapViewer.markUnreachable(goalList.get(i));
-            }
-            
-            if(reachablePointFound){
-
-                System.out.println("Current goal: "+goal.toString());
-                
-                AStarSolverResult astarSolverResult = astarSolver.solve(mapViewer.getSubjectiveMap(), _robot, goal);
-                
-                robotActions = RobotAction.fromPath(_robot, astarSolverResult.shortestPath);
-                //System.out.println("Action size: " + robotActions.size());
-                for (RobotAction action : robotActions) {
-                    view(_robot);
-
-                    if (!mapViewer.validate(_robot, action)) {
-                        //actionFormulator.circumvent(_robot);
-                        //System.out.println("Here2");
-                        // in circumvent, stop circumventing when the obstacle is fully identified
-                        actionFormulator.view(_robot); // take a look , update map
-                    		break;
-                    }
-                    //System.out.println("Here3");
-                    _robot.bufferAction(action);
-                }
-            }
-            
-            // prepare for next loop
-            reachablePointFound = false;
-        }
+        actionFormulator.exploreRemainingArea(_robot);
         
+   
         
     }
 

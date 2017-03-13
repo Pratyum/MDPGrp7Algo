@@ -61,6 +61,76 @@ public class ActionFormulator {
            
    }
     
+   public void exploreRemainingArea(Robot _robot) throws InterruptedException, IOException{
+	   boolean reachablePointFound = false;
+	   LinkedList<Vector2> reachableList;
+	   AStarSolver astarSolver = new AStarSolver();
+	   LinkedList<RobotAction> robotActions;
+	   
+	   while (!mapViewer.checkIfNavigationComplete()) {
+           LinkedList<Vector2> goalList = mapViewer.findUnexploredInAscendingDistanceOrder(_robot);
+           System.out.println("My goal list  "+goalList.toString());
+           Vector2 goal = new Vector2(-1,-1);
+           if(goalList.size()==0)
+           {
+           		System.out.println("Exploration completed");
+           		break;
+           }
+           for(int i=0 ; i< goalList.size(); i++){
+           		
+           		System.out.println("Processing goal "+goalList.get(i).toString());
+           		if(mapViewer.markGhostBlock(goalList.get(i)))
+           			continue;
+           		reachableList = mapViewer.findScannableReachableFromGoal(goalList.get(i), _robot);
+           		for(int j = 0 ; j < reachableList.size(); j++){
+           			if((!mapViewer.checkRobotVisited(reachableList.get(j))) 
+           					&& mapViewer.getSubjectiveMap().getPoint(reachableList.get(j)).obstacleState()!= WPObstacleState.IsVirtualObstacle)
+           			{
+           				
+           				goal = reachableList.get(j);
+           				reachablePointFound = true;	
+           				System.out.println("Goal found "+goal);
+           				break;
+           			}
+           		}
+           		
+           		if(reachablePointFound)
+           			break; /// findFirst goal
+           		mapViewer.markUnreachable(goalList.get(i));
+           }
+           
+           if(reachablePointFound){
+
+               System.out.println("Current goal: "+goal.toString());
+               
+               AStarSolverResult astarSolverResult = astarSolver.solve(mapViewer.getSubjectiveMap(), _robot, goal);
+               
+               robotActions = RobotAction.fromPath(_robot, astarSolverResult.shortestPath);
+               //System.out.println("Action size: " + robotActions.size());
+               for (RobotAction action : robotActions) {
+                   view(_robot);
+
+                   if (!mapViewer.validate(_robot, action)) {
+                       //actionFormulator.circumvent(_robot);
+                       //System.out.println("Here2");
+                       // in circumvent, stop circumventing when the obstacle is fully identified
+                       view(_robot); // take a look , update map
+                   		break;
+                   }
+                   //System.out.println("Here3");
+                   _robot.bufferAction(action);
+               }
+           }
+           
+           // prepare for next loop
+           reachablePointFound = false;
+       }
+	   System.out.println("All remaining blocks explored or checked as unreachable ");
+   }
+    
+    
+    
+    
     public void rightWallFollower(Robot robot ) throws InterruptedException, IOException {
 
     	
