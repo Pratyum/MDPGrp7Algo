@@ -18,7 +18,9 @@ public class Main {
     private static IGUIUpdatable _gui;
     private static ITranslatable _rpi;
 
-    private static boolean _isSimulating = true;
+    private static boolean _isSimulating = false;
+
+
 
     public static void main(String[] args) throws IOException {
         // run simulation

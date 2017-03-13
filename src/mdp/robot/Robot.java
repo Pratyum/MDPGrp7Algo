@@ -22,7 +22,8 @@ public class Robot {
     private static LinkedList<RobotAction> bufferedActions = new LinkedList<>();
     private MapViewer mapViewer;
     private ActionFormulator actionFormulator;
-
+    private long executionStartTime = System.currentTimeMillis();
+    private long executionEndTime ;
     public Robot() {
         this(new Vector2(1, 1), Direction.Right);
     }
@@ -94,11 +95,12 @@ public class Robot {
     public void executeBufferActions(int sleepPeriod) throws IOException {
         try {
             if (!Main.isSimulating()) {
-
+            		executionEndTime = System.currentTimeMillis();
+            		System.out.println("Computational time for next movement"+ (executionStartTime- executionEndTime));
                 Main.getRpi().sendMoveCommand(bufferedActions);
                 while (!actionCompleted) {
                 }
-
+                executionStartTime = System.currentTimeMillis();
                 Map map = mapViewer.getSubjectiveMap();
                 int[][] explored = mapViewer.getExplored();
 
