@@ -187,7 +187,11 @@ public class MapViewer {
 
         if (map.checkValidBoundary(v)&&(!checkConfidence(v))) //prevent it being a wall , out of bound array
         {
-            explored[v.i()][v.j()] = 2;
+        		if((!(v.i()>=map.DIM_I-3 && v.j()>=map.DIM_J-3 ))
+        				&&
+        				(!(v.i()<3 && v.j()<3 ))
+        				)
+        			explored[v.i()][v.j()] = 2;
         }
     }
 
