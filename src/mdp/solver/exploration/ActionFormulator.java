@@ -108,8 +108,8 @@ public class ActionFormulator {
                robotActions = RobotAction.fromPath(_robot, astarSolverResult.shortestPath);
                //System.out.println("Action size: " + robotActions.size());
                for (RobotAction action : robotActions) {
-                   view(_robot);
-
+                   
+            	   		view(_robot);
                    if (!mapViewer.validate(_robot, action)) {
                        //actionFormulator.circumvent(_robot);
                        //System.out.println("Here2");
@@ -119,6 +119,7 @@ public class ActionFormulator {
                    }
                    //System.out.println("Here3");
                    _robot.bufferAction(action);
+                   
                }
            }
            
@@ -232,15 +233,17 @@ public class ActionFormulator {
                     s.front_m = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(1)));
                     s.front_r = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(2)));
                     s.right_f = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(3)));
-                    s.right_b = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(4)));
+                    s.right_m = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(4)));
                     s.left = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(5)));
     
         }
 
         Map subjective_map = mapViewer.updateMap(robot, s);
-        //System.out.println(mapViewer.exploredAreaToString());
-        //System.out.println(mapViewer.robotVisitedPlaceToString());
-        //System.out.println(subjective_map.toString(robot));
+        System.out.println(mapViewer.exploredAreaToString());
+        System.out.println(mapViewer.robotVisitedPlaceToString());
+        System.out.println(mapViewer.confidenceDetectionAreaToString());
+        System.out.println(subjective_map.toString(robot));
+        
         isSensingDataArrived = false;
         
         /*if (!Main.isSimulating()) {

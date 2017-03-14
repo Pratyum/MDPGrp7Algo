@@ -22,7 +22,7 @@ public class Simulator {
     }
 
     public SensingData getSensingData(Robot robot) {
-        Vector2 edge, edge_l, edge_r,edge_b;
+        Vector2 edge, edge_l, edge_r,edge_b,edge_rm;
         
         edge = robot.position().fnAdd(robot.orientation().toVector2());
         s.front_m = detect(edge, robot.orientation());
@@ -38,8 +38,8 @@ public class Simulator {
         //System.out.println("s.left " + s.left);
         s.right_f = detect(edge_r, robot.orientation().getRight());
         
-        edge_b = robot.position().fnAdd(robot.orientation().getRight().toVector2()).fnAdd(robot.orientation().getBehind().toVector2());
-        s.right_b = detect(edge_b, robot.orientation().getRight());
+        edge_rm = robot.position().fnAdd(robot.orientation().getRight().toVector2());
+        s.right_m = detect(edge_rm, robot.orientation().getRight());
         //System.out.println("s.right " + s.right);
         return s;
 

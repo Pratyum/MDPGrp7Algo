@@ -153,19 +153,7 @@ public class ExplorationSolver {
     }
 
     // look through map and update 
-    public static Map view(Robot robot) throws InterruptedException, IOException {
-        if (robot.checkIfHavingBufferActions()) {
-            robot.executeBufferActions(ExplorationSolver.getExePeriod());
-        }
 
-        SensingData s;
-        s = simulator.getSensingData(robot);
-        Map subjective_map = mapViewer.updateMap(robot, s);
-        System.out.println(mapViewer.exploredAreaToString());
-        System.out.println(subjective_map.toString(robot));
-
-        return subjective_map;
-    }
 
     public static void goBackToStart(Map map, Robot robot, Runnable callback) {
         System.out.println("Going back to start with the following map");
