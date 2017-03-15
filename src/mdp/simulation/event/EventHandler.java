@@ -8,6 +8,10 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -36,6 +40,7 @@ public class EventHandler implements IHandleable {
     private Thread _explorationThread;
     private static boolean _isShortestPath = true;
     private volatile boolean _callbackCalled;
+    private Timer _timerThread;
 
     public static boolean isShortestPath() {
         return _isShortestPath;
@@ -112,7 +117,7 @@ public class EventHandler implements IHandleable {
     }
 
     @Override
-    public void resolveBtnHandler(GUIClickEvent hdlr, MouseEvent e) {
+    public void resolveHandler(GUIClickEvent hdlr, MouseEvent e) {
         switch (hdlr) {
             case OnToggleObstacle:
                 _onToggleObstacle(e);
@@ -160,8 +165,14 @@ public class EventHandler implements IHandleable {
                 } catch (IOException ex) {
                     Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                break;
             }
-            break;
+            case OnStartTimer:
+                _onStartTimer();
+                break;
+            case OnStopTimer:
+                _onStopTimer();
+                break;
         }
     }
 
@@ -178,7 +189,7 @@ public class EventHandler implements IHandleable {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                resolveBtnHandler(hdlr, e);
+                resolveHandler(hdlr, e);
             }
         };
 
@@ -280,6 +291,7 @@ public class EventHandler implements IHandleable {
         _explorationThread = new Thread(() -> {
             try {
                 _explorationProcedure(exePeriod, () -> {
+                    _gui.trigger(GUIClickEvent.OnStopTimer);
                 });
             } catch (InterruptedException ex) {
                 Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
@@ -316,6 +328,7 @@ public class EventHandler implements IHandleable {
                     // shortest path
                     try {
                         _shortestPathProcedure(exePeriod);
+                        _gui.trigger(GUIClickEvent.OnStopTimer);
                     } catch (IOException e1) {
                         // TODO Auto-generated catch block
                         e1.printStackTrace();
@@ -401,6 +414,27 @@ public class EventHandler implements IHandleable {
     private void _onConnect(MouseEvent e) throws IOException {
         Main.connectToRpi();
     }
+    
+    private void _onStartTimer() {
+        Date startTime = new Date();
+        System.out.println("startTime = " + startTime);
+        _timerThread = new Timer();
+        _timerThread.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Date diffTime = new Date(new Date().getTime() - startTime.getTime() - 1800000);
+                System.out.println("diffTime = " + diffTime);
+                String timeStr = new SimpleDateFormat("mm:ss").format(diffTime);
+                _gui.getMainFrame()
+                        .getMainPanel()
+                        .getStatsCtrlPanel()
+                        .setTime(timeStr);
+            }
+        }, 1000, 1000);
+    }
+    private void _onStopTimer() {
+        _timerThread.cancel();
+    }
 
     // shared procedures
     private void _explorationProcedure(int exePeriod, Runnable callback) throws InterruptedException, IOException {
@@ -447,6 +481,7 @@ public class EventHandler implements IHandleable {
         } else if (termTime != 0) {
             new Terminator(termTime, interruptCallback).observe();
         }
+        _gui.trigger(GUIClickEvent.OnStartTimer);
         ExplorationSolver.solve(_gui.getMap(), exePeriod);
         System.out.println("Exploration completed.");
         nonInterruptCallback.run();

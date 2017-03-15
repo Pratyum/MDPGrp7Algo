@@ -7,7 +7,7 @@ public class MainFrame extends JFrame {
     
     private static final String _FRAME_NAME = "MDP Grp 7 - Simulator";
     private static final int _FRAME_WIDTH = 680;
-    private static final int _FRAME_HEIGHT = 655;
+    private static final int _FRAME_HEIGHT = 700;
     
     private MainPanel _mainPanel;
 

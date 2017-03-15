@@ -43,7 +43,7 @@ public class ExplorationSolver {
         _robot = new Robot(robotPos, robotDir, mapViewer, actionFormulator);
 
         Direction last_orientation;
-        LinkedList<Direction> twoDirectionAway = new LinkedList<Direction>();
+        LinkedList<Direction> twoDirectionAway = new LinkedList<>();
 
         // put some blockers into the map
         System.out.println("For Simulation Purpose");
@@ -163,20 +163,21 @@ public class ExplorationSolver {
                         Main.getRpi().sendMoveCommand(curAct);
                     }
                 } else {
-                    _restoreOrientation();
+                    _restoreOrientation(callback);
                     timer.cancel();
                     System.out.println("Starting callback");
-                    callback.run();
                 }
             }
         }, _exePeriod, _exePeriod);
     }
 
-    private static void _restoreOrientation() {
+    private static void _restoreOrientation(Runnable callback) {
         // calibrate
-        Main.getRpi().sendCalibrationCommand(CalibrationType.Front_LR);
-        Main.getRpi().sendCalibrationCommand(CalibrationType.Right);
-        
+        if (!Main.isSimulating()) {
+            Main.getRpi().sendCalibrationCommand(CalibrationType.Front_LR);
+            Main.getRpi().sendCalibrationCommand(CalibrationType.Right);
+        }
+
         // find actions
         Robot defaultRobot = new Robot();
         LinkedList<RobotAction> actions = new LinkedList<>();
@@ -188,7 +189,7 @@ public class ExplorationSolver {
             actions.add(RobotAction.RotateLeft);
             actions.add(RobotAction.RotateLeft);
         }
-        
+
         // rotate
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -205,6 +206,7 @@ public class ExplorationSolver {
                     }
                 } else {
                     timer.cancel();
+                    callback.run();
                 }
             }
         }, _exePeriod, _exePeriod);

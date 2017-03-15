@@ -81,7 +81,7 @@ public class GUI implements IGUIControllable {
 
     @Override
     public void trigger(GUIClickEvent hdlr) {
-        _eventHandler.resolveBtnHandler(hdlr, null);
+        _eventHandler.resolveHandler(hdlr, null);
     }
     
 }

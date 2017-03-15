@@ -5,5 +5,6 @@ public enum GUIClickEvent {
     OnOpen, OnSave, OnGetHex, OnCheckWeb,
     OnExploration, OnShortestPath, OnCombined,
     OnRestart,
-    OnToggleSim, OnConnectBtn
+    OnToggleSim, OnConnectBtn,
+    OnStartTimer, OnStopTimer
 }

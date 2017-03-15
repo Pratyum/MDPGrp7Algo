@@ -5,7 +5,7 @@ import java.awt.event.WindowEvent;
 
 public interface IHandleable {
 
-    void resolveBtnHandler(GUIClickEvent hdlr, MouseEvent e);
+    void resolveHandler(GUIClickEvent hdlr, MouseEvent e);
 
     void resolveFrameHandler(GUIWindowEvent hdlr, WindowEvent e);
     
