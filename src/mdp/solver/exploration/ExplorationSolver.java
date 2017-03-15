@@ -54,7 +54,7 @@ public class ExplorationSolver {
 
         //default to rotate in order to get initial sensing data
         _robot.bufferAction(RobotAction.RotateRight);
-        _robot.executeBufferActions(ExplorationSolver.getExePeriod());;
+        _robot.executeBufferActions(ExplorationSolver.getExePeriod());
         ////////////
         //start exploration
 
@@ -62,7 +62,7 @@ public class ExplorationSolver {
         twoDirectionAway.add(Direction.Down);
 
         int counter = 0;
-        Vector2 last_position = new Vector2(-1, -1);
+        Vector2 last_position;
         while (!goalFormulator.checkIfReachFinalGoal(_robot.position())) {
             //System.out.println("following right wall");
 
@@ -163,31 +163,7 @@ public class ExplorationSolver {
                         Main.getRpi().sendMoveCommand(curAct);
                     }
                 } else {
-                    Robot defaultRobot = new Robot();
-                    if (defaultRobot.orientation().equals(robot.orientation().getLeft())) {
-                        robot.execute(RobotAction.RotateLeft);
-                        if (!Main.isSimulating()) {
-                            LinkedList<RobotAction> curAct = new LinkedList<>();
-                            curAct.add(RobotAction.RotateLeft);
-                            Main.getRpi().sendMoveCommand(curAct);
-                        }
-                    } else if (defaultRobot.orientation().equals(robot.orientation().getRight())) {
-                        robot.execute(RobotAction.RotateRight);
-                        if (!Main.isSimulating()) {
-                            LinkedList<RobotAction> curAct = new LinkedList<>();
-                            curAct.add(RobotAction.RotateRight);
-                            Main.getRpi().sendMoveCommand(curAct);
-                        }
-                    } else if (defaultRobot.orientation().equals(robot.orientation().getBehind())) {
-                        robot.execute(RobotAction.RotateLeft);
-                        robot.execute(RobotAction.RotateLeft);
-                        if (!Main.isSimulating()) {
-                            LinkedList<RobotAction> curAct = new LinkedList<>();
-                            curAct.add(RobotAction.RotateLeft);
-                            curAct.add(RobotAction.RotateLeft);
-                            Main.getRpi().sendMoveCommand(curAct);
-                        }
-                    }
+                    _restoreOrientation();
                     timer.cancel();
                     System.out.println("Starting callback");
                     callback.run();
@@ -196,6 +172,41 @@ public class ExplorationSolver {
         }, _exePeriod, _exePeriod);
     }
 
-    public static void restart() {
+    private static void _restoreOrientation() {
+        // calibrate
+        Main.getRpi().sendCalibrationCommand(CalibrationType.Front_LR);
+        Main.getRpi().sendCalibrationCommand(CalibrationType.Right);
+        
+        // find actions
+        Robot defaultRobot = new Robot();
+        LinkedList<RobotAction> actions = new LinkedList<>();
+        if (defaultRobot.orientation().equals(_robot.orientation().getLeft())) {
+            actions.add(RobotAction.RotateLeft);
+        } else if (defaultRobot.orientation().equals(_robot.orientation().getRight())) {
+            actions.add(RobotAction.RotateRight);
+        } else if (defaultRobot.orientation().equals(_robot.orientation().getBehind())) {
+            actions.add(RobotAction.RotateLeft);
+            actions.add(RobotAction.RotateLeft);
+        }
+        
+        // rotate
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (!actions.isEmpty()) {
+                    RobotAction action = actions.pop();
+                    _robot.execute(action);
+                    Main.getGUI().update(_robot);
+                    if (!Main.isSimulating()) {
+                        LinkedList<RobotAction> curAct = new LinkedList<>();
+                        curAct.add(action);
+                        Main.getRpi().sendMoveCommand(curAct);
+                    }
+                } else {
+                    timer.cancel();
+                }
+            }
+        }, _exePeriod, _exePeriod);
     }
 }

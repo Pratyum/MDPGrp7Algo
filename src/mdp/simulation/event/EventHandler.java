@@ -138,12 +138,12 @@ public class EventHandler implements IHandleable {
                 _onExploration(e);
                 break;
             case OnShortestPath:
-			try {
-				_onShortestPath(e);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+                try {
+                    _onShortestPath(e);
+                } catch (IOException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
                 break;
             case OnCombined:
                 _onCombined(e);
@@ -251,10 +251,10 @@ public class EventHandler implements IHandleable {
     private void _onCheckWeb(MouseEvent e) throws URISyntaxException, IOException {
         Map map = ExplorationSolver.getMapViewer().getSubjectiveMap();
         int[][] explored = ExplorationSolver.getMapViewer().getExplored();
-        
+
         String descStr = Descriptor.stringify(map, explored);
         String[] content = Descriptor.toHex(descStr);
-        
+
         String p1 = content[0];
         String p2 = content[1];
         String sampleArena = _gui
@@ -315,11 +315,11 @@ public class EventHandler implements IHandleable {
                     System.out.println("Is at COMBINED callback");
                     // shortest path
                     try {
-						_shortestPathProcedure(exePeriod);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
+                        _shortestPathProcedure(exePeriod);
+                    } catch (IOException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
                 });
             } catch (InterruptedException ex) {
                 Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
@@ -367,7 +367,6 @@ public class EventHandler implements IHandleable {
     private void _onRestart(MouseEvent e) {
         _gui.getMainFrame().dispose();
         Main.startGUI();
-        ExplorationSolver.restart();
         _isShortestPath = true;
         System.out.println("Restart completed.");
     }
@@ -423,24 +422,24 @@ public class EventHandler implements IHandleable {
 
         Runnable interruptCallback = () -> {
             if (!_callbackCalled) {
-	        		_callbackCalled = true;
-	            System.out.println(">> STOP <<");
-	            Robot curRobot = ExplorationSolver.getRobot();
-	            int[][] explored = ExplorationSolver.getMapViewer().getExplored();
-	            _explorationThread.stop();
-	            Map finalMap = new Map(explored, false);
-	            ExplorationSolver.goBackToStart(finalMap, curRobot, callback);
-	            Main.getGUI().update(finalMap);
+                _callbackCalled = true;
+                System.out.println(">> STOP <<");
+                Robot curRobot = ExplorationSolver.getRobot();
+                int[][] explored = ExplorationSolver.getMapViewer().getExplored();
+                _explorationThread.stop();
+                Map finalMap = new Map(explored, false);
+                ExplorationSolver.goBackToStart(finalMap, curRobot, callback);
+                Main.getGUI().update(finalMap);
             }
         };
         Runnable nonInterruptCallback = () -> {
             if (!_callbackCalled) {
-        			_callbackCalled = true;
-	            Robot curRobot = ExplorationSolver.getRobot();
-	            int[][] explored = ExplorationSolver.getMapViewer().getExplored();
-	            Map finalMap = new Map(explored, false);
-	            ExplorationSolver.goBackToStart(finalMap, curRobot, callback);
-	            Main.getGUI().update(finalMap);
+                _callbackCalled = true;
+                Robot curRobot = ExplorationSolver.getRobot();
+                int[][] explored = ExplorationSolver.getMapViewer().getExplored();
+                Map finalMap = new Map(explored, false);
+                ExplorationSolver.goBackToStart(finalMap, curRobot, callback);
+                Main.getGUI().update(finalMap);
             }
         };
         if (termCoverage != 0) {
@@ -455,35 +454,35 @@ public class EventHandler implements IHandleable {
 
     private void _shortestPathProcedure(int exePeriod) throws IOException {
         System.out.println("Starting Shortest Path");
-		_isShortestPath = true;
-		AStarSolver solver = new AStarSolver();
-		AStarSolverResult solveResult = solver.solve(_gui.getMap(), _gui.getRobot());
-		_gui.getMap().highlight(solveResult.openedPoints, WPSpecialState.IsOpenedPoint);
-		_gui.getMap().highlight(solveResult.closedPoints, WPSpecialState.IsClosedPoint);
-		_gui.getMap().highlight(solveResult.shortestPath, WPSpecialState.IsPathPoint);
-		LinkedList<RobotAction> actions = RobotAction
-		        .fromPath(_gui.getRobot(), solveResult.shortestPath);
+        _isShortestPath = true;
+        AStarSolver solver = new AStarSolver();
+        AStarSolverResult solveResult = solver.solve(_gui.getMap(), _gui.getRobot());
+        _gui.getMap().highlight(solveResult.openedPoints, WPSpecialState.IsOpenedPoint);
+        _gui.getMap().highlight(solveResult.closedPoints, WPSpecialState.IsClosedPoint);
+        _gui.getMap().highlight(solveResult.shortestPath, WPSpecialState.IsPathPoint);
+        LinkedList<RobotAction> actions = RobotAction
+                .fromPath(_gui.getRobot(), solveResult.shortestPath);
 
-		/////////////////////////////
-		if (!Main.isSimulating()) {
-		    // messaging arduino
-		    System.out.println("Sending sensing request to rpi (-> arduino) ");
-		    Main.getRpi().sendMoveCommand(actions);
-		}
-		/////////////////////////////
+        /////////////////////////////
+        if (!Main.isSimulating()) {
+            // messaging arduino
+            System.out.println("Sending sensing request to rpi (-> arduino) ");
+            Main.getRpi().sendMoveCommand(actions);
+        }
+        /////////////////////////////
 
-		_shortestPathThread = new Timer();
-		_shortestPathThread.schedule(new TimerTask() {
-		    @Override
-		    public void run() {
-		        if (!actions.isEmpty()) {
-		            _gui.getRobot().execute(actions.pop());
-		            _gui.update(_gui.getMap(), _gui.getRobot());
-		        } else {
-		            System.out.println("Shortest path completed.");
-		            this.cancel();
-		        }
-		    }
-		}, exePeriod, exePeriod);
+        _shortestPathThread = new Timer();
+        _shortestPathThread.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (!actions.isEmpty()) {
+                    _gui.getRobot().execute(actions.pop());
+                    _gui.update(_gui.getMap(), _gui.getRobot());
+                } else {
+                    System.out.println("Shortest path completed.");
+                    this.cancel();
+                }
+            }
+        }, exePeriod, exePeriod);
     }
 }
