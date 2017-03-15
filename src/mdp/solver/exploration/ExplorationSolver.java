@@ -89,7 +89,7 @@ public class ExplorationSolver {
                 _robot.bufferAction(RobotAction.RotateRight);
                 _robot.bufferAction(RobotAction.RotateRight);
                 _robot.bufferAction(RobotAction.MoveForward);
-                _robot.bufferAction(RobotAction.RotateRight);
+               
                 actionFormulator.view(_robot);
                 counter = 0;
             }
@@ -119,7 +119,7 @@ public class ExplorationSolver {
                 _robot.bufferAction(RobotAction.RotateRight);
                 _robot.bufferAction(RobotAction.RotateRight);
                 _robot.bufferAction(RobotAction.MoveForward);
-                _robot.bufferAction(RobotAction.RotateRight);
+    
                 actionFormulator.view(_robot);
                 counter = 0;
             }
