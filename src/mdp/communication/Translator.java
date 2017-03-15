@@ -62,9 +62,13 @@ public class Translator implements ITranslatable {
 
     @Override
     public void sendSmoothMoveCommand(List<Vector2> smoothPath) {
-        String message = _TO_ARDUINO_MARKER + Compiler.compileSmoothActions(smoothPath);
-        System.out.println("message = " + message);
-//            _socketCommunicator.echo(message);
+        try {
+            String message = _TO_ARDUINO_MARKER + Compiler.compileSmoothActions(smoothPath);
+            System.out.println("message = " + message);
+            _socketCommunicator.echo(message);
+        } catch (IOException ex) {
+            Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
