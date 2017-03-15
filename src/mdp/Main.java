@@ -20,15 +20,13 @@ public class Main {
 
     private static boolean _isSimulating = true;
 
-
-
     public static void main(String[] args) throws IOException {
         // run simulation
         System.out.println("Initiating GUI...");
         startGUI();
-        
+
         // testing (if needed)
-//        Test.run();
+//        connectToRpi();
     }
 
     public static boolean isSimulating() {
@@ -58,7 +56,7 @@ public class Main {
         _rpi.connect(() -> {
             try {
                 _listenToRPi();
-
+//                Test.run();
             } catch (IOException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }

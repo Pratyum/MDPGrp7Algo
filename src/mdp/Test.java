@@ -26,8 +26,9 @@ public class Test {
         
         List<Vector2> obs = new LinkedList<>();
         
-//        obs.add(new Vector2(5, 9));
-//        obs.add(new Vector2(6, 10));
+        obs.add(new Vector2(5, 9));
+        obs.add(new Vector2(6, 10));
+
         obs.add(new Vector2(0, 6));
         obs.add(new Vector2(1, 6));
         obs.add(new Vector2(2, 6));
@@ -86,9 +87,7 @@ public class Test {
         map.highlight(smoothPath, WPSpecialState.IsOpenedPoint);
         System.out.println(map.toString(robot));
         
-        
-        ITranslatable rpi = new Translator();
-        rpi.sendSmoothMoveCommand(smoothPath);
+        Main.getRpi().sendSmoothMoveCommand(smoothPath);
 
     }
     

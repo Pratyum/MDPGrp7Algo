@@ -66,6 +66,7 @@ public class Translator implements ITranslatable {
             String message = _TO_ARDUINO_MARKER + Compiler.compileSmoothActions(smoothPath);
             System.out.println("message = " + message);
             _socketCommunicator.echo(message);
+//            _socketCommunicator.echo(_TO_ARDUINO_MARKER + "r54.321|");
         } catch (IOException ex) {
             Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex);
         }

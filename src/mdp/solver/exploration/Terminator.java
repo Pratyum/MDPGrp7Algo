@@ -52,7 +52,7 @@ public class Terminator {
                             }
                         }
                     }
-                }, 0, 50);
+                }, 0, 10);
                 break;
             case Time:
                 _thread = new Timer();

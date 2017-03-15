@@ -115,8 +115,18 @@ public class Compiler {
             );
             double angle = alpha + (posDiff.j() < 0 ? 90 : 0);
             double rotation = Math.abs(angle - orientation);
-            String rotateDirection = posDiff.i() > 0 ? "r" : "l";
-            String rotationStr = rotateDirection + _roundToString(rotation) + _TRAILER;
+//            System.out.println("diff = " + ());
+//            System.out.println("posDiff = " + posDiff);
+//            System.out.println("angle = " + angle);
+//            System.out.println("orientation = " + orientation);
+            String rotateDirection = angle - orientation > 0 ? "r" : "l";
+            String roundedAngle = _roundToString(rotation);
+            String rotationStr;
+            if (!"0".equals(roundedAngle)) {
+                rotationStr = rotateDirection + _roundToString(rotation) + _TRAILER;
+            } else {
+                rotationStr = "";
+            }
             
             // calculate distance to travel
             double distance = Math.sqrt(Math.pow(posDiff.i(), 2) + Math.pow(posDiff.j(), 2));
