@@ -91,13 +91,14 @@ public class Robot {
         actionCompleted = true;
 
     }
-
+    
     public void executeBufferActions(int sleepPeriod) throws IOException {
         try {
             if (!Main.isSimulating()) {
             		executionEndTime = System.currentTimeMillis();
-            		System.out.println("Computational time for next movement"+ (executionStartTime- executionEndTime));
+            		System.out.println("Computational time for next movement"+ (executionStartTime- executionEndTime) + "ms");
                 Main.getRpi().sendMoveCommand(bufferedActions);
+                
                 while (!actionCompleted) {
                 }
                 executionStartTime = System.currentTimeMillis();
@@ -118,6 +119,7 @@ public class Robot {
                 execute(action);
                 mapViewer.markRobotVisited(_position);
                 
+              
                 /*f(first == 0 && mapViewer.detectCircle(_position, _orientation)!=-1){
                 		first = 1;
                 		index = mapViewer.detectCircle(_position, _orientation);
@@ -129,6 +131,8 @@ public class Robot {
                     Thread.sleep(sleepPeriod);
                 }
             }
+            
+            
             /*
             if(first!= 0){
             		

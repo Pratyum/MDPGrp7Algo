@@ -24,6 +24,7 @@ public class MapViewer {
     //1 empty, 2 obstacle, 0 havent explored
     private int[][] explored;
     private int[][] robotPosition;
+    private int[][] confidentDetectionArea;
     public LinkedList<RobotMovementHistory> robotMovementHistory ;
     MapViewer() {
         map = new Map();
@@ -62,6 +63,23 @@ public class MapViewer {
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
         };
+        confidentDetectionArea = new int[][] {
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+        };
     }
 
     public boolean markRobotVisited(Vector2 v){
@@ -72,6 +90,65 @@ public class MapViewer {
     			}
     		return false;
     		
+    }
+    
+    public boolean checkConfidence(Vector2 v){
+    		if(map.checkValidBoundary(v))
+    			{
+    			if(confidentDetectionArea[v.i()][v.j()]==1)
+    				return true;
+    			else
+    				return false;
+    			}
+    		return true;
+    		
+    }
+    
+    
+    public boolean markConfidentRange(Robot robot){
+    		Vector2 edge, edge_l, edge_r , edge_rm,edge_rf, edge_lf;
+        
+        Vector2 robotPosition = robot.position();
+        markConfidentDetection(robotPosition);
+        markConfidentDetectionDirect(robotPosition.i(), robotPosition.j() + 1);
+        markConfidentDetectionDirect(robotPosition.i(), robotPosition.j() - 1);
+        markConfidentDetectionDirect(robotPosition.i() - 1, robotPosition.j());
+        markConfidentDetectionDirect(robotPosition.i() + 1, robotPosition.j());
+        markConfidentDetectionDirect(robotPosition.i() + 1, robotPosition.j() + 1);
+        markConfidentDetectionDirect(robotPosition.i() - 1, robotPosition.j() - 1);
+        markConfidentDetectionDirect(robotPosition.i() + 1, robotPosition.j() - 1);
+        markConfidentDetectionDirect(robotPosition.i() - 1, robotPosition.j() + 1);
+    	
+        edge = robot.position().fnAdd(robot.orientation().toVector2().fnMultiply(2));
+        edge_l = edge.fnAdd(robot.orientation().getLeft().toVector2());
+        edge_r = edge.fnAdd(robot.orientation().getRight().toVector2());
+        edge_rm = robot.position().fnAdd(robot.orientation().getRight().toVector2().fnMultiply(2));
+        edge_rf= robot.position().fnAdd(robot.orientation().getRight().toVector2().fnMultiply(2)).fnAdd(robot.orientation().toVector2());
+        edge_lf = robot.position().fnAdd(robot.orientation().getLeft().toVector2().fnMultiply(2)).fnAdd(robot.orientation().toVector2());
+        markConfidentDetection(edge);
+        markConfidentDetection(edge_l);
+        markConfidentDetection(edge_r);
+        markConfidentDetection(edge_rm);
+        markConfidentDetection(edge_rf);
+        markConfidentDetection(edge_lf);
+        
+        
+        return true;
+        
+    }
+   
+    public boolean markConfidentDetection(Vector2 v){
+    		if(checkValidExploredRange(v))
+    			confidentDetectionArea[v.i()][v.j()]=1;
+    		return true;
+    }
+    
+    
+    
+    public boolean markConfidentDetectionDirect(int i, int j){
+		if(checkValidExploredRange(new Vector2(i,j)))
+			confidentDetectionArea[i][j]=1;
+		return true;
     }
     
     public boolean checkRobotVisited(Vector2 v){
@@ -94,22 +171,27 @@ public class MapViewer {
     }
 
     public void markExploredEmpty(Vector2 v) {
-        if(map.checkValidBoundary(v)) {
+        
+    		if(map.checkValidBoundary(v)&&(!checkConfidence(v))) {
             explored[v.i()][v.j()] = 1;
         }
     }
 
     public void markUnreachable(Vector2 v) {
-        if(map.checkValidBoundary(v)) {
+        if(map.checkValidBoundary(v)&&(!checkConfidence(v))) {
             explored[v.i()][v.j()] = -1;
         }
     }
     	
     private void markExploredObstacle(Vector2 v) {
 
-        if (map.checkValidBoundary(v)) //prevent it being a wall , out of bound array
+        if (map.checkValidBoundary(v)&&(!checkConfidence(v))) //prevent it being a wall , out of bound array
         {
-            explored[v.i()][v.j()] = 2;
+        		if((!(v.i()>=map.DIM_I-3 && v.j()>=map.DIM_J-3 ))
+        				&&
+        				(!(v.i()<3 && v.j()<3 ))
+        				)
+        			explored[v.i()][v.j()] = 2;
         }
     }
 
@@ -224,6 +306,33 @@ public class MapViewer {
 
     }
     
+    public String confidenceDetectionAreaToString() {
+        String result = "";
+        for (int i = -1; i <= Map.DIM_I; i++) {
+            for (int j = -1; j <= Map.DIM_J; j++) {
+                if (i == -1 || j == -1 || i == Map.DIM_I || j == Map.DIM_J) {
+                    result += "# ";
+                } else {
+                    switch (confidentDetectionArea[i][j]) {
+                        case 1:
+                            result += "+ ";
+                            break;
+                        
+                        default:
+                            result += "  ";
+                            break;
+                    }
+                }
+            }
+            result += "\n";
+        }
+        return result;
+
+    }
+    
+    
+    
+    
     public Know checkAllAroundEmpty(Robot robot) throws InterruptedException, IOException {
         if (robot.checkIfHavingBufferActions()) {
             robot.executeBufferActions(ExplorationSolver.getExePeriod());
@@ -312,7 +421,7 @@ public class MapViewer {
     public Map updateMap(Robot robot, SensingData s) {
         List<Vector2> obstaclePositions = new ArrayList<>();
         Vector2 obstaclePosition;
-        Vector2 edge, edge_l, edge_r , edge_b;
+        Vector2 edge, edge_l, edge_r , edge_b,edge_rm;
         int i = 1;
         Vector2 robotPosition = robot.position();
         markExploredEmpty(robotPosition);
@@ -329,6 +438,7 @@ public class MapViewer {
         edge_l = edge.fnAdd(robot.orientation().getLeft().toVector2());
         edge_r = edge.fnAdd(robot.orientation().getRight().toVector2());
         edge_b = robot.position().fnAdd(robot.orientation().getRight().toVector2()).fnAdd(robot.orientation().getBehind().toVector2());
+        edge_rm = robot.position().fnAdd(robot.orientation().getRight().toVector2());
         if (s.front_m != 0) {
             obstaclePosition = edge.fnAdd(robot.orientation().toVector2().fnMultiply(s.front_m));
             if (map.checkValidBoundary(obstaclePosition)) {
@@ -411,24 +521,26 @@ public class MapViewer {
             }
         }
         
-        if (s.right_b != 0) {
+        if (s.right_m != 0) {
         		
-            obstaclePosition = edge_b.fnAdd(robot.orientation().getRight().toVector2().fnMultiply(s.right_b));
+            obstaclePosition = edge_rm.fnAdd(robot.orientation().getRight().toVector2().fnMultiply(s.right_m));
             if (map.checkValidBoundary(obstaclePosition)) {
                 obstaclePositions.add(obstaclePosition);
                 markExploredObstacle(obstaclePosition);
             
             }
-            for (i = 1; i < s.right_b; i++) {
-                markExploredEmpty(edge_b.fnAdd(robot.orientation().getRight().toVector2().fnMultiply(i)));
+            for (i = 1; i < s.right_m; i++) {
+                markExploredEmpty(edge_rm.fnAdd(robot.orientation().getRight().toVector2().fnMultiply(i)));
             }
             
         } else {
             for (i = 1; i <= 2; i++) {
-                markExploredEmpty(edge_b.fnAdd(robot.orientation().getRight().toVector2().fnMultiply(i)));
+                markExploredEmpty(edge_rm.fnAdd(robot.orientation().getRight().toVector2().fnMultiply(i)));
             }
         }
 
+        /// mark confident explored area
+        markConfidentRange(robot);
         //update map with proper obstacles
         map = new Map(explored, true);
         map.addObstacle(obstaclePositions);
