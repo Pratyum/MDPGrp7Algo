@@ -22,8 +22,7 @@ public class ActionFormulator {
     private MapViewer mapViewer;
 
     private Simulator simulator;
-    
-    
+
     private static volatile boolean calibrationCompleted = false;
     private static volatile boolean isSensingDataArrived = false;
     private static volatile String sensingDataFromRPI;
@@ -42,113 +41,104 @@ public class ActionFormulator {
 
     }
 
-    public  void reverseToThePoint( RobotMovementHistory robotState , Robot robot) throws InterruptedException, IOException{
-    		AStarSolver astarsolver = new AStarSolver();
-    		AStarSolverResult astarSolverResult = astarsolver.solve(mapViewer.getSubjectiveMap(), robot, robotState._position);
-    		LinkedList<RobotAction> robotActions = RobotAction.fromPath(robot, astarSolverResult.shortestPath);
-            //System.out.println("Action size: " + robotActions.size());
-            for (RobotAction action : robotActions) {
-                //System.out.println("Here3");
-                robot.bufferAction(action);
-            }
+    public void reverseToThePoint(RobotMovementHistory robotState, Robot robot) throws InterruptedException, IOException {
+        AStarSolver astarsolver = new AStarSolver();
+        AStarSolverResult astarSolverResult = astarsolver.solve(mapViewer.getSubjectiveMap(), robot, robotState._position);
+        LinkedList<RobotAction> robotActions = RobotAction.fromPath(robot, astarSolverResult.shortestPath);
+        //System.out.println("Action size: " + robotActions.size());
+        robotActions.forEach((action) -> {
+            //System.out.println("Here3");
+            robot.bufferAction(action);
+        });
+        view(robot);
+
+        while (robot.orientation() != robotState._direcition) {
+            robot.bufferAction(RobotAction.RotateLeft);
             view(robot);
-        
-        while(robot.orientation()!=robotState._direcition){
-        		robot.bufferAction(RobotAction.RotateLeft);
-        		view(robot);
         }
-        
-           
-   }
-    
-   public void exploreRemainingArea(Robot _robot) throws InterruptedException, IOException{
-	   boolean reachablePointFound = false;
-	   LinkedList<Vector2> reachableList;
-	   AStarSolver astarSolver = new AStarSolver();
-	   LinkedList<RobotAction> robotActions;
-	   
-	   while (!mapViewer.checkIfNavigationComplete()) {
-           LinkedList<Vector2> goalList = mapViewer.findUnexploredInAscendingDistanceOrder(_robot);
-           System.out.println("My goal list  "+goalList.toString());
-           Vector2 goal = new Vector2(-1,-1);
-           if(goalList.size()==0)
-           {
-           		System.out.println("Exploration completed");
-           		break;
-           }
-           for(int i=0 ; i< goalList.size(); i++){
-           		
-           		System.out.println("Processing goal "+goalList.get(i).toString());
-           		if(mapViewer.markGhostBlock(goalList.get(i)))
-           			continue;
-           		reachableList = mapViewer.findScannableReachableFromGoal(goalList.get(i), _robot);
-           		for(int j = 0 ; j < reachableList.size(); j++){
-           			if((!mapViewer.checkRobotVisited(reachableList.get(j))) 
-           					&& mapViewer.getSubjectiveMap().getPoint(reachableList.get(j)).obstacleState()!= WPObstacleState.IsVirtualObstacle)
-           			{
-           				
-           				goal = reachableList.get(j);
-           				reachablePointFound = true;	
-           				System.out.println("Goal found "+goal);
-           				break;
-           			}
-           		}
-           		
-           		if(reachablePointFound)
-           			break; /// findFirst goal
-           		mapViewer.markUnreachable(goalList.get(i));
-           }
-           
-           if(reachablePointFound){
 
-               System.out.println("Current goal: "+goal.toString());
-               
-               AStarSolverResult astarSolverResult = astarSolver.solve(mapViewer.getSubjectiveMap(), _robot, goal);
-               
-               robotActions = RobotAction.fromPath(_robot, astarSolverResult.shortestPath);
-               //System.out.println("Action size: " + robotActions.size());
-               for (RobotAction action : robotActions) {
-                   
-            	   		view(_robot);
-                   if (!mapViewer.validate(_robot, action)) {
-                       //actionFormulator.circumvent(_robot);
-                       //System.out.println("Here2");
-                       // in circumvent, stop circumventing when the obstacle is fully identified
-                       view(_robot); // take a look , update map
-                   		break;
-                   }
-                   //System.out.println("Here3");
-                   _robot.bufferAction(action);
-                   
-               }
-           }
-           
-           // prepare for next loop
-           reachablePointFound = false;
-       }
-	   System.out.println("All remaining blocks explored or checked as unreachable ");
-   }
-    
-    
-    
-    
-    public void rightWallFollower(Robot robot ) throws InterruptedException, IOException {
+    }
 
-    	
-    	
-    		//can I view less ? 
+    public void exploreRemainingArea(Robot _robot) throws InterruptedException, IOException {
+        boolean reachablePointFound = false;
+        LinkedList<Vector2> reachableList;
+        AStarSolver astarSolver = new AStarSolver();
+        LinkedList<RobotAction> robotActions;
+
+        while (!mapViewer.checkIfNavigationComplete()) {
+            LinkedList<Vector2> goalList = mapViewer.findUnexploredInAscendingDistanceOrder(_robot);
+            System.out.println("My goal list  " + goalList.toString());
+            Vector2 goal = new Vector2(-1, -1);
+            if (goalList.isEmpty()) {
+                System.out.println("Exploration completed");
+                break;
+            }
+            for (int i = 0; i < goalList.size(); i++) {
+
+                System.out.println("Processing goal " + goalList.get(i).toString());
+                if (mapViewer.markGhostBlock(goalList.get(i))) {
+                    continue;
+                }
+                reachableList = mapViewer.findScannableReachableFromGoal(goalList.get(i), _robot);
+                for (int j = 0; j < reachableList.size(); j++) {
+                    if ((!mapViewer.checkRobotVisited(reachableList.get(j)))
+                            && mapViewer.getSubjectiveMap().getPoint(reachableList.get(j)).obstacleState() != WPObstacleState.IsVirtualObstacle) {
+
+                        goal = reachableList.get(j);
+                        reachablePointFound = true;
+                        System.out.println("Goal found " + goal);
+                        break;
+                    }
+                }
+
+                if (reachablePointFound) {
+                    break; /// findFirst goal
+                }
+                mapViewer.markUnreachable(goalList.get(i));
+            }
+
+            if (reachablePointFound) {
+
+                System.out.println("Current goal: " + goal.toString());
+
+                AStarSolverResult astarSolverResult = astarSolver.solve(mapViewer.getSubjectiveMap(), _robot, goal);
+
+                robotActions = RobotAction.fromPath(_robot, astarSolverResult.shortestPath);
+                //System.out.println("Action size: " + robotActions.size());
+                for (RobotAction action : robotActions) {
+
+                    view(_robot);
+                    if (!mapViewer.validate(_robot, action)) {
+                        //actionFormulator.circumvent(_robot);
+                        //System.out.println("Here2");
+                        // in circumvent, stop circumventing when the obstacle is fully identified
+                        view(_robot); // take a look , update map
+                        break;
+                    }
+                    //System.out.println("Here3");
+                    _robot.bufferAction(action);
+
+                }
+            }
+
+            // prepare for next loop
+            reachablePointFound = false;
+        }
+        System.out.println("All remaining blocks explored or checked as unreachable ");
+    }
+
+    public void rightWallFollower(Robot robot) throws InterruptedException, IOException {
+
+        //can I view less ? 
         view(robot); // for scanning purpose
-        
+
         /*while(mapViewer.checkIfRight5SquaresEmpty(robot)){
         		robot.bufferAction(RobotAction.MoveBackward);
         		view(robot);
         }*/
-        		
-
-        
         if (null != mapViewer.checkWalkable(robot, Direction.Right)) {
-        		
-        			switch (mapViewer.checkWalkable(robot, Direction.Right)) {
+
+            switch (mapViewer.checkWalkable(robot, Direction.Right)) {
                 case Yes:
                     robot.bufferAction(RobotAction.RotateRight);
                     view(robot);
@@ -157,37 +147,32 @@ public class ActionFormulator {
                 case No:
                     turnLeftTillEmpty(robot); //now didnt turn left , so execute directly
                     break;
-                case Unsure:{
-	                    robot.bufferAction(RobotAction.RotateRight);
-	                    view(robot);
-	                    if (null == mapViewer.checkWalkable(robot, Direction.Up)) {
-	                        System.out.println("Error1");
-	                    } else {
-	                        switch (mapViewer.checkWalkable(robot, Direction.Up)) {
-	                            case Yes:
-	                                robot.bufferAction(RobotAction.MoveForward);
-	                                break;
-	                            case No:
-	                                robot.bufferAction(RobotAction.RotateLeft);
-	                                turnLeftTillEmpty(robot);
-	                                break;
-	                            default:
-	                                System.out.println("Error1");
-	                                break;
-	                        }
-	                    }
-	                    break;
+                case Unsure: {
+                    robot.bufferAction(RobotAction.RotateRight);
+                    view(robot);
+                    if (null == mapViewer.checkWalkable(robot, Direction.Up)) {
+                        System.out.println("Error1");
+                    } else {
+                        switch (mapViewer.checkWalkable(robot, Direction.Up)) {
+                            case Yes:
+                                robot.bufferAction(RobotAction.MoveForward);
+                                break;
+                            case No:
+                                robot.bufferAction(RobotAction.RotateLeft);
+                                turnLeftTillEmpty(robot);
+                                break;
+                            default:
+                                System.out.println("Error1");
+                                break;
+                        }
                     }
-                	default:
                     break;
-        				}
+                }
+                default:
+                    break;
+            }
         }
         view(robot);
-        		
-        			
-        	
-        		
-        
 
         // if all around empty, avoid turning in a loop, find the wall directly
         /*if (mapViewer.checkAllAroundEmpty(robot) == Know.Yes) {
@@ -200,19 +185,18 @@ public class ActionFormulator {
             robot.bufferAction(RobotAction.RotateLeft);
             view(robot);
         }*/
-
     }
 
     public static void sensingDataCallback(String input) {
         sensingDataFromRPI = input;
-        
+
     }
 
     // look through map and update 
     public Map view(Robot robot) throws InterruptedException, IOException {
-    		int calibirationType;
-    		
-    		if (robot.checkIfHavingBufferActions()) {
+        int calibirationType;
+
+        if (robot.checkIfHavingBufferActions()) {
             robot.executeBufferActions(ExplorationSolver.getExePeriod());
         }
 
@@ -220,23 +204,20 @@ public class ActionFormulator {
         if (Main.isSimulating()) {
             s = simulator.getSensingData(robot);
         } else {
-            
 
-                //RPI call here
-                
-                //while (isSensingDataArrived != true) {}
-                
-        			if(sensingDataFromRPI.isEmpty())
-        				System.out.println("ERROR: empty sensing data");
-        				
-        	
-                    s.front_l = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(0)));
-                    s.front_m = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(1)));
-                    s.front_r = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(2)));
-                    s.right_f = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(3)));
-                    s.right_m = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(4)));
-                    s.left = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(5)));
-    
+            //RPI call here
+            //while (isSensingDataArrived != true) {}
+            if (sensingDataFromRPI.isEmpty()) {
+                System.out.println("ERROR: empty sensing data");
+            }
+
+            s.front_l = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(0)));
+            s.front_m = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(1)));
+            s.front_r = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(2)));
+            s.right_f = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(3)));
+            s.right_m = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(4)));
+            s.left = Integer.parseInt(Character.toString(sensingDataFromRPI.charAt(5)));
+
         }
 
         Map subjective_map = mapViewer.updateMap(robot, s);
@@ -244,9 +225,9 @@ public class ActionFormulator {
         System.out.println(mapViewer.robotVisitedPlaceToString());
         System.out.println(mapViewer.confidenceDetectionAreaToString());
         System.out.println(subjective_map.toString(robot));
-        
+
         isSensingDataArrived = false;
-        
+
         /*if (!Main.isSimulating()) {
             if(robot.checkIfCalibrationCounterReached()){
             	
@@ -269,16 +250,14 @@ public class ActionFormulator {
             
             calibrationCompleted = false;
         }
-        */
-        
-        
+         */
         return subjective_map;
     }
 
-    public static void calibrationCompletedCallBack(){
-    		calibrationCompleted = true;
+    public static void calibrationCompletedCallBack() {
+        calibrationCompleted = true;
     }
-    
+
     public void circumvent(Robot robot) throws InterruptedException, IOException {
         Vector2 initialPosition = robot.position();
         while (robot.position().i() != initialPosition.i() && robot.position().j() != initialPosition.j()) {
@@ -292,7 +271,7 @@ public class ActionFormulator {
         Know check = mapViewer.checkWalkable(robot, Direction.Up);
 
         /*if (check == Know.Unsure) { */
-            view(robot);
+        view(robot);
         /*}*/
         // make sure it is viewed before turn
         //update

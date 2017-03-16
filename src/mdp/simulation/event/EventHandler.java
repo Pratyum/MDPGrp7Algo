@@ -414,7 +414,7 @@ public class EventHandler implements IHandleable {
     private void _onConnect(MouseEvent e) throws IOException {
         Main.connectToRpi();
     }
-    
+
     private void _onStartTimer() {
         Date startTime = new Date();
         System.out.println("startTime = " + startTime);
@@ -432,6 +432,7 @@ public class EventHandler implements IHandleable {
             }
         }, 1000, 1000);
     }
+
     private void _onStopTimer() {
         _timerThread.cancel();
     }
@@ -463,11 +464,13 @@ public class EventHandler implements IHandleable {
                 _explorationThread.stop();
                 Map finalMap = new Map(explored, false);
                 try {
-					ExplorationSolver.goBackToStart(finalMap, curRobot, callback);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+                    ExplorationSolver.goBackToStart(finalMap, curRobot, callback);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 Main.getGUI().update(finalMap);
             }
         };
@@ -478,11 +481,13 @@ public class EventHandler implements IHandleable {
                 int[][] explored = ExplorationSolver.getMapViewer().getExplored();
                 Map finalMap = new Map(explored, false);
                 try {
-					ExplorationSolver.goBackToStart(finalMap, curRobot, callback);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+                    ExplorationSolver.goBackToStart(finalMap, curRobot, callback);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 Main.getGUI().update(finalMap);
             }
         };
@@ -508,6 +513,7 @@ public class EventHandler implements IHandleable {
         LinkedList<RobotAction> actions = RobotAction
                 .fromPath(_gui.getRobot(), solveResult.shortestPath);
 
+        System.out.println("Main.isSimulating() = " + Main.isSimulating());
         /////////////////////////////
         if (!Main.isSimulating()) {
             // messaging arduino

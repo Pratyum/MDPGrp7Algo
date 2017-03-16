@@ -91,7 +91,7 @@ public class ExplorationSolver {
                 _robot.bufferAction(RobotAction.RotateRight);
                 _robot.bufferAction(RobotAction.RotateRight);
                 _robot.bufferAction(RobotAction.MoveForward);
-               
+
                 actionFormulator.view(_robot);
                 counter = 0;
             }
@@ -99,7 +99,7 @@ public class ExplorationSolver {
 
         }
         while ((!goalFormulator.checkIfReachStartZone(_robot.position()))
-        		&&(!mapViewer.checkIfNavigationComplete())) {
+                && (!mapViewer.checkIfNavigationComplete())) {
             last_position = new Vector2(_robot.position().i(), _robot.position().j());
             last_orientation = _robot.orientation();
             actionFormulator.rightWallFollower(_robot);
@@ -122,7 +122,7 @@ public class ExplorationSolver {
                 _robot.bufferAction(RobotAction.RotateRight);
                 _robot.bufferAction(RobotAction.RotateRight);
                 _robot.bufferAction(RobotAction.MoveForward);
-    
+
                 actionFormulator.view(_robot);
                 counter = 0;
             }
@@ -131,7 +131,6 @@ public class ExplorationSolver {
         }
 
         actionFormulator.exploreRemainingArea(_robot);
-        
 
     }
 
@@ -148,115 +147,52 @@ public class ExplorationSolver {
     }
 
     // look through map and update 
-    public static void goBackToStart(Map map, Robot robot, Runnable callback) throws IOException {
+    public static void goBackToStart(Map map, Robot robot, Runnable callback) throws IOException, InterruptedException {
         System.out.println("Going back to start with the following map");
         System.out.println(map.toString(robot));
         AStarSolverResult result = new AStarSolver().solve(map, robot, Map.START_POS);
         LinkedList<RobotAction> actions = RobotAction.fromPath(robot, result.shortestPath);
-        /*Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (!actions.isEmpty()) {
-                    RobotAction action = actions.pop();
-                    robot.execute(action);
-                    Main.getGUI().update(robot);
-                    if (!Main.isSimulating()) {
-                        LinkedList<RobotAction> curAct = new LinkedList<>();
-                        curAct.add(action);
-                        Main.getRpi().sendMoveCommand(curAct);
-                        Main.getRpi().sendInfoToAndroid(map, mapViewer.getExplored(), curAct);
-                    }
-                		
-                	
-                } else {
-                    _restoreOrientation(callback);
-                    timer.cancel();
-                    System.out.println("Starting callback");
-                }
-            }
-        }, _exePeriod, _exePeriod);*/
+        
         robot.cleanBufferedActions();
-        for(RobotAction action: actions){
-        		if(robot.checkBufferActionSize()<4)
-        			robot.bufferAction(action);
-        		else
-        		{
-        			robot.bufferAction(action);
-        			robot.executeBufferActions(ExplorationSolver.getExePeriod());
-        			//for the purpose of calibration
-        			//in this way, after every five actions, the robot will calibrate
-        		}
-        	
+        for (RobotAction action : actions) {
+//            if (robot.checkBufferActionSize() < 4) {
+//                robot.bufferAction(action);
+//            } else {
+                robot.bufferAction(action);
+//                actionFormulator.view(_robot);
+                robot.executeBufferActions(ExplorationSolver.getExePeriod());
+                //for the purpose of calibration
+                //in this way, after every five actions, the robot will calibrate
+//            }
+
         }
-        if(robot.checkBufferActionSize()!=0)
-        		robot.executeBufferActions(ExplorationSolver.getExePeriod());
-        _restoreOrientation(callback);
+        if (robot.checkBufferActionSize() != 0) {
+            robot.executeBufferActions(ExplorationSolver.getExePeriod());
+        }
+
+//        while (!goalFormulator.checkIfReachStartZone(_robot.position())) {
+//            actionFormulator.rightWallFollower(_robot);
+//        }
         System.out.println("Starting callback");
+        _restoreOrientation(callback);
     }
 
     private static void _restoreOrientation(Runnable callback) throws IOException {
-        // calibrate
+
+        if (_robot.orientation().equals(Direction.Up)) {
+            _robot.bufferAction(RobotAction.RotateLeft);
+            _robot.executeBufferActions(_exePeriod);
+        }
         if (!Main.isSimulating()) {
             Main.getRpi().sendCalibrationCommand(CalibrationType.Front_LR);
-            Main.getRpi().sendCalibrationCommand(CalibrationType.Right);
         }
+        _robot.bufferAction(RobotAction.RotateRight);
+        _robot.executeBufferActions(_exePeriod);
+        if (!Main.isSimulating()) {
+            Main.getRpi().sendCalibrationCommand(CalibrationType.Front_LR);
+        }
+        _robot.bufferAction(RobotAction.RotateRight);
+        _robot.executeBufferActions(_exePeriod);
 
-        // find actions
-        Robot defaultRobot = new Robot();
-        LinkedList<RobotAction> actions = new LinkedList<>();
-        if (defaultRobot.orientation().equals(_robot.orientation().getLeft())) {
-            actions.add(RobotAction.RotateLeft);
-        } else if (defaultRobot.orientation().equals(_robot.orientation().getRight())) {
-            actions.add(RobotAction.RotateRight);
-        } else if (defaultRobot.orientation().equals(_robot.orientation().getBehind())) {
-            actions.add(RobotAction.RotateLeft);
-            actions.add(RobotAction.RotateLeft);
-        }
-
-        // rotate
-        /*Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (!actions.isEmpty()) {
-                    RobotAction action = actions.pop();
-                    _robot.execute(action);
-                    Main.getGUI().update(_robot);
-                    if (!Main.isSimulating()) {
-                        LinkedList<RobotAction> curAct = new LinkedList<>();
-                        curAct.add(action);
-                        Main.getRpi().sendMoveCommand(curAct);
-                    }
-                } else {
-                    timer.cancel();
-                    callback.run();
-                }
-            }
-        }, _exePeriod, _exePeriod);*/
-        
-        _robot.cleanBufferedActions();
-        try {
-			TimeUnit.SECONDS.sleep(5);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        for(RobotAction action: actions){
-        		if(_robot.checkBufferActionSize()<4)
-        			_robot.bufferAction(action);
-        		else
-        		{
-        			_robot.bufferAction(action);
-        			_robot.executeBufferActions(ExplorationSolver.getExePeriod());
-        			//for the purpose of calibration
-        			//in this way, after every five actions, the robot will calibrate
-        		}
-        	
-        }
-        if(_robot.checkBufferActionSize()!=0)
-        		_robot.executeBufferActions(ExplorationSolver.getExePeriod());
-        
-        
     }
 }

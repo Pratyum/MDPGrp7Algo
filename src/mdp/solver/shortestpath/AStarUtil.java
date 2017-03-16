@@ -17,11 +17,11 @@ public class AStarUtil {
 
     public static int getMoveCost(Robot robot, Direction direction) {
         if (direction == robot.orientation()) {
-            return 1;
-        } else if (direction == robot.orientation().getBehind()) {
-            return 3;
-        } else {
             return 2;
+        } else if (direction == robot.orientation().getBehind()) {
+            return 1;
+        } else {
+            return 1;
         }
     }
     
