@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+
 import mdp.Main;
 import mdp.common.Direction;
 import mdp.map.Map;
@@ -96,7 +98,8 @@ public class ExplorationSolver {
             System.out.println("Counter is " + counter);
 
         }
-        while (!goalFormulator.checkIfReachStartZone(_robot.position())) {
+        while ((!goalFormulator.checkIfReachStartZone(_robot.position()))
+        		&&(!mapViewer.checkIfNavigationComplete())) {
             last_position = new Vector2(_robot.position().i(), _robot.position().j());
             last_orientation = _robot.orientation();
             actionFormulator.rightWallFollower(_robot);
@@ -128,6 +131,7 @@ public class ExplorationSolver {
         }
 
         actionFormulator.exploreRemainingArea(_robot);
+        
 
     }
 
@@ -144,12 +148,12 @@ public class ExplorationSolver {
     }
 
     // look through map and update 
-    public static void goBackToStart(Map map, Robot robot, Runnable callback) {
+    public static void goBackToStart(Map map, Robot robot, Runnable callback) throws IOException {
         System.out.println("Going back to start with the following map");
         System.out.println(map.toString(robot));
         AStarSolverResult result = new AStarSolver().solve(map, robot, Map.START_POS);
         LinkedList<RobotAction> actions = RobotAction.fromPath(robot, result.shortestPath);
-        Timer timer = new Timer();
+        /*Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -161,7 +165,7 @@ public class ExplorationSolver {
                         LinkedList<RobotAction> curAct = new LinkedList<>();
                         curAct.add(action);
                         Main.getRpi().sendMoveCommand(curAct);
-                        Main.getRpi().sendInfoToAndroid(map, mapViewer.getExplored(), actions);
+                        Main.getRpi().sendInfoToAndroid(map, mapViewer.getExplored(), curAct);
                     }
                 		
                 	
@@ -171,10 +175,27 @@ public class ExplorationSolver {
                     System.out.println("Starting callback");
                 }
             }
-        }, _exePeriod, _exePeriod);
+        }, _exePeriod, _exePeriod);*/
+        robot.cleanBufferedActions();
+        for(RobotAction action: actions){
+        		if(robot.checkBufferActionSize()<4)
+        			robot.bufferAction(action);
+        		else
+        		{
+        			robot.bufferAction(action);
+        			robot.executeBufferActions(ExplorationSolver.getExePeriod());
+        			//for the purpose of calibration
+        			//in this way, after every five actions, the robot will calibrate
+        		}
+        	
+        }
+        if(robot.checkBufferActionSize()!=0)
+        		robot.executeBufferActions(ExplorationSolver.getExePeriod());
+        _restoreOrientation(callback);
+        System.out.println("Starting callback");
     }
 
-    private static void _restoreOrientation(Runnable callback) {
+    private static void _restoreOrientation(Runnable callback) throws IOException {
         // calibrate
         if (!Main.isSimulating()) {
             Main.getRpi().sendCalibrationCommand(CalibrationType.Front_LR);
@@ -194,7 +215,7 @@ public class ExplorationSolver {
         }
 
         // rotate
-        Timer timer = new Timer();
+        /*Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -212,6 +233,30 @@ public class ExplorationSolver {
                     callback.run();
                 }
             }
-        }, _exePeriod, _exePeriod);
+        }, _exePeriod, _exePeriod);*/
+        
+        _robot.cleanBufferedActions();
+        try {
+			TimeUnit.SECONDS.sleep(5);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        for(RobotAction action: actions){
+        		if(_robot.checkBufferActionSize()<4)
+        			_robot.bufferAction(action);
+        		else
+        		{
+        			_robot.bufferAction(action);
+        			_robot.executeBufferActions(ExplorationSolver.getExePeriod());
+        			//for the purpose of calibration
+        			//in this way, after every five actions, the robot will calibrate
+        		}
+        	
+        }
+        if(_robot.checkBufferActionSize()!=0)
+        		_robot.executeBufferActions(ExplorationSolver.getExePeriod());
+        
+        
     }
 }

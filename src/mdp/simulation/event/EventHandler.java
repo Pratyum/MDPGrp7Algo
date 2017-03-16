@@ -462,7 +462,12 @@ public class EventHandler implements IHandleable {
                 int[][] explored = ExplorationSolver.getMapViewer().getExplored();
                 _explorationThread.stop();
                 Map finalMap = new Map(explored, false);
-                ExplorationSolver.goBackToStart(finalMap, curRobot, callback);
+                try {
+					ExplorationSolver.goBackToStart(finalMap, curRobot, callback);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
                 Main.getGUI().update(finalMap);
             }
         };
@@ -472,7 +477,12 @@ public class EventHandler implements IHandleable {
                 Robot curRobot = ExplorationSolver.getRobot();
                 int[][] explored = ExplorationSolver.getMapViewer().getExplored();
                 Map finalMap = new Map(explored, false);
-                ExplorationSolver.goBackToStart(finalMap, curRobot, callback);
+                try {
+					ExplorationSolver.goBackToStart(finalMap, curRobot, callback);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
                 Main.getGUI().update(finalMap);
             }
         };

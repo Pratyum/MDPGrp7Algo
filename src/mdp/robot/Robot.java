@@ -86,7 +86,16 @@ public class Robot {
     public boolean bufferAction(RobotAction action) {
         return bufferedActions.add(action);
     }
-
+    
+    public int checkBufferActionSize() {
+        return bufferedActions.size();
+    }
+    
+    public void cleanBufferedActions(){
+    		bufferedActions.clear();
+    		
+    }
+    
     public static void actionCompletedCallBack() {
         actionCompleted = true;
 

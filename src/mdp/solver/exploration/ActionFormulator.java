@@ -136,7 +136,7 @@ public class ActionFormulator {
 
     	
     	
-    		
+    		//can I view less ? 
         view(robot); // for scanning purpose
         
         /*while(mapViewer.checkIfRight5SquaresEmpty(robot)){
@@ -151,6 +151,7 @@ public class ActionFormulator {
         			switch (mapViewer.checkWalkable(robot, Direction.Right)) {
                 case Yes:
                     robot.bufferAction(RobotAction.RotateRight);
+                    view(robot);
                     robot.bufferAction(RobotAction.MoveForward);
                     break;
                 case No:
@@ -290,9 +291,9 @@ public class ActionFormulator {
 
         Know check = mapViewer.checkWalkable(robot, Direction.Up);
 
-        if (check == Know.Unsure) {
+        /*if (check == Know.Unsure) { */
             view(robot);
-        }
+        /*}*/
         // make sure it is viewed before turn
         //update
         check = mapViewer.checkWalkable(robot, Direction.Up);
@@ -304,6 +305,7 @@ public class ActionFormulator {
 
         if (check == Know.No) {
             robot.bufferAction(RobotAction.RotateLeft);
+            view(robot);
             turnLeftTillEmpty(robot);
 
         }
