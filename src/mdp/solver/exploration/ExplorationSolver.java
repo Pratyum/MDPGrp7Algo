@@ -161,7 +161,10 @@ public class ExplorationSolver {
                         LinkedList<RobotAction> curAct = new LinkedList<>();
                         curAct.add(action);
                         Main.getRpi().sendMoveCommand(curAct);
+                        Main.getRpi().sendInfoToAndroid(map, mapViewer.getExplored(), actions);
                     }
+                		
+                	
                 } else {
                     _restoreOrientation(callback);
                     timer.cancel();
