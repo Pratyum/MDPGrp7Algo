@@ -32,5 +32,5 @@ public class AStarWaypoint extends Waypoint {
     public void parentDir(Direction parentDir) { _parentDir = parentDir; }
     
     
-    public int fval() { return 2 * _hval + _gval; }
+    public int fval() { return 100 * _hval + 95 * _gval; }
 }

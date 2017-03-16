@@ -13,22 +13,25 @@ public class AStarUtil {
     public static int getMDistance(Vector2 point1, Vector2 point2) {
         return Math.abs(point1.i() - point2.i())
                 + Math.abs(point1.j() - point2.j());
+//    	return 1;
     }
 
-    public static int getMoveCost(Robot robot, Direction direction) {
-        if (direction == robot.orientation()) {
-            return 2;
-        } else if (direction == robot.orientation().getBehind()) {
+    public static int getMoveCost(Direction origin, Direction direction) {
+    	System.out.println(origin + " vs " + direction);
+    	System.out.println(direction == origin);
+        if (direction == origin) {
             return 1;
+        } else if (direction == origin.getBehind()) {
+            return 3;
         } else {
-            return 1;
+            return 2;
         }
     }
     
-    public static int getSmoothMoveCost(Robot robot, Direction direction) {
-        if (direction == robot.orientation()) {
+    public static int getSmoothMoveCost(Direction origin, Direction direction) {
+        if (direction == origin) {
             return 3;
-        } else if (direction == robot.orientation().getBehind()) {
+        } else if (direction == origin.getBehind()) {
             return 2;
         } else {
             return 2;

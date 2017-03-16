@@ -78,30 +78,47 @@ public class AStarSolver {
         }
 
         // loop until a point next tp goal is found
+        boolean isFirstCur = true;
+        
         while (AStarUtil.getMDistance(curPoint.position(), goalPos) != 1) {
-//            System.out.println("Cur:");
-//            System.out.println(curPoint.position());
+            System.out.println("Cur:");
+            System.out.println(curPoint.position());
 
             // close point
             openedPoints.remove(curPoint.position().toString());
             closedPoints.put(curPoint.position().toString(), curPoint);
 
             // detect adj points
-//            System.out.println("Finding adj:");
+            System.out.println("Finding adj:");
             Vector2 curPos = curPoint.position();
             for (Direction dir : Direction.values()) {
 //                System.out.println(dir.toString());
                 // get adj point
                 Vector2 adjPos = curPos.fnAdd(dir.toVector2());
                 if (map.checkValidPosition(adjPos)) {
-//                    System.out.println(adjPos);
+                    System.out.println(adjPos);
                     Waypoint adjMapPoint = map.getPoint(adjPos);
+                    int curGval;
+                    int deltaGval;
+                    Direction curDirection;
+                    if (isFirstCur) {
+                    	curGval = 0;
+                    	deltaGval = 1;
+                    } else {
+                    	curGval = curPoint.gval();
+                    	curDirection = curPoint.parentDir().getBehind();
+                        if (!isSmooth) {
+                        	deltaGval = AStarUtil.getMoveCost(curDirection, dir);
+                        } else {
+                        	deltaGval = AStarUtil.getSmoothMoveCost(curDirection, dir);
+                        }
+                    }
+                    System.out.println("curGval = " + curGval);
+                    System.out.println("deltaMoveCost = " + deltaGval);
                     AStarWaypoint adjPoint = new AStarWaypoint(
                             adjMapPoint,
                             AStarUtil.getMDistance(adjPos, goalPos),
-                            !isSmooth
-                                    ? AStarUtil.getMoveCost(robot, dir) + curPoint.gval()
-                                    : AStarUtil.getSmoothMoveCost(robot, dir) + curPoint.gval(),
+                            curGval + deltaGval,
                             dir.getBehind()
                     );
 
@@ -128,25 +145,32 @@ public class AStarSolver {
             // check all open points for potential next cur point
             if (!openedPoints.isEmpty()) {
                 // loop through map info to find lowest fval point
+            	System.out.println("Deciding which of the following opened points to choose:");
                 AStarWaypoint lowestFvalPoint = new AStarWaypoint();
                 for (String key : openedPoints.keySet()) {
                     AStarWaypoint cur = openedPoints.get(key);
+                	System.out.println(cur.position() + " hval = " + cur.hval() + ", gval = " + cur.gval() + ", fval = " + cur.fval());
                     if (cur.fval() < lowestFvalPoint.fval()) {
                         lowestFvalPoint = cur;
                     }
                 }
 
                 // set this as cur
-//                System.out.println("Next cur selected:");
-//                System.out.println(lowestFvalPoint.position());
-//                System.out.println();
+                System.out.println("Next cur selected:");
+                System.out.println(lowestFvalPoint.position());
+                System.out.println();
                 curPoint = lowestFvalPoint;
             } else {
                 // path to goal is blocked
                 System.out.println("No possible path to goal found.");
                 return result;
             }
+            
+            System.out.println("Changing isFirstCur");
+            if (isFirstCur) isFirstCur = false;
         }
+        
+        System.out.println("Finished Finding the path...");
 
         // path has been found
         result.shortestPath.add(goalPos);
