@@ -17,8 +17,8 @@ public class AStarUtil {
     }
 
     public static int getMoveCost(Direction origin, Direction direction) {
-    	System.out.println(origin + " vs " + direction);
-    	System.out.println(direction == origin);
+//    	System.out.println(origin + " vs " + direction);
+//    	System.out.println(direction == origin);
         if (direction == origin) {
             return 1;
         } else if (direction == origin.getBehind()) {
