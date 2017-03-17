@@ -6,6 +6,7 @@ import java.util.LinkedList;
 
 import mdp.common.Direction;
 import mdp.common.Vector2;
+import mdp.communication.Translator;
 import mdp.solver.exploration.ActionFormulator;
 import mdp.solver.exploration.MapViewer;
 import mdp.Main;
@@ -106,7 +107,7 @@ public class Robot {
             if (!Main.isSimulating()) {
             		executionEndTime = System.currentTimeMillis();
             		System.out.println("Computational time for next movement"+ (executionStartTime- executionEndTime) + "ms");
-                Main.getRpi().sendMoveCommand(bufferedActions);
+                Main.getRpi().sendMoveCommand(bufferedActions, Translator.MODE_0);
                 
                 while (!actionCompleted) {
                 }

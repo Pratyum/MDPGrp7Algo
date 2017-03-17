@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import mdp.Main;
 import mdp.common.Vector2;
+import mdp.communication.Translator;
 import mdp.map.Descriptor;
 import mdp.map.Map;
 import mdp.map.WPObstacleState;
@@ -423,7 +424,6 @@ public class EventHandler implements IHandleable {
             @Override
             public void run() {
                 Date diffTime = new Date(new Date().getTime() - startTime.getTime() - 1800000);
-                System.out.println("diffTime = " + diffTime);
                 String timeStr = new SimpleDateFormat("mm:ss").format(diffTime);
                 _gui.getMainFrame()
                         .getMainPanel()
@@ -518,7 +518,7 @@ public class EventHandler implements IHandleable {
         if (!Main.isSimulating()) {
             // messaging arduino
             System.out.println("Sending sensing request to rpi (-> arduino) ");
-            Main.getRpi().sendMoveCommand(actions);
+            Main.getRpi().sendMoveCommand(actions, Translator.MODE_1);
         }
         /////////////////////////////
 

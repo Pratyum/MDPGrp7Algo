@@ -34,7 +34,7 @@ public class Compiler {
         return new DecimalFormat(_DECIMAL_FORMAT).format(target);
     }
 
-    static String compileActions(List<RobotAction> actions) {
+    static String compileActions(List<RobotAction> actions, String mode) {
         String result = "";
         int count = 1;
         String lastAction = "";
@@ -84,6 +84,8 @@ public class Compiler {
 
         result += (isRotating ? "" : count) + _TRAILER;
         System.out.println("Sending out: " + result);
+        
+        result = (!mode.isEmpty() ? mode + _TRAILER : "") + result;
         return result;
     }
 

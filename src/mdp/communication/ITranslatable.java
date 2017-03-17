@@ -19,7 +19,7 @@ public interface ITranslatable {
     
     void sendSensingRequest();
 
-    void sendMoveCommand(List<RobotAction> actions);
+    void sendMoveCommand(List<RobotAction> actions, String mode);
     
     void sendSmoothMoveCommand(List<Vector2> path);
     

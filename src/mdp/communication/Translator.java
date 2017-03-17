@@ -21,6 +21,9 @@ public class Translator implements ITranslatable {
     private static final String _MSG_SEPARATOR = "_";
 
     private static final int _PROBING_PERIOD = 20;
+    
+    public static final String MODE_0 = "";
+    public static final String MODE_1 = "m1";
 
     private SocketCommunicator _socketCommunicator;
     private String _inputBuffer;
@@ -51,9 +54,10 @@ public class Translator implements ITranslatable {
 
     // Arduino
     @Override
-    public void sendMoveCommand(List<RobotAction> actions) {
+    public void sendMoveCommand(List<RobotAction> actions, String mode) {
         try {
-            String message = _TO_ARDUINO_MARKER + Compiler.compileActions(actions);
+            String message = _TO_ARDUINO_MARKER + Compiler.compileActions(actions, mode);
+            System.out.println("message = " + message);
             _socketCommunicator.echo(message);
         } catch (IOException ex) {
             Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex);
@@ -89,7 +93,7 @@ public class Translator implements ITranslatable {
             String message = _TO_ANDROID_MARKER
                     + Compiler.compileMap(map, explored)
                     + _MSG_SEPARATOR
-                    + Compiler.compileActions(actions);
+                    + Compiler.compileActions(actions, MODE_0);
             _socketCommunicator.echo(message);
         } catch (IOException ex) {
             Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex);
