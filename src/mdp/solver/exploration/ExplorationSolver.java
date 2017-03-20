@@ -109,10 +109,11 @@ public class ExplorationSolver {
                 firstLeaveStartZone = true;
             }
             actionFormulator.rightWallFollower(_robot);
-            //actionFormulator.actionSimplifier(_robot)
+            
+            actionFormulator.actionSimplifier(_robot);
         }
-
-        actionFormulator.exploreRemainingArea(_robot);
+        
+        //actionFormulator.exploreRemainingArea(_robot);
         
     }
 

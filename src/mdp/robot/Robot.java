@@ -118,7 +118,7 @@ public class Robot {
                 // send info to android
                 Main.getRpi().sendInfoToAndroid(map, explored, bufferedActions);
 
-                System.out.println("Actions completed");
+                //System.out.println("Actions completed");
                 actionCompleted = false;
                 //increment calibrationCounter
                 calibrationCounter += bufferedActions.size();
@@ -129,7 +129,7 @@ public class Robot {
                 execute(action);
                 mapViewer.markRobotVisited(_position);
                 
-              
+                System.out.println("Execute action: "+action.toString());
                 /*f(first == 0 && mapViewer.detectCircle(_position, _orientation)!=-1){
                 		first = 1;
                 		index = mapViewer.detectCircle(_position, _orientation);

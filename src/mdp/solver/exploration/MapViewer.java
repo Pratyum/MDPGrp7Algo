@@ -500,7 +500,7 @@ public class MapViewer {
             }
             
         } else {
-            for (i = 1; i <= 3; i++) {
+            for (i = 1; i <= 4; i++) {
                 markExploredEmpty(edge_l.fnAdd(robot.orientation().getLeft().toVector2().fnMultiply(i)));
             }
         }
@@ -936,6 +936,14 @@ public class MapViewer {
             return true;
         else 
             return false;
+    }
+
+    public int getExploredState(Vector2 v) {
+        // TODO Auto-generated method stub
+        if(map.checkValidBoundary(v))
+            return explored[v.i()][v.j()];
+        else
+            return -2;
     }
     
     
