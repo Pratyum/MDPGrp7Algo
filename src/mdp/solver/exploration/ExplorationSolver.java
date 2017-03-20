@@ -143,14 +143,18 @@ public class ExplorationSolver {
 //            } else {
                 robot.bufferAction(action);
 //                actionFormulator.view(_robot);
-                robot.executeBufferActions(ExplorationSolver.getExePeriod());
+                //robot.executeBufferActions(ExplorationSolver.getExePeriod());
+                //allow update map
+                actionFormulator.view(robot);
+                
                 //for the purpose of calibration
                 //in this way, after every five actions, the robot will calibrate
 //            }
 
         }
         if (robot.checkBufferActionSize() != 0) {
-            robot.executeBufferActions(ExplorationSolver.getExePeriod());
+            actionFormulator.view(robot);
+            //robot.executeBufferActions(ExplorationSolver.getExePeriod());
         }
 
 //        while (!goalFormulator.checkIfReachStartZone(_robot.position())) {

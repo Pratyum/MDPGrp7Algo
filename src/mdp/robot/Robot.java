@@ -20,6 +20,8 @@ public class Robot {
     private static volatile int calibrationCounter = 0;
     private static volatile boolean actionCompleted = false;
 
+    private static volatile boolean robotVisitedBefore = false;
+    
     private static LinkedList<RobotAction> bufferedActions = new LinkedList<>();
     private MapViewer mapViewer;
     private ActionFormulator actionFormulator;
@@ -41,6 +43,10 @@ public class Robot {
         actionFormulator = ac;
     }
 
+    public boolean checkIfRobotVisitedBefore(){
+        
+        return robotVisitedBefore;
+    }
     public Vector2 position() {
         return _position;
     }
@@ -127,6 +133,12 @@ public class Robot {
             int index =0;
             for (RobotAction action : bufferedActions) {
                 execute(action);
+                if(mapViewer.checkRobotVisited(_position)){
+                    robotVisitedBefore= true;
+                    
+                }
+                else 
+                    robotVisitedBefore = false;
                 mapViewer.markRobotVisited(_position);
                 
                 System.out.println("Execute action: "+action.toString());
