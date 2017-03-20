@@ -11,53 +11,7 @@ import mdp.map.Waypoint;
 
 public class AStarSolver {
 
-    public Vector2 solveSingle(Map map, Robot robot, Vector2 goalPos) {
-        Vector2 diff = goalPos.fnAdd(robot.position().fnMultiply(-1));
-        Vector2 horizontalResult;
-        Vector2 verticalResult;
-        if (diff.j() > 0) {
-            // move down
-            horizontalResult = robot.position().fnAdd(Direction.Down.toVector2());
-        } else {
-            // move up
-            horizontalResult = robot.position().fnAdd(Direction.Up.toVector2());
-        }
-        if (diff.i() > 0) {
-            // move right
-            verticalResult = robot.position().fnAdd(Direction.Right.toVector2());
-        } else {
-            // move left
-            verticalResult = robot.position().fnAdd(Direction.Left.toVector2());
-        }
-
-        boolean horizontallyWalkable = false;
-        boolean verticallyWalkable = false;
-        if (map.getPoint(horizontalResult).obstacleState()
-                .equals(WPObstacleState.IsWalkable)) {
-            horizontallyWalkable = true;
-        }
-        if (map.getPoint(verticalResult).obstacleState()
-                .equals(WPObstacleState.IsWalkable)) {
-            verticallyWalkable = true;
-        }
-
-        if (horizontallyWalkable) {
-            if (verticallyWalkable) {
-                return diff.i() > diff.j() ? verticalResult : horizontalResult;
-            } else {
-                return horizontalResult;
-            }
-        } else {
-            if (verticallyWalkable) {
-                return verticalResult;
-            } else {
-                System.out.println("No possible solution found.");
-                return new Vector2(-1, -1);
-            }
-        }
-    }
-
-    public AStarSolverResult solve(Map map, Robot robot, Vector2 goalPos, boolean isSmooth) {
+    private AStarSolverResult _solve(Map map, Robot robot, Vector2 goalPos, SolveType solveType) {
 
         AStarSolverResult result = new AStarSolverResult();
 
@@ -79,7 +33,7 @@ public class AStarSolver {
 
         // loop until a point next tp goal is found
         boolean isFirstCur = true;
-        
+
         while (AStarUtil.getMDistance(curPoint.position(), goalPos) != 1) {
 //            System.out.println("Cur:");
 //            System.out.println(curPoint.position());
@@ -96,29 +50,40 @@ public class AStarSolver {
                 // get adj point
                 Vector2 adjPos = curPos.fnAdd(dir.toVector2());
                 if (map.checkValidPosition(adjPos)) {
-//                    System.out.println(adjPos);
-                    Waypoint adjMapPoint = map.getPoint(adjPos);
-                    int curGval;
+                    
+                    // gval
+                    int baseGval;
                     int deltaGval;
                     Direction curDirection;
                     if (isFirstCur) {
-                    	curGval = 0;
-                    	deltaGval = 1;
+                        baseGval = 0;
+                        deltaGval = 1;
                     } else {
-                    	curGval = curPoint.gval();
-                    	curDirection = curPoint.parentDir().getBehind();
-                        if (!isSmooth) {
-                        	deltaGval = AStarUtil.getMoveCost(curDirection, dir);
-                        } else {
-                        	deltaGval = AStarUtil.getSmoothMoveCost(curDirection, dir);
+                        baseGval = curPoint.gval();
+                        curDirection = curPoint.parentDir().getBehind();
+                        switch (solveType) {
+                            case Normal:
+                            default:
+                                deltaGval = AStarUtil.getMoveCost(curDirection, dir);
+                                break;
+                            case Smooth:
+                                deltaGval = AStarUtil.getSmoothMoveCost(curDirection, dir);
+                                break;
+
                         }
                     }
-//                    System.out.println("curGval = " + curGval);
-//                    System.out.println("deltaMoveCost = " + deltaGval);
+                    
+                    // hval
+                    int hval = AStarUtil.getMDistance(adjPos, goalPos);
+                    switch (solveType) {
+                        case Safe:
+                            hval += AStarUtil.getSafetyBenefit(map, adjPos);
+                    }
+                    
                     AStarWaypoint adjPoint = new AStarWaypoint(
-                            adjMapPoint,
-                            AStarUtil.getMDistance(adjPos, goalPos),
-                            curGval + deltaGval,
+                            map.getPoint(adjPos),
+                            hval,
+                            baseGval + deltaGval,
                             dir.getBehind()
                     );
 
@@ -165,13 +130,14 @@ public class AStarSolver {
                 System.out.println("No possible path to goal found.");
                 return result;
             }
-            
-//            System.out.println("Changing isFirstCur");
-            if (isFirstCur) isFirstCur = false;
-        }
-        
-//        System.out.println("Finished Finding the path...");
 
+//            System.out.println("Changing isFirstCur");
+            if (isFirstCur) {
+                isFirstCur = false;
+            }
+        }
+
+//        System.out.println("Finished Finding the path...");
         // path has been found
         result.shortestPath.add(goalPos);
         do {
@@ -200,15 +166,60 @@ public class AStarSolver {
     }
 
     public AStarSolverResult solve(Map map, Robot robot, Vector2 goalPos) {
-        return solve(map, robot, goalPos, false);
+        return _solve(map, robot, goalPos, SolveType.Normal);
     }
 
     public AStarSolverResult solve(Map map, Robot robot) {
-        return solve(map, robot, map.GOAL_POS, false);
+        return _solve(map, robot, map.GOAL_POS, SolveType.Normal);
     }
 
-    public AStarSolverResult solve(Map map, Robot robot, boolean isSmooth) {
-        return solve(map, robot, map.GOAL_POS, isSmooth);
+    public AStarSolverResult solve(Map map, Robot robot, SolveType solveType) {
+        return _solve(map, robot, map.GOAL_POS, solveType);
     }
 
+//    public Vector2 solveSingle(Map map, Robot robot, Vector2 goalPos) {
+//        Vector2 diff = goalPos.fnAdd(robot.position().fnMultiply(-1));
+//        Vector2 horizontalResult;
+//        Vector2 verticalResult;
+//        if (diff.j() > 0) {
+//            // move down
+//            horizontalResult = robot.position().fnAdd(Direction.Down.toVector2());
+//        } else {
+//            // move up
+//            horizontalResult = robot.position().fnAdd(Direction.Up.toVector2());
+//        }
+//        if (diff.i() > 0) {
+//            // move right
+//            verticalResult = robot.position().fnAdd(Direction.Right.toVector2());
+//        } else {
+//            // move left
+//            verticalResult = robot.position().fnAdd(Direction.Left.toVector2());
+//        }
+//
+//        boolean horizontallyWalkable = false;
+//        boolean verticallyWalkable = false;
+//        if (map.getPoint(horizontalResult).obstacleState()
+//                .equals(WPObstacleState.IsWalkable)) {
+//            horizontallyWalkable = true;
+//        }
+//        if (map.getPoint(verticalResult).obstacleState()
+//                .equals(WPObstacleState.IsWalkable)) {
+//            verticallyWalkable = true;
+//        }
+//
+//        if (horizontallyWalkable) {
+//            if (verticallyWalkable) {
+//                return diff.i() > diff.j() ? verticalResult : horizontalResult;
+//            } else {
+//                return horizontalResult;
+//            }
+//        } else {
+//            if (verticallyWalkable) {
+//                return verticalResult;
+//            } else {
+//                System.out.println("No possible solution found.");
+//                return new Vector2(-1, -1);
+//            }
+//        }
+//    }
 }

@@ -14,6 +14,7 @@ import mdp.solver.shortestpath.AStarSolver;
 import mdp.solver.shortestpath.AStarUtil;
 import mdp.communication.Compiler;
 import mdp.robot.RobotAction;
+import mdp.solver.shortestpath.SolveType;
 
 public class Test {
     
@@ -70,7 +71,7 @@ public class Test {
         System.out.println(map.toString(robot));
         
         
-        List<Vector2> path = solver.solve(map, robot, true).shortestPath;
+        List<Vector2> path = solver.solve(map, robot, SolveType.Smooth).shortestPath;
         System.out.println("Path");
         path.forEach((pos) -> {
             System.out.println(pos);

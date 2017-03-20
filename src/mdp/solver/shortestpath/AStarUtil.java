@@ -27,7 +27,7 @@ public class AStarUtil {
             return 2;
         }
     }
-    
+
     public static int getSmoothMoveCost(Direction origin, Direction direction) {
         if (direction == origin) {
             return 3;
@@ -90,11 +90,25 @@ public class AStarUtil {
             }
 
             prevPos = curPos;
-            
+
         }
         // save goal
         result.add(prevPos);
 
+        return result;
+    }
+
+    public static int getSafetyBenefit(Map map, Vector2 curPos) {
+        int result = 0;
+        for (Direction dir : Direction.values()) {
+            Vector2 adjPos = curPos.fnAdd(dir.toVector2());
+            if (map.checkValidPosition(adjPos)) {
+                if (!map.getPoint(adjPos).obstacleState()
+                        .equals(WPObstacleState.IsWalkable)) {
+                    result -= 1;
+                }
+            }
+        }
         return result;
     }
 

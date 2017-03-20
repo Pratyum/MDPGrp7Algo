@@ -9,14 +9,14 @@ public class AStarWaypoint extends Waypoint {
     private int _gval;
     private Direction _parentDir;
     
-    public AStarWaypoint(Waypoint wp, int hval, int gval, Direction parentIndex) {
+    public AStarWaypoint(Waypoint wp, int hval, int gval, Direction parentDir) {
         super(wp.position(), wp.specialState(), wp.obstacleState());
         _hval = hval;
         _gval = gval;
-        _parentDir = parentIndex;
+        _parentDir = parentDir;
     }
     public AStarWaypoint(Waypoint wp) {
-        this(wp, 1000000, 1000000, Direction.Up);
+        this(wp, 1000000, 1000000, Direction.Left);
     }
     public AStarWaypoint() {
         this(new Waypoint());
