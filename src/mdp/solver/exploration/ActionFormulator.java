@@ -148,6 +148,7 @@ public class ActionFormulator {
                         break;
                     }
                     //System.out.println("Here3");
+                    System.out.println("Execute action"+ robotActions.get(i));
                     _robot.bufferAction(robotActions.get(i));
 
                 }
