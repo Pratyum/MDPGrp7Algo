@@ -90,7 +90,7 @@ public class ActionFormulator {
                         break;
                     }
                 }
-
+                
                 if (reachablePointFound) {
                     break; /// findFirst goal
                 }
@@ -114,17 +114,36 @@ public class ActionFormulator {
                     Robot robotSimulator = new Robot(new Vector2(_robot.position().i(),_robot.position().j()),_robot.orientation());
                     if(i>=1)
                         robotSimulator.execute(robotActions.get(i-1));
-                    robotSimulator.execute(robotActions.get(i));
-                    if(ventureIntoDangerousZone == false && mapViewer.checkIfInDangerousZone(robotSimulator)){
+                    
+                    if(ventureIntoDangerousZone == false && !mapViewer.checkIfInDangerousZone(robotSimulator) ){
+                        robotSimulator.execute(robotActions.get(i));
+                        if(mapViewer.checkIfInDangerousZone(robotSimulator)){
                         
                         ventureIntoDangerousZone = true;
                         
                         System.out.println("Venturing into somewhere dangerous");
                         if(!Main.isSimulating())
                             Main.getRpi().sendCalibrationCommand(CalibrationType.Emergency);
+                        }
                     }
                     
+                    Robot robotSimulator2 = new Robot(new Vector2(_robot.position().i(),_robot.position().j()),_robot.orientation());
+                    if(i>=1)
+                        robotSimulator2.execute(robotActions.get(i-1));
                     
+                    
+                    if(mapViewer.checkLeftObstacles(robotSimulator2))
+                        if(Main.isSimulating())
+                           System.out.println("Send calibration command " + CalibrationType.Left.toString()); 
+                        else 
+                           Main.getRpi().sendCalibrationCommand(CalibrationType.Left);
+                    
+                    //only front back on the right side
+                    if(mapViewer.checkRightFrontBack(robotSimulator2))
+                        if(Main.isSimulating())
+                            System.out.println("Send calibration command " + CalibrationType.Right.toString()); 
+                        else
+                           Main.getRpi().sendCalibrationCommand(CalibrationType.Right);
                      
                     
                     
@@ -240,20 +259,8 @@ public class ActionFormulator {
         
         ///check current map configuration , give calibration command
         
-        /*
-         * if(mapViewer.checkLeftObstacles(robot))
-            if(Main.isSimulating())
-               System.out.println("Send calibration command " + CalibrationType.Left.toString()); 
-            else 
-               Main.getRpi().sendCalibrationCommand(CalibrationType.Left);
         
-        //only front back on the right side
-        if(mapViewer.checkRightFrontBack(robot))
-            if(Main.isSimulating())
-                System.out.println("Send calibration command " + CalibrationType.Right.toString()); 
-            else
-               Main.getRpi().sendCalibrationCommand(CalibrationType.Right);
-        */
+        
         
         if (robot.checkIfHavingBufferActions()) {
             robot.executeBufferActions(ExplorationSolver.getExePeriod());
@@ -352,6 +359,17 @@ public class ActionFormulator {
 
     public void actionSimplifier(Robot _robot) throws InterruptedException, IOException {
         // TODO Auto-generated method stub
+        if(!turnAroundInDeadCorner(_robot));
+        //    turnAroundFromRight(_robot);
+    }
+    
+    
+    private void turnAroundFromRight(Robot _robot) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public boolean turnAroundInDeadCorner(Robot _robot) throws InterruptedException, IOException{
         Vector2 left_m,left_f,left_b, right_up, right_down, right_middle,front_m,front_l,front_r;
         boolean frontWall;
         boolean right_up_explored, right_down_explored,right_middle_explored;
@@ -482,18 +500,26 @@ public class ActionFormulator {
             }
         }
         
+        
         if(left_b_explored && left_f_explored &&left_m_explored &&
                 right_middle_explored && right_up_explored & right_down_explored &&
                 frontWall){
             _robot.bufferAction(RobotAction.RotateLeft);
             _robot.bufferAction(RobotAction.RotateLeft);
+            
             _robot.bufferAction(RobotAction.MoveForward);
             view(_robot);
+            if(mapViewer.checkWalkable(_robot, Direction.Right)== Know.Yes){
+                _robot.bufferAction(RobotAction.RotateRight);
+                _robot.bufferAction(RobotAction.MoveForward);
+                _robot.bufferAction(RobotAction.RotateLeft);
+                view(_robot);
+            }
+            return true;
         }
-        
+        else
+            return false;
     }
-    
-    
     
     
     

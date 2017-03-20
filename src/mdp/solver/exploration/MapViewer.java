@@ -107,7 +107,7 @@ public class MapViewer {
     
     
     public boolean markConfidentRange(Robot robot){
-    		Vector2 edge, edge_l, edge_r , edge_rm,edge_rf, edge_lf;
+    		Vector2 edge, edge_l, edge_r , edge_rm,edge_rf, edge_lf,left;
         
         Vector2 robotPosition = robot.position();
         markConfidentDetection(robotPosition);
@@ -123,15 +123,20 @@ public class MapViewer {
         edge = robot.position().fnAdd(robot.orientation().toVector2().fnMultiply(2));
         edge_l = edge.fnAdd(robot.orientation().getLeft().toVector2());
         edge_r = edge.fnAdd(robot.orientation().getRight().toVector2());
+        left = robot.position().fnAdd(robot.orientation().toVector2()).fnAdd(robot.orientation().getLeft().toVector2().fnMultiply(2));
+        
+      
         edge_rm = robot.position().fnAdd(robot.orientation().getRight().toVector2().fnMultiply(2));
         edge_rf= robot.position().fnAdd(robot.orientation().getRight().toVector2().fnMultiply(2)).fnAdd(robot.orientation().toVector2());
         edge_lf = robot.position().fnAdd(robot.orientation().getLeft().toVector2().fnMultiply(2)).fnAdd(robot.orientation().toVector2());
+        
         markConfidentDetection(edge);
         markConfidentDetection(edge_l);
         markConfidentDetection(edge_r);
         markConfidentDetection(edge_rm);
         markConfidentDetection(edge_rf);
         markConfidentDetection(edge_lf);
+        markConfidentDetection(left);
         
         
         return true;
@@ -500,7 +505,7 @@ public class MapViewer {
             }
             
         } else {
-            for (i = 1; i <= 4; i++) {
+            for (i = 1; i <= 5; i++) {
                 markExploredEmpty(edge_l.fnAdd(robot.orientation().getLeft().toVector2().fnMultiply(i)));
             }
         }

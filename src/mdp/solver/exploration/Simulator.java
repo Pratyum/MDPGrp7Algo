@@ -100,10 +100,10 @@ public class Simulator {
             return 4;
         }
         
-        /*tmp.add(unit);
+        tmp.add(unit);
         if (!objective_map.checkValidBoundary(tmp) || objective_map.getPoint(tmp).obstacleState() == WPObstacleState.IsActualObstacle) {
             return 5;
-        }*/
+        }
         
         return 0; // no obstacle in front
 

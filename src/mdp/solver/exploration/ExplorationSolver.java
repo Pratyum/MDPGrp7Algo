@@ -113,7 +113,7 @@ public class ExplorationSolver {
             actionFormulator.actionSimplifier(_robot);
         }
         
-        //actionFormulator.exploreRemainingArea(_robot);
+        actionFormulator.exploreRemainingArea(_robot);
         
     }
 
