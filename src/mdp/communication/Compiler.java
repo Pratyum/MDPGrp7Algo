@@ -19,10 +19,12 @@ public class Compiler {
     private static final String _ROTATE_RIGHT = "r";
 
     private static final String _CAL_FRONT_LR = "x";
-    private static final String _CAL_FRONT_ML = "y";
-    private static final String _CAL_FRONT_MR = "z";
+    private static final String _CAL_FRONT_ML = "x";
+    private static final String _CAL_FRONT_MR = "x";
     private static final String _CAL_RIGHT = "c";
-
+    private static final String _CAL_LEFT = "z";
+    private static final String _CAL_EMERGENCY = "e";
+    
     private static final String _SENSING_REQUEST = "s";
     private static final String _TRAILER = "|";
 
@@ -157,6 +159,10 @@ public class Compiler {
                 return _CAL_FRONT_ML + _TRAILER;
             case Front_MR:
                 return _CAL_FRONT_MR + _TRAILER;
+            case Left:
+                return _CAL_LEFT + _TRAILER;
+            case Emergency:
+                return _CAL_EMERGENCY + _TRAILER;
             default:
                 return "";
         }

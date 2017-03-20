@@ -38,15 +38,15 @@ public class ExplorationSolver {
         _exePeriod = exePeriod;
         objective_map = map;
         simulator = new Simulator(objective_map);
-
+        
         Vector2 robotPos = new Vector2(1, 1);
         Direction robotDir = Direction.Right;
         actionFormulator = new ActionFormulator(mapViewer, simulator);
         _robot = new Robot(robotPos, robotDir, mapViewer, actionFormulator);
 
-        Direction last_orientation;
-        LinkedList<Direction> twoDirectionAway = new LinkedList<>();
-
+        //Direction last_orientation;
+        //LinkedList<Direction> twoDirectionAway = new LinkedList<>();
+        boolean firstLeaveStartZone = false;
         // put some blockers into the map
         System.out.println("For Simulation Purpose");
         System.out.println(objective_map.toString(_robot));
@@ -60,12 +60,12 @@ public class ExplorationSolver {
         ////////////
         //start exploration
 
-        twoDirectionAway.add(Direction.Down);
-        twoDirectionAway.add(Direction.Down);
+        //twoDirectionAway.add(Direction.Down);
+        //twoDirectionAway.add(Direction.Down);
 
         int counter = 0;
         Vector2 last_position;
-        while (!goalFormulator.checkIfReachFinalGoal(_robot.position())) {
+        /*while (!goalFormulator.checkIfReachFinalGoal(_robot.position())) {
             //System.out.println("following right wall");
 
             //System.out.println(mapViewer.getSubjectiveMap().toString(_robot));
@@ -97,41 +97,24 @@ public class ExplorationSolver {
             }
             System.out.println("Counter is " + counter);
 
-        }
-        while ((!goalFormulator.checkIfReachStartZone(_robot.position()))
-                && (!mapViewer.checkIfNavigationComplete())) {
-            last_position = new Vector2(_robot.position().i(), _robot.position().j());
-            last_orientation = _robot.orientation();
+        }*/
+        
+        while ( firstLeaveStartZone == false||
+                !goalFormulator.checkIfReachStartZone(_robot.position())
+                && !mapViewer.checkIfNavigationComplete()
+                ) {
+           
+            if((!_robot.position().equals(new Vector2(1,1))) &&firstLeaveStartZone ==false)
+            {
+                firstLeaveStartZone = true;
+            }
             actionFormulator.rightWallFollower(_robot);
-
-            System.out.println("Last position: " + last_position.toString());
-            System.out.println("Current position: " + _robot.position().toString());
-            System.out.println("last orientation: " + last_orientation.toString());
-            //System.out.println(mapViewer.exploredAreaToString());
-            //System.out.println(mapViewer.robotVisitedPlaceToString());
-            //System.out.println(mapViewer.getSubjectiveMap().toString(_robot));
-
-            if (_robot.position().equals(last_position.fnAdd(last_orientation.getRight().toVector2()))) {
-
-                counter++;
-            } else {
-                counter = 0;
-            }
-
-            if (counter == 7) {
-                _robot.bufferAction(RobotAction.RotateRight);
-                _robot.bufferAction(RobotAction.RotateRight);
-                _robot.bufferAction(RobotAction.MoveForward);
-
-                actionFormulator.view(_robot);
-                counter = 0;
-            }
-            System.out.println("Counter is " + counter);
-
+            
+            actionFormulator.actionSimplifier(_robot);
         }
-
+        
         actionFormulator.exploreRemainingArea(_robot);
-
+        
     }
 
     public static int getExePeriod() {

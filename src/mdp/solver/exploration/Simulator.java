@@ -64,9 +64,9 @@ public class Simulator {
         }
         tmp.add(unit);
 
-        if (!objective_map.checkValidBoundary(tmp) || objective_map.getPoint(tmp).obstacleState() == WPObstacleState.IsActualObstacle) {
+        /*if (!objective_map.checkValidBoundary(tmp) || objective_map.getPoint(tmp).obstacleState() == WPObstacleState.IsActualObstacle) {
             return 3;
-        }
+        }*/
         return 0; // no obstacle in front
 
     }
@@ -99,6 +99,7 @@ public class Simulator {
         if (!objective_map.checkValidBoundary(tmp) || objective_map.getPoint(tmp).obstacleState() == WPObstacleState.IsActualObstacle) {
             return 4;
         }
+        
         tmp.add(unit);
         if (!objective_map.checkValidBoundary(tmp) || objective_map.getPoint(tmp).obstacleState() == WPObstacleState.IsActualObstacle) {
             return 5;
