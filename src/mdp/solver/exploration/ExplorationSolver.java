@@ -17,6 +17,7 @@ import mdp.common.Vector2;
 import mdp.robot.RobotAction;
 import mdp.solver.shortestpath.AStarSolver;
 import mdp.solver.shortestpath.AStarSolverResult;
+import mdp.solver.shortestpath.SolveType;
 
 public class ExplorationSolver {
 
@@ -46,7 +47,8 @@ public class ExplorationSolver {
 
         //Direction last_orientation;
         //LinkedList<Direction> twoDirectionAway = new LinkedList<>();
-        boolean firstLeaveStartZone = false;
+        
+        boolean goalZoneReached = false;
         // put some blockers into the map
         System.out.println("For Simulation Purpose");
         System.out.println(objective_map.toString(_robot));
@@ -99,14 +101,15 @@ public class ExplorationSolver {
 
         }*/
         
-        while ( firstLeaveStartZone == false||
+        
+        while ( !goalZoneReached ||
                 !goalFormulator.checkIfReachStartZone(_robot.position())
-                && !mapViewer.checkIfNavigationComplete()
+                
                 ) {
            
-            if((!_robot.position().equals(new Vector2(1,1))) &&firstLeaveStartZone ==false)
+            if(_robot.position().equals(new Vector2(map.DIM_I-2,map.DIM_J-2)) )
             {
-                firstLeaveStartZone = true;
+               goalZoneReached= true;
             }
             actionFormulator.rightWallFollower(_robot);
             
@@ -133,7 +136,7 @@ public class ExplorationSolver {
     public static void goBackToStart(Map map, Robot robot, Runnable callback) throws IOException, InterruptedException {
         System.out.println("Going back to start with the following map");
         System.out.println(map.toString(robot));
-        AStarSolverResult result = new AStarSolver().solve(map, robot, Map.START_POS);
+        AStarSolverResult result = new AStarSolver().solve(map, robot, Map.START_POS , SolveType.Safe);
         LinkedList<RobotAction> actions = RobotAction.fromPath(robot, result.shortestPath);
         
         robot.cleanBufferedActions();

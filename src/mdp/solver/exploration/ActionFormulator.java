@@ -17,7 +17,7 @@ import mdp.solver.shortestpath.*;
 
 public class ActionFormulator {
 
-    private static boolean simulation_mode = false;
+    
 
     private MapViewer mapViewer;
 
@@ -101,7 +101,7 @@ public class ActionFormulator {
 
                 System.out.println("Current goal: " + goal.toString());
 
-                AStarSolverResult astarSolverResult = astarSolver.solve(mapViewer.getSubjectiveMap(), _robot, goal);
+                AStarSolverResult astarSolverResult = astarSolver.solve(mapViewer.getSubjectiveMap(), _robot, goal , SolveType.Safe);
                 
                 
                 robotActions = RobotAction.fromPath(_robot, astarSolverResult.shortestPath);
