@@ -139,7 +139,7 @@ public class Robot {
                 
                 if (Main.isSimulating()) {
                     Thread.sleep(sleepPeriod);
-                }
+                } 
             }
             
             

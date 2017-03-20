@@ -21,6 +21,7 @@ public class MapViewer {
 
     private Map map;
 
+    
     //1 empty, 2 obstacle, 0 havent explored
     private int[][] explored;
     private int[][] robotPosition;
@@ -795,23 +796,23 @@ public class MapViewer {
     }
     
     
-    public CalibrationType checkCalibrationAvailable(Robot robot){
-        Vector2 front_l, front_r, front_m, right_up,right_down;
+    public boolean checkRightFrontBack(Robot robot){
+        Vector2  right_up,right_down,right_middle;
         
-        front_m = robot.position().fnAdd(robot.orientation().toVector2().fnMultiply(2));
+        /*front_m = robot.position().fnAdd(robot.orientation().toVector2().fnMultiply(2));
         front_l = front_m.fnAdd(robot.orientation().getLeft().toVector2());
         front_r = front_m.fnAdd(robot.orientation().getRight().toVector2());
-    		
+    		*/
         right_up = robot.position().fnAdd(robot.orientation().toVector2()).fnAdd(robot.orientation().getRight().toVector2().fnMultiply(2));
         right_down = robot.position().fnAdd(robot.orientation().getBehind().toVector2()).fnAdd(robot.orientation().getRight().toVector2().fnMultiply(2));
-    
+        right_middle = robot.position().fnAdd(robot.orientation().getRight().toVector2().fnMultiply(2));
     
         /*if(map.getPoint(right_up).obstacleState() == WPObstacleState.IsActualObstacle && 
         		map.getPoint(right_down).obstacleState() == WPObstacleState.IsActualObstacle){
         		return CalibrationType.Right;
         }*/
         
-        
+        /*
 	        if(!map.checkValidBoundary(front_r) || map.getPoint(front_r).obstacleState() == WPObstacleState.IsActualObstacle)
 	        		if(!map.checkValidBoundary(front_l) ||map.getPoint(front_l).obstacleState() == WPObstacleState.IsActualObstacle){
 	        		return CalibrationType.Front_LR;
@@ -826,9 +827,14 @@ public class MapViewer {
 	        		if(!map.checkValidBoundary(front_m) ||map.getPoint(front_m).obstacleState() == WPObstacleState.IsActualObstacle){
 	        		return CalibrationType.Front_MR;
         		}
-	       
+	    */   
+        if(!map.checkValidBoundary(right_up) || map.getPoint(right_up).obstacleState() == WPObstacleState.IsActualObstacle)
+            if(!map.checkValidBoundary(right_down) ||map.getPoint(right_down).obstacleState() == WPObstacleState.IsActualObstacle){
+                if(map.checkValidBoundary(right_middle) && map.getPoint(right_middle).obstacleState() != WPObstacleState.IsActualObstacle)
+                    return true;
+       }
         
-        return CalibrationType.NA;
+        return false;
         
     }
     
@@ -845,6 +851,91 @@ public class MapViewer {
 			return WPObstacleState.IsActualObstacle;
     		
 		return map.getPoint(robot.position().fnAdd(robot.orientation().toVector2().fnMultiply(-2)).fnAdd(robot.orientation().getRight().toVector2().fnMultiply(2))).obstacleState();  
+    }
+
+    public boolean checkLeftObstacles(Robot _robot) {
+        // TODO Auto-generated method stub
+        Vector2 left_f,left_m,left_b;
+        int m=0 ,f=0 ,b=0 ;
+        left_m = _robot.position().fnAdd(_robot.orientation().getLeft().toVector2().fnMultiply(2));
+        left_f = left_m.fnAdd(_robot.orientation().toVector2());
+        left_b = left_m.fnAdd(_robot.orientation().getBehind().toVector2());
+        
+        if(!map.checkValidBoundary(left_m) || map.getPoint(left_m).obstacleState() == WPObstacleState.IsActualObstacle){
+            m=1;
+        }
+        
+        if(!map.checkValidBoundary(left_f) || map.getPoint(left_f).obstacleState() == WPObstacleState.IsActualObstacle){
+            f=1;
+        }
+        if(!map.checkValidBoundary(left_b) || map.getPoint(left_b).obstacleState() == WPObstacleState.IsActualObstacle){
+            b=1;
+        }
+        
+        
+        
+        return (m+f+b)>=2;
+    }
+
+    public boolean checkIfInDangerousZone(Robot _robot) throws InterruptedException, IOException {
+        
+        Vector2 left_m, left_f,left_b, right_up, right_down, right_middle,front_m,front_l,front_r;
+        
+        int left,right,front;
+        left=0;right=0;front=0;
+        
+        left_m = _robot.position().fnAdd(_robot.orientation().getLeft().toVector2().fnMultiply(2));
+        left_f = left_m.fnAdd(_robot.orientation().toVector2());
+        left_b = left_m.fnAdd(_robot.orientation().getBehind().toVector2());
+        
+        right_up = _robot.position().fnAdd(_robot.orientation().toVector2()).fnAdd(_robot.orientation().getRight().toVector2().fnMultiply(2));
+        right_down = _robot.position().fnAdd(_robot.orientation().getBehind().toVector2()).fnAdd(_robot.orientation().getRight().toVector2().fnMultiply(2));
+        right_middle= _robot.position().fnAdd(_robot.orientation().getRight().toVector2().fnMultiply(2));
+        
+        
+        front_m = _robot.position().fnAdd(_robot.orientation().toVector2().fnMultiply(2));
+        front_l = front_m.fnAdd(_robot.orientation().getLeft().toVector2());
+        front_r = front_m.fnAdd(_robot.orientation().getRight().toVector2());
+        
+        if(!map.checkValidBoundary(left_m) || map.getPoint(left_m).obstacleState() == WPObstacleState.IsActualObstacle){
+            left++;
+        }
+        
+        if(!map.checkValidBoundary(left_f) || map.getPoint(left_f).obstacleState() == WPObstacleState.IsActualObstacle){
+            left++;
+        }
+        if(!map.checkValidBoundary(left_b) || map.getPoint(left_b).obstacleState() == WPObstacleState.IsActualObstacle){
+            left++;
+        }
+        
+        
+        if(!map.checkValidBoundary(right_up) || map.getPoint(right_up).obstacleState() == WPObstacleState.IsActualObstacle){
+            right++;
+        }
+        
+        if(!map.checkValidBoundary(right_down) || map.getPoint(right_down).obstacleState() == WPObstacleState.IsActualObstacle){
+            right++;
+        }
+        if(!map.checkValidBoundary(right_middle) || map.getPoint(right_middle).obstacleState() == WPObstacleState.IsActualObstacle){
+            right++;
+        }
+        
+        
+        if(!map.checkValidBoundary(front_m) || map.getPoint(front_m).obstacleState() == WPObstacleState.IsActualObstacle){
+            front++;
+        }
+        
+        if(!map.checkValidBoundary(front_l) || map.getPoint(front_l).obstacleState() == WPObstacleState.IsActualObstacle){
+            front++;
+        }
+        if(!map.checkValidBoundary(front_r) || map.getPoint(front_r).obstacleState() == WPObstacleState.IsActualObstacle){
+            front++;
+        }
+        
+        if(front<=1 && right<=1 && left<=1)
+            return true;
+        else 
+            return false;
     }
     
     

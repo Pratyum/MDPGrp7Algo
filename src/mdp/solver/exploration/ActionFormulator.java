@@ -69,10 +69,7 @@ public class ActionFormulator {
             LinkedList<Vector2> goalList = mapViewer.findUnexploredInAscendingDistanceOrder(_robot);
             System.out.println("My goal list  " + goalList.toString());
             Vector2 goal = new Vector2(-1, -1);
-            if (goalList.isEmpty()) {
-                System.out.println("Exploration completed");
-                break;
-            }
+            
             for (int i = 0; i < goalList.size(); i++) {
 
                 System.out.println("Processing goal " + goalList.get(i).toString());
@@ -81,8 +78,8 @@ public class ActionFormulator {
                 }
                 reachableList = mapViewer.findScannableReachableFromGoal(goalList.get(i), _robot);
                 for (int j = 0; j < reachableList.size(); j++) {
-                    if ((!mapViewer.checkRobotVisited(reachableList.get(j)))
-                            && mapViewer.getSubjectiveMap().getPoint(reachableList.get(j)).obstacleState() != WPObstacleState.IsVirtualObstacle) {
+                    if (!mapViewer.checkRobotVisited(reachableList.get(j)))
+                        {
 
                         goal = reachableList.get(j);
                         reachablePointFound = true;
@@ -104,11 +101,46 @@ public class ActionFormulator {
                 AStarSolverResult astarSolverResult = astarSolver.solve(mapViewer.getSubjectiveMap(), _robot, goal);
 
                 robotActions = RobotAction.fromPath(_robot, astarSolverResult.shortestPath);
+                System.out.println(_robot.position().toString());
+                System.out.println(_robot.orientation().toString());
+                System.out.println(robotActions.toString());
                 //System.out.println("Action size: " + robotActions.size());
-                for (RobotAction action : robotActions) {
-
+                boolean ventureIntoDangerousZone = false;
+                boolean dangerousZoneEntered = false;
+                
+                for (int i=0; i<robotActions.size() ; i++) {
+                    Robot robotSimulator = new Robot(_robot.position(),_robot.orientation());
+                    robotSimulator.execute(robotActions.get(i));
+                    robotSimulator.execute(robotActions.get(i+1));
+                    if(ventureIntoDangerousZone == false && mapViewer.checkIfInDangerousZone(robotSimulator)){
+                        
+                        ventureIntoDangerousZone = true;
+                        
+                        System.out.println("Venturing into somewhere dangerous");
+                        if(!Main.isSimulating())
+                            Main.getRpi().sendCalibrationCommand(CalibrationType.Emergency);
+                    }
+                    
+                    
+                     
+                    
+                    
+                    
+                    
+                    // for actions , check next move and give calibration command
                     view(_robot);
-                    if (!mapViewer.validate(_robot, action)) {
+                    
+                    if(mapViewer.checkIfInDangerousZone(_robot)){
+                        dangerousZoneEntered = true;
+                    }
+                    
+                    
+                    if( dangerousZoneEntered && ventureIntoDangerousZone && !mapViewer.checkIfInDangerousZone(_robot)){
+                        ventureIntoDangerousZone = false;
+                    }
+                    
+                    
+                    if (!mapViewer.validate(_robot, robotActions.get(i))) {
                         //actionFormulator.circumvent(_robot);
                         //System.out.println("Here2");
                         // in circumvent, stop circumventing when the obstacle is fully identified
@@ -116,7 +148,7 @@ public class ActionFormulator {
                         break;
                     }
                     //System.out.println("Here3");
-                    _robot.bufferAction(action);
+                    _robot.bufferAction(robotActions.get(i));
 
                 }
             }
@@ -125,6 +157,9 @@ public class ActionFormulator {
             reachablePointFound = false;
         }
         System.out.println("All remaining blocks explored or checked as unreachable ");
+        
+        System.out.println("Exploration completed");
+        
     }
 
     public void rightWallFollower(Robot robot) throws InterruptedException, IOException {
@@ -195,7 +230,22 @@ public class ActionFormulator {
     // look through map and update 
     public Map view(Robot robot) throws InterruptedException, IOException {
         int calibirationType;
-
+        
+        ///check current map configuration , give calibration command
+        
+        if(mapViewer.checkLeftObstacles(robot))
+            if(Main.isSimulating())
+               System.out.println("Send calibration command " + CalibrationType.Left.toString()); 
+            else 
+               Main.getRpi().sendCalibrationCommand(CalibrationType.Left);
+        
+        //only front back on the right side
+        if(mapViewer.checkRightFrontBack(robot))
+            if(Main.isSimulating())
+                System.out.println("Send calibration command " + CalibrationType.Right.toString()); 
+            else
+               Main.getRpi().sendCalibrationCommand(CalibrationType.Right);
+        
         if (robot.checkIfHavingBufferActions()) {
             robot.executeBufferActions(ExplorationSolver.getExePeriod());
         }
@@ -222,8 +272,8 @@ public class ActionFormulator {
 
         Map subjective_map = mapViewer.updateMap(robot, s);
         System.out.println(mapViewer.exploredAreaToString());
-        System.out.println(mapViewer.robotVisitedPlaceToString());
-        System.out.println(mapViewer.confidenceDetectionAreaToString());
+        //System.out.println(mapViewer.robotVisitedPlaceToString());
+        //System.out.println(mapViewer.confidenceDetectionAreaToString());
         System.out.println(subjective_map.toString(robot));
 
         isSensingDataArrived = false;
