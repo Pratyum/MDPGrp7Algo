@@ -128,8 +128,10 @@ public class ExplorationSolver {
         }
 
         _hasFinishedFirstRound = true;
-        if(!)
-            actionFormulator.exploreRemainingArea(_robot);
+        
+        Thread.sleep(20);
+        
+        actionFormulator.exploreRemainingArea(_robot);
 
     }
 
