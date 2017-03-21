@@ -31,6 +31,8 @@ public class ExplorationSolver {
 
     private static int _exePeriod;
     private static Robot _robot;
+    
+    private static boolean _hasFinishedFirstRound;
 
     public static void solve(Map map, int exePeriod) throws InterruptedException, IOException {
         mapViewer = new MapViewer();
@@ -99,6 +101,8 @@ public class ExplorationSolver {
 
         }*/
         
+        _hasFinishedFirstRound = false;
+        
         while ( firstLeaveStartZone == false||
                 !goalFormulator.checkIfReachStartZone(_robot.position())
                 && !mapViewer.checkIfNavigationComplete()
@@ -112,6 +116,8 @@ public class ExplorationSolver {
             
             actionFormulator.actionSimplifier(_robot);
         }
+        
+        _hasFinishedFirstRound = true;
         
         actionFormulator.exploreRemainingArea(_robot);
         
@@ -127,6 +133,10 @@ public class ExplorationSolver {
 
     public static Robot getRobot() {
         return _robot;
+    }
+
+    public static boolean hasFinishedFirstRound() {
+        return _hasFinishedFirstRound;
     }
 
     // look through map and update 
