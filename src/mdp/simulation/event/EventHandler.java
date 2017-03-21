@@ -496,7 +496,7 @@ public class EventHandler implements IHandleable {
         Terminator terminator = null;
         if (termRound) {
             terminator = new Terminator(1, interruptCallback);
-        } else if (termCoverage != 0) {
+        } else if (termCoverage != 0 && termCoverage != 100) {
             terminator = new Terminator(termCoverage / 100f, interruptCallback);
         } else if (termTime != 0) {
             terminator = new Terminator(termTime, interruptCallback);
