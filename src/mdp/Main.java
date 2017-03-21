@@ -10,7 +10,7 @@ import mdp.robot.Robot;
 import mdp.communication.ITranslatable;
 import mdp.simulation.GUI;
 import mdp.simulation.event.GUIClickEvent;
-import mdp.simulation.view.IGUIUpdatable;
+import mdp.simulation.IGUIUpdatable;
 import mdp.solver.exploration.ActionFormulator;
 
 public class Main {

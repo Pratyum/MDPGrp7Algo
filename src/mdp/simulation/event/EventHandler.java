@@ -26,7 +26,7 @@ import mdp.robot.Robot;
 import mdp.robot.RobotAction;
 import mdp.simulation.view.GridSquare;
 import mdp.simulation.view.HexFrame;
-import mdp.simulation.view.IGUIControllable;
+import mdp.simulation.IGUIControllable;
 import mdp.solver.exploration.ExplorationSolver;
 import mdp.solver.exploration.Terminator;
 import mdp.solver.shortestpath.AStarSolver;

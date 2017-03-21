@@ -1,7 +1,6 @@
 package mdp.simulation;
 
 import mdp.simulation.view.MainFrame;
-import mdp.simulation.view.IGUIControllable;
 import mdp.simulation.event.EventHandler;
 import mdp.map.Map;
 import mdp.robot.Robot;
@@ -82,6 +81,14 @@ public class GUI implements IGUIControllable {
     @Override
     public void trigger(GUIClickEvent hdlr) {
         _eventHandler.resolveHandler(hdlr, null);
+    }
+
+    @Override
+    public boolean isSingleRoundRun() {
+        return _mainFrame
+                .getMainPanel()
+                .getIntrCtrlPanel()
+                .getTermRoundCheckbox().isSelected();
     }
     
 }
