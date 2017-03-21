@@ -32,6 +32,7 @@ public class ExplorationSolver {
 
     private static int _exePeriod;
     private static Robot _robot;
+
     private static volatile boolean permitTermination = true;
     
     public static void setPermitTerminationState(boolean var ){
@@ -44,13 +45,17 @@ public class ExplorationSolver {
        return permitTermination ;
     }
     
+
+
+    private static boolean _hasFinishedFirstRound;
+
     public static void solve(Map map, int exePeriod) throws InterruptedException, IOException {
         mapViewer = new MapViewer();
         goalFormulator = new GoalFormulator(mapViewer);
         _exePeriod = exePeriod;
         objective_map = map;
         simulator = new Simulator(objective_map);
-        
+
         Vector2 robotPos = new Vector2(1, 1);
         Direction robotDir = Direction.Right;
         actionFormulator = new ActionFormulator(mapViewer, simulator);
@@ -58,7 +63,6 @@ public class ExplorationSolver {
 
         //Direction last_orientation;
         //LinkedList<Direction> twoDirectionAway = new LinkedList<>();
-        
         boolean goalZoneReached = false;
         // put some blockers into the map
         System.out.println("For Simulation Purpose");
@@ -75,7 +79,6 @@ public class ExplorationSolver {
 
         //twoDirectionAway.add(Direction.Down);
         //twoDirectionAway.add(Direction.Down);
-
         int counter = 0;
         Vector2 last_position;
         /*while (!goalFormulator.checkIfReachFinalGoal(_robot.position())) {
@@ -111,24 +114,23 @@ public class ExplorationSolver {
             System.out.println("Counter is " + counter);
 
         }*/
-        
-        
-        while ( !goalZoneReached ||
-                !goalFormulator.checkIfReachStartZone(_robot.position())
-                
-                ) {
-           
-            if(_robot.position().equals(new Vector2(map.DIM_I-2,map.DIM_J-2)) )
-            {
-               goalZoneReached= true;
+
+        _hasFinishedFirstRound = false;
+        while (!goalZoneReached
+                || !goalFormulator.checkIfReachStartZone(_robot.position())) {
+
+            if (_robot.position().equals(new Vector2(map.DIM_I - 2, map.DIM_J - 2))) {
+                goalZoneReached = true;
             }
             actionFormulator.rightWallFollower(_robot);
-            
+
             actionFormulator.actionSimplifier(_robot);
         }
-        
-        actionFormulator.exploreRemainingArea(_robot);
-        
+
+        _hasFinishedFirstRound = true;
+        if(!)
+            actionFormulator.exploreRemainingArea(_robot);
+
     }
 
     public static int getExePeriod() {
@@ -143,28 +145,31 @@ public class ExplorationSolver {
         return _robot;
     }
 
+    public static boolean hasFinishedFirstRound() {
+        return _hasFinishedFirstRound;
+    }
+
     // look through map and update 
     public static void goBackToStart(Map map, Robot robot, Runnable callback) throws IOException, InterruptedException {
         System.out.println("Going back to start with the following map");
         System.out.println(map.toString(robot));
-        AStarSolverResult result = new AStarSolver().solve(map, robot, Map.START_POS , SolveType.Safe);
+        AStarSolverResult result = new AStarSolver().solve(map, robot, Map.START_POS, SolveType.Safe);
         LinkedList<RobotAction> actions = RobotAction.fromPath(robot, result.shortestPath);
-        
+
         robot.cleanBufferedActions();
         for (RobotAction action : actions) {
 //            if (robot.checkBufferActionSize() < 4) {
 //                robot.bufferAction(action);
 //            } else {
-                robot.bufferAction(action);
+            robot.bufferAction(action);
 //                actionFormulator.view(_robot);
-                //robot.executeBufferActions(ExplorationSolver.getExePeriod());
-                //allow update map
-                actionFormulator.view(robot);
-                
-                //for the purpose of calibration
-                //in this way, after every five actions, the robot will calibrate
-//            }
+            //robot.executeBufferActions(ExplorationSolver.getExePeriod());
+            //allow update map
+            actionFormulator.view(robot);
 
+            //for the purpose of calibration
+            //in this way, after every five actions, the robot will calibrate
+//            }
         }
         if (robot.checkBufferActionSize() != 0) {
             actionFormulator.view(robot);

@@ -5,28 +5,38 @@ import java.util.TimerTask;
 import mdp.map.Map;
 
 public class Terminator {
-    
-    private enum TerminatorType { Coverage, Time }
-    
+
+    private enum TerminatorType {
+        Coverage, Time, Round
+    }
+
+    private static final int _PROBING_PERIOD = 10;
+
     private float _maxCoverage;
     private long _maxDiffTime;
     private TerminatorType _terminationType;
     private Runnable _callback;
-    
+
     private java.util.Timer _thread;
-    
+
+    public Terminator(int round, Runnable callback) {
+        // round not used for now
+        _terminationType = TerminatorType.Round;
+        _callback = callback;
+    }
+
     public Terminator(float maxCoverage, Runnable callback) {
         _maxCoverage = maxCoverage;
         _terminationType = TerminatorType.Coverage;
         _callback = callback;
     }
-    
+
     public Terminator(long maxDiffTime, Runnable callback) {
         _maxDiffTime = maxDiffTime;
         _terminationType = TerminatorType.Time;
         _callback = callback;
     }
-    
+
     public void observe() {
         System.out.println("///////////////// " + _terminationType);
         switch (_terminationType) {
@@ -52,7 +62,7 @@ public class Terminator {
                             }
                         }
                     }
-                }, 0, 10);
+                }, 0, _PROBING_PERIOD);
                 break;
             case Time:
                 _thread = new Timer();
@@ -64,7 +74,19 @@ public class Terminator {
                     }
                 }, _maxDiffTime * 1000);
                 break;
+            case Round:
+                _thread = new Timer();
+                _thread.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (ExplorationSolver.hasFinishedFirstRound()) {
+                            System.out.println("Round Terminator activated");
+                            _thread.cancel();
+                            _callback.run();
+                        }
+                    }
+                }, 0, _PROBING_PERIOD);
         }
     }
-    
+
 }

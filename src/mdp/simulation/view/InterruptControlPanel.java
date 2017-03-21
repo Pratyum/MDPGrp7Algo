@@ -1,7 +1,9 @@
 package mdp.simulation.view;
 
 import java.awt.Color;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -12,9 +14,10 @@ public class InterruptControlPanel extends JPanel {
     
 //    private JButton _stopBtn;
 //    private JButton _resetBtn;
-    private JButton _restartBtn;
+//    private JButton _restartBtn;
     private JTextField _termCoverageText;
     private JTextField _termTimeText;
+    private JCheckBox _termRoundCheckbox;
     
     public InterruptControlPanel() {
         // config
@@ -23,9 +26,10 @@ public class InterruptControlPanel extends JPanel {
         // children
 //        _stopBtn = new JButton("Stop");
 //        _resetBtn = new JButton("Reset");
-        _restartBtn = new JButton("Restart");
+//        _restartBtn = new JButton("Restart");
         _termCoverageText = new JTextField("100", 3);
         _termTimeText = new JTextField("0", 3);
+        _termRoundCheckbox = new JCheckBox("Terminate after 1st round");
         JLabel termLabel = new JLabel("Terminate after: ");
         JLabel coverageLabel = new JLabel("% or");
         JLabel timeLabel = new JLabel("seconds");
@@ -39,7 +43,8 @@ public class InterruptControlPanel extends JPanel {
         this.add(coverageLabel);
         this.add(_termTimeText);
         this.add(timeLabel);
-        this.add(_restartBtn);
+//        this.add(_restartBtn);
+        this.add(_termRoundCheckbox);
     }
 
 //    public JButton getStopBtn() {
@@ -50,9 +55,9 @@ public class InterruptControlPanel extends JPanel {
 //        return _resetBtn;
 //    }
 
-    public JButton getRestartBtn() {
-        return _restartBtn;
-    }
+//    public JButton getRestartBtn() {
+//        return _restartBtn;
+//    }
 
     public JTextField getTermCoverageText() {
         return _termCoverageText;
@@ -60,6 +65,10 @@ public class InterruptControlPanel extends JPanel {
 
     public JTextField getTermTimeText() {
         return _termTimeText;
+    }
+
+    public JCheckBox getTermRoundCheckbox() {
+        return _termRoundCheckbox;
     }
     
 }

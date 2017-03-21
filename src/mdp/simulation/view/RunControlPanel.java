@@ -13,7 +13,7 @@ public class RunControlPanel extends JPanel {
     
     private JButton _explorationBtn;
     private JButton _shortestPathBtn;
-    private JButton _combinedBtn;
+//    private JButton _combinedBtn;
     private JTextField _exePeriod;
     
     public RunControlPanel() {
@@ -23,11 +23,11 @@ public class RunControlPanel extends JPanel {
         // children
         _explorationBtn = new JButton("Exploration");
         _shortestPathBtn = new JButton("Shortest Path");
-        _combinedBtn = new JButton("Combined");
+//        _combinedBtn = new JButton("Combined");
         _exePeriod = new JTextField("100", 5);
         this.add(_explorationBtn);
         this.add(_shortestPathBtn);
-        this.add(_combinedBtn);
+//        this.add(_combinedBtn);
         this.add(_exePeriod);
         JLabel exePeriodLabel = new JLabel("s/action");
         exePeriodLabel.setForeground(Color.WHITE);
@@ -42,9 +42,9 @@ public class RunControlPanel extends JPanel {
         return _shortestPathBtn;
     }
 
-    public JButton getCombinedBtn() {
-        return _combinedBtn;
-    }
+//    public JButton getCombinedBtn() {
+//        return _combinedBtn;
+//    }
 
     public JTextField getExePeriod() {
         return _exePeriod;

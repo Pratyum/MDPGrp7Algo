@@ -85,10 +85,10 @@ public class EventHandler implements IHandleable {
                 .getMainPanel()
                 .getRunCtrlPanel()
                 .getShortestPathBtn().addMouseListener(_wrapMouseAdapter(GUIClickEvent.OnShortestPath));
-        _gui.getMainFrame()
-                .getMainPanel()
-                .getRunCtrlPanel()
-                .getCombinedBtn().addMouseListener(_wrapMouseAdapter(GUIClickEvent.OnCombined));
+//        _gui.getMainFrame()
+//                .getMainPanel()
+//                .getRunCtrlPanel()
+//                .getCombinedBtn().addMouseListener(_wrapMouseAdapter(GUIClickEvent.OnCombined));
 
         // run control event
 //        _gui.getMainFrame()
@@ -99,11 +99,10 @@ public class EventHandler implements IHandleable {
 //                .getMainPanel()
 //                .getIntrCtrlPanel()
 //                .getStopBtn().addMouseListener(_onStop());
-        _gui.getMainFrame()
-                .getMainPanel()
-                .getIntrCtrlPanel()
-                .getRestartBtn().addMouseListener(_wrapMouseAdapter(GUIClickEvent.OnRestart));
-
+//        _gui.getMainFrame()
+//                .getMainPanel()
+//                .getIntrCtrlPanel()
+//                .getRestartBtn().addMouseListener(_wrapMouseAdapter(GUIClickEvent.OnRestart));
         // simulation/non-simulation control event
         _gui.getMainFrame()
                 .getMainPanel()
@@ -130,24 +129,14 @@ public class EventHandler implements IHandleable {
             case OnGetHex:
                 _onGetHex(e);
                 break;
-            case OnCheckWeb: {
-                try {
-                    _onCheckWeb(e);
-                } catch (URISyntaxException | IOException ex) {
-                    Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            break;
+            case OnCheckWeb:
+                _onCheckWeb(e);
+                break;
             case OnExploration:
                 _onExploration(e);
                 break;
             case OnShortestPath:
-                try {
-                    _onShortestPath(e);
-                } catch (IOException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
+                _onShortestPath(e);
                 break;
             case OnCombined:
                 _onCombined(e);
@@ -158,14 +147,9 @@ public class EventHandler implements IHandleable {
             case OnToggleSim:
                 _onToggleSim(e);
                 break;
-            case OnConnectBtn: {
-                try {
-                    _onConnect(e);
-                } catch (IOException ex) {
-                    Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
-                }
+            case OnConnectBtn:
+                _onConnect(e);
                 break;
-            }
             case OnStartTimer:
                 _onStartTimer();
                 break;
@@ -258,7 +242,7 @@ public class EventHandler implements IHandleable {
         System.out.println("Get hex completed.");
     }
 
-    private void _onCheckWeb(MouseEvent e) throws URISyntaxException, IOException {
+    private void _onCheckWeb(MouseEvent e) {
         Map map = ExplorationSolver.getMapViewer().getSubjectiveMap();
         int[][] explored = ExplorationSolver.getMapViewer().getExplored();
 
@@ -273,11 +257,16 @@ public class EventHandler implements IHandleable {
                 .getDescCtrlPanel()
                 .getFilePathTextField()
                 .getText();
-        Desktop.getDesktop().browse(new URI(
-                "http://mdpcx3004.sce.ntu.edu.sg/mapdescriptor.php?"
-                + "P1=" + p1 + "&"
-                + "P2=" + p2 + "&"
-                + "samplearena=" + sampleArena));
+
+        try {
+            Desktop.getDesktop().browse(new URI(
+                    "http://mdpcx3004.sce.ntu.edu.sg/mapdescriptor.php?"
+                    + "P1=" + p1 + "&"
+                    + "P2=" + p2 + "&"
+                    + "samplearena=" + sampleArena));
+        } catch (URISyntaxException | IOException ex) {
+            Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void _onExploration(MouseEvent e) {
@@ -302,14 +291,19 @@ public class EventHandler implements IHandleable {
         _explorationThread.start();
     }
 
-    private void _onShortestPath(MouseEvent e) throws IOException {
-        int exePeriod = Integer.parseInt(
-                _gui.getMainFrame()
-                        .getMainPanel()
-                        .getRunCtrlPanel()
-                        .getExePeriod().getText()
-        );
-        _shortestPathProcedure(exePeriod);
+    private void _onShortestPath(MouseEvent e) {
+        try {
+            int exePeriod = Integer.parseInt(
+                    _gui.getMainFrame()
+                            .getMainPanel()
+                            .getRunCtrlPanel()
+                            .getExePeriod().getText()
+            );
+            _shortestPathProcedure(exePeriod);
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
     }
 
     private void _onCombined(MouseEvent e) {
@@ -410,8 +404,12 @@ public class EventHandler implements IHandleable {
         }
     }
 
-    private void _onConnect(MouseEvent e) throws IOException {
-        Main.connectToRpi();
+    private void _onConnect(MouseEvent e) {
+        try {
+            Main.connectToRpi();
+        } catch (IOException ex) {
+            Logger.getLogger(EventHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void _onStartTimer() {
@@ -452,6 +450,11 @@ public class EventHandler implements IHandleable {
                 .getIntrCtrlPanel()
                 .getTermTimeText().getText()
         );
+        boolean termRound = _gui
+                .getMainFrame()
+                .getMainPanel()
+                .getIntrCtrlPanel()
+                .getTermRoundCheckbox().isSelected();
 
         Runnable interruptCallback = () -> {
             if (!_callbackCalled) {
@@ -489,11 +492,17 @@ public class EventHandler implements IHandleable {
                 Main.getGUI().update(finalMap);
             }
         };
-        if (termCoverage != 0) {
-            new Terminator(termCoverage / 100f, interruptCallback).observe();
+        
+        Terminator terminator = null;
+        if (termRound) {
+            terminator = new Terminator(1, interruptCallback);
+        } else if (termCoverage != 0) {
+            terminator = new Terminator(termCoverage / 100f, interruptCallback);
         } else if (termTime != 0) {
-            new Terminator(termTime, interruptCallback).observe();
+            terminator = new Terminator(termTime, interruptCallback);
         }
+        if (terminator != null) terminator.observe();
+        
         _gui.trigger(GUIClickEvent.OnStartTimer);
         ExplorationSolver.solve(_gui.getMap(), exePeriod);
         System.out.println("Exploration completed.");
