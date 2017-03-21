@@ -1,6 +1,7 @@
 package mdp.robot;
 
 import java.io.IOException;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 
@@ -8,6 +9,7 @@ import mdp.common.Direction;
 import mdp.common.Vector2;
 import mdp.communication.Translator;
 import mdp.solver.exploration.ActionFormulator;
+import mdp.solver.exploration.ExplorationSolver;
 import mdp.solver.exploration.MapViewer;
 import mdp.Main;
 import mdp.map.Map;
@@ -110,6 +112,8 @@ public class Robot {
     
     public void executeBufferActions(int sleepPeriod) throws IOException {
         try {
+            
+            ExplorationSolver.setPermitTerminationState(false);    
             if (!Main.isSimulating()) {
             		executionEndTime = System.currentTimeMillis();
             		System.out.println("Computational time for next movement"+ (executionStartTime- executionEndTime) + "ms");
@@ -172,7 +176,7 @@ public class Robot {
             
             
             bufferedActions.clear();
-
+            ExplorationSolver.setPermitTerminationState(true);   
         } catch (InterruptedException e) {
             System.out.println("Robot execution interrupted");
         }

@@ -32,7 +32,18 @@ public class ExplorationSolver {
 
     private static int _exePeriod;
     private static Robot _robot;
-
+    private static volatile boolean permitTermination = true;
+    
+    public static void setPermitTerminationState(boolean var ){
+        permitTermination = var;
+    }
+    
+    
+    
+    public static boolean checkPermitTerminationState(){
+       return permitTermination ;
+    }
+    
     public static void solve(Map map, int exePeriod) throws InterruptedException, IOException {
         mapViewer = new MapViewer();
         goalFormulator = new GoalFormulator(mapViewer);
