@@ -13,6 +13,4 @@ public interface IGUIControllable extends IGUIUpdatable {
     Robot getRobot();
 
     void reset();
-    
-    boolean isSingleRoundRun();
 }

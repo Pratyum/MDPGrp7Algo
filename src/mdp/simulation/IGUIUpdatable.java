@@ -17,4 +17,6 @@ public interface IGUIUpdatable {
 
     void update(Robot robot);
     
+    boolean isSingleRoundRun();
+    
 }

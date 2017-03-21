@@ -18,6 +18,7 @@ import mdp.robot.RobotAction;
 import mdp.solver.shortestpath.AStarSolver;
 import mdp.solver.shortestpath.AStarSolverResult;
 import mdp.solver.shortestpath.SolveType;
+import mdp.simulation.IGUIUpdatable;
 
 public class ExplorationSolver {
 
@@ -124,9 +125,10 @@ public class ExplorationSolver {
         _hasFinishedFirstRound = true;
 
         // System.out.println("Before thread sleep");
-        Thread.sleep(20);
+        
 
-        if (!mapViewer.checkIfNavigationComplete()) {
+        if (!mapViewer.checkIfNavigationComplete() && !Main.getGUI().isSingleRoundRun()) {
+            
 
             // System.out.println("After thread sleep");
             actionFormulator.exploreRemainingArea(_robot);
