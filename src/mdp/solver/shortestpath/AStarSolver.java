@@ -177,6 +177,9 @@ public class AStarSolver {
         return _solve(map, robot, map.GOAL_POS, solveType);
     }
 
+    public AStarSolverResult solve(Map map, Robot robot,  Vector2 goalPos, SolveType solveType) {
+        return _solve(map, robot, goalPos, solveType);
+    }
 //    public Vector2 solveSingle(Map map, Robot robot, Vector2 goalPos) {
 //        Vector2 diff = goalPos.fnAdd(robot.position().fnMultiply(-1));
 //        Vector2 horizontalResult;

@@ -36,10 +36,10 @@ public class Simulator {
 
         s.left = detectLong(edge_l, robot.orientation().getLeft());
         //System.out.println("s.left " + s.left);
-        s.right_f = detect(edge_r, robot.orientation().getRight());
+        s.right_f = detectMiddle(edge_r, robot.orientation().getRight());
         
         edge_rm = robot.position().fnAdd(robot.orientation().getRight().toVector2());
-        s.right_m = detect(edge_rm, robot.orientation().getRight());
+        s.right_m = detectMiddle(edge_rm, robot.orientation().getRight());
         //System.out.println("s.right " + s.right);
         return s;
 
@@ -67,6 +67,33 @@ public class Simulator {
         /*if (!objective_map.checkValidBoundary(tmp) || objective_map.getPoint(tmp).obstacleState() == WPObstacleState.IsActualObstacle) {
             return 3;
         }*/
+        return 0; // no obstacle in front
+
+    }
+
+    
+    private int detectMiddle(Vector2 position, Direction dir) {
+        Vector2 tmp = new Vector2(position.i(), position.j());
+        Waypoint wp;
+        Vector2 unit;
+        unit = dir.toVector2();
+
+        tmp.add(unit);
+
+        //seeing range is not relevant to virtual obstacle
+        if (!objective_map.checkValidBoundary(tmp) || objective_map.getPoint(tmp).obstacleState() == WPObstacleState.IsActualObstacle) {
+            return 1;
+        }
+        tmp.add(unit);
+
+        if (!objective_map.checkValidBoundary(tmp) || objective_map.getPoint(tmp).obstacleState() == WPObstacleState.IsActualObstacle) {
+            return 2;
+        }
+        tmp.add(unit);
+
+        if (!objective_map.checkValidBoundary(tmp) || objective_map.getPoint(tmp).obstacleState() == WPObstacleState.IsActualObstacle) {
+            return 3;
+        }
         return 0; // no obstacle in front
 
     }

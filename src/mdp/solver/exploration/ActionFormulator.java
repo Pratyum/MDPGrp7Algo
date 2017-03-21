@@ -17,7 +17,7 @@ import mdp.solver.shortestpath.*;
 
 public class ActionFormulator {
 
-    private static boolean simulation_mode = false;
+    
 
     private MapViewer mapViewer;
 
@@ -101,7 +101,7 @@ public class ActionFormulator {
 
                 System.out.println("Current goal: " + goal.toString());
 
-                AStarSolverResult astarSolverResult = astarSolver.solve(mapViewer.getSubjectiveMap(), _robot, goal);
+                AStarSolverResult astarSolverResult = astarSolver.solve(mapViewer.getSubjectiveMap(), _robot, goal , SolveType.Safe);
                 
                 
                 robotActions = RobotAction.fromPath(_robot, astarSolverResult.shortestPath);
@@ -153,6 +153,8 @@ public class ActionFormulator {
                     System.out.println(_robot.position().toString());
                     System.out.println(_robot.orientation().toString());
                     view(_robot);
+                    if(mapViewer.checkIfNavigationComplete())
+                        break;
                     
                     if(mapViewer.checkIfInDangerousZone(_robot)){
                         dangerousZoneEntered = true;
@@ -359,7 +361,8 @@ public class ActionFormulator {
 
     public void actionSimplifier(Robot _robot) throws InterruptedException, IOException {
         // TODO Auto-generated method stub
-        if(!turnAroundInDeadCorner(_robot));
+        if(!_robot.checkIfRobotVisitedBefore())
+            cutRightWall(_robot);
         //    turnAroundFromRight(_robot);
     }
     
@@ -369,12 +372,12 @@ public class ActionFormulator {
         
     }
 
-    public boolean turnAroundInDeadCorner(Robot _robot) throws InterruptedException, IOException{
+    public boolean cutRightWall(Robot _robot) throws InterruptedException, IOException{
         Vector2 left_m,left_f,left_b, right_up, right_down, right_middle,front_m,front_l,front_r;
         boolean frontWall;
         boolean right_up_explored, right_down_explored,right_middle_explored;
         boolean left_m_explored, left_f_explored, left_b_explored;
-        
+        int counter;
         frontWall = false;
         right_up_explored =false;
         right_down_explored= false;
@@ -407,120 +410,116 @@ public class ActionFormulator {
         
         
         //
-        if(!mapViewer.getSubjectiveMap().checkValidBoundary(right_up))
-            right_up_explored= true;
-        else if (mapViewer.getSubjectiveMap().getPoint(right_up).obstacleState() == WPObstacleState.IsActualObstacle){
-            right_up_explored= true;
-        }
-        else if(mapViewer.getExploredState(right_up)!=0){
+        counter =0;
+        while(  mapViewer.getSubjectiveMap().checkValidBoundary(right_up)
+                && mapViewer.getSubjectiveMap().getPoint(right_up).obstacleState() 
+                != WPObstacleState.IsActualObstacle
+                && mapViewer.getExploredState(right_up)!=0){
             right_up = right_up.fnAdd(_robot.orientation().getRight().toVector2());
-            if(!mapViewer.getSubjectiveMap().checkValidBoundary(right_up))
-                right_up_explored= true;
-            else if (mapViewer.getSubjectiveMap().getPoint(right_up).obstacleState() == WPObstacleState.IsActualObstacle){
-                right_up_explored= true;
-            }
+            //counter++;
         }
+        if(mapViewer.getExploredState(right_up)!=0 )
+            right_up_explored= true;
         
-        //
-        if(!mapViewer.getSubjectiveMap().checkValidBoundary(right_down))
-            right_down_explored= true;
-        else if (mapViewer.getSubjectiveMap().getPoint(right_down).obstacleState() == WPObstacleState.IsActualObstacle){
-            right_down_explored= true;
-        }
-        else if(mapViewer.getExploredState(right_down)!=0){
+        
+        counter =0;
+        while( mapViewer.getSubjectiveMap().checkValidBoundary(right_down)
+                && mapViewer.getSubjectiveMap().getPoint(right_down).obstacleState() 
+                != WPObstacleState.IsActualObstacle
+                && mapViewer.getExploredState(right_down)!=0){
             right_down = right_down.fnAdd(_robot.orientation().getRight().toVector2());
-            if(!mapViewer.getSubjectiveMap().checkValidBoundary(right_down))
-                right_down_explored= true;
-            else if (mapViewer.getSubjectiveMap().getPoint(right_down).obstacleState() == WPObstacleState.IsActualObstacle){
-                right_down_explored= true;
-            }
+            
         }
+        if( mapViewer.getExploredState(right_down)!=0)
+            right_down_explored= true;
         
         
-        //
-        if(!mapViewer.getSubjectiveMap().checkValidBoundary(right_middle))
-            right_middle_explored= true;
-        else if (mapViewer.getSubjectiveMap().getPoint(right_middle).obstacleState() == WPObstacleState.IsActualObstacle){
-            right_middle_explored= true;
-        }
-        else if(mapViewer.getExploredState(right_middle)!=0){
+        counter =0;
+        while(mapViewer.getSubjectiveMap().checkValidBoundary(right_middle)
+                && mapViewer.getSubjectiveMap().getPoint(right_middle).obstacleState() 
+                != WPObstacleState.IsActualObstacle
+                && mapViewer.getExploredState(right_middle)!=0){
             right_middle = right_middle.fnAdd(_robot.orientation().getRight().toVector2());
-            if(!mapViewer.getSubjectiveMap().checkValidBoundary(right_middle))
-                right_middle_explored= true;
-            else if (mapViewer.getSubjectiveMap().getPoint(right_middle).obstacleState() == WPObstacleState.IsActualObstacle){
-                right_middle_explored= true;
-            }
+            counter++;
         }
         
+        if(mapViewer.getExploredState(right_middle)!=0)
+            right_middle_explored= true;
         
-        //
-        if(!mapViewer.getSubjectiveMap().checkValidBoundary(left_f))
-            left_f_explored= true;
-        else if (mapViewer.getSubjectiveMap().getPoint(left_f).obstacleState() == WPObstacleState.IsActualObstacle){
-            left_f_explored= true;
-        }
-        else if(mapViewer.getExploredState(left_f)!=0){
-            left_f = left_f.fnAdd(_robot.orientation().getLeft().toVector2());
-            if(!mapViewer.getSubjectiveMap().checkValidBoundary(left_f))
-                left_f_explored= true;
-            else if (mapViewer.getSubjectiveMap().getPoint(left_f).obstacleState() == WPObstacleState.IsActualObstacle){
-                left_f_explored= true;
-            }
-        }
-        
-        
-        //
-        if(!mapViewer.getSubjectiveMap().checkValidBoundary(left_m))
-            left_m_explored= true;
-        else if (mapViewer.getSubjectiveMap().getPoint(left_m).obstacleState() == WPObstacleState.IsActualObstacle){
-            left_m_explored= true;
-        }
-        else if(mapViewer.getExploredState(left_m)!=0){
-            left_m = left_m.fnAdd(_robot.orientation().getLeft().toVector2());
-            if(!mapViewer.getSubjectiveMap().checkValidBoundary(left_m))
-                left_m_explored= true;
-            else if (mapViewer.getSubjectiveMap().getPoint(left_m).obstacleState() == WPObstacleState.IsActualObstacle){
-                left_m_explored= true;
-            }
-        }
-        
-        
-        //
-        if(!mapViewer.getSubjectiveMap().checkValidBoundary(left_b))
-            left_b_explored= true;
-        else if (mapViewer.getSubjectiveMap().getPoint(left_b).obstacleState() == WPObstacleState.IsActualObstacle){
-            left_b_explored= true;
-        }
-        else if(mapViewer.getExploredState(left_b)!=0){
-            left_b = left_b.fnAdd(_robot.orientation().getLeft().toVector2());
-            if(!mapViewer.getSubjectiveMap().checkValidBoundary(left_b))
-                left_b_explored= true;
-            else if (mapViewer.getSubjectiveMap().getPoint(left_b).obstacleState() == WPObstacleState.IsActualObstacle){
-                left_b_explored= true;
-            }
-        }
-        
-        
-        if(left_b_explored && left_f_explored &&left_m_explored &&
-                right_middle_explored && right_up_explored & right_down_explored &&
-                frontWall){
-            _robot.bufferAction(RobotAction.RotateLeft);
+        if(right_middle_explored && right_down_explored && right_up_explored 
+                && frontWall)  
+        {
             _robot.bufferAction(RobotAction.RotateLeft);
             
+        }
+        else{
+            return false;
+        }
+       
+        /*counter=0;
+        while(counter<6 && mapViewer.getSubjectiveMap().checkValidBoundary(left_f)
+                && mapViewer.getSubjectiveMap().getPoint(left_f).obstacleState() 
+                != WPObstacleState.IsActualObstacle
+                && mapViewer.getExploredState(left_f)!=0){
+            left_f = left_f.fnAdd(_robot.orientation().getLeft().toVector2());
+            counter++;
+        }
+        if(counter!=6 && mapViewer.getExploredState(left_f)!=0)
+            left_f_explored= true;
+        
+        counter=0;
+        while(counter<6 && mapViewer.getSubjectiveMap().checkValidBoundary(left_m)
+                && mapViewer.getSubjectiveMap().getPoint(left_m).obstacleState() 
+                != WPObstacleState.IsActualObstacle
+                && mapViewer.getExploredState(left_m)!=0){
+            left_m = left_m.fnAdd(_robot.orientation().getLeft().toVector2());
+            counter++;
+        }
+        if(counter!=6 && mapViewer.getExploredState(left_m)!=0)
+            left_m_explored= true;
+        
+        
+        counter= 0;
+        while(counter<6 && mapViewer.getSubjectiveMap().checkValidBoundary(left_b)
+                && mapViewer.getSubjectiveMap().getPoint(left_b).obstacleState() 
+                != WPObstacleState.IsActualObstacle
+                && mapViewer.getExploredState(left_b)!=0){
+            left_b = left_b.fnAdd(_robot.orientation().getLeft().toVector2());
+            counter++;
+        }
+        if(counter!=6 && mapViewer.getExploredState(left_b)!=0)
+            left_b_explored= true;
+        
+        if(left_b_explored && left_f_explored && left_m_explored 
+                && frontWall)  
+        {
+            _robot.bufferAction(RobotAction.RotateLeft);
             _robot.bufferAction(RobotAction.MoveForward);
             view(_robot);
             if(mapViewer.checkWalkable(_robot, Direction.Right)== Know.Yes){
                 _robot.bufferAction(RobotAction.RotateRight);
                 _robot.bufferAction(RobotAction.MoveForward);
-                _robot.bufferAction(RobotAction.RotateLeft);
                 view(_robot);
+                boolean whileStart=false;
+                while(mapViewer.checkWalkable(_robot, Direction.Up)== Know.Yes){
+                    _robot.bufferAction(RobotAction.MoveForward);
+                    view(_robot);
+                    whileStart=true;
+                }
+                
+                if(whileStart == true)
+                    _robot.bufferAction(RobotAction.RotateLeft);
             }
-            return true;
+            
+            
         }
         else
-            return false;
+        {
+            view(_robot);
+            return true;
+        
+        }
+        */
+        return true;
     }
-    
-    
-    
 }
