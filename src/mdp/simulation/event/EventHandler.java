@@ -91,6 +91,10 @@ public class EventHandler implements IHandleable {
 //                .getCombinedBtn().addMouseListener(_wrapMouseAdapter(GUIClickEvent.OnCombined));
 
         // run control event
+        _gui.getMainFrame()
+                .getMainPanel()
+                .getIntrCtrlPanel()
+                .getTermRoundCheckbox().addMouseListener(_wrapMouseAdapter(GUIClickEvent.OnToggleRound));
 //        _gui.getMainFrame()
 //                .getMainPanel()
 //                .getIntrCtrlPanel()
@@ -143,6 +147,9 @@ public class EventHandler implements IHandleable {
                 break;
             case OnRestart:
                 _onRestart(e);
+                break;
+            case OnToggleRound:
+                _onToggleRound(e);
                 break;
             case OnToggleSim:
                 _onToggleSim(e);
@@ -389,6 +396,19 @@ public class EventHandler implements IHandleable {
         target.toggleBackground();
 
         System.out.println("Toggled obstacle at " + clickedPos);
+    }
+
+    private void _onToggleRound(MouseEvent e) {
+        boolean isChecked = _gui
+                .getMainFrame()
+                .getMainPanel()
+                .getIntrCtrlPanel()
+                .getTermRoundCheckbox().isSelected();
+        if (isChecked) {
+            System.out.println("Enabled terminating after 1st round");
+        } else {
+            System.out.println("Disabled terminating after 1st round");
+        }
     }
 
     private void _onToggleSim(MouseEvent e) {
