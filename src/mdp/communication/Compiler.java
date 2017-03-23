@@ -25,6 +25,8 @@ public class Compiler {
     private static final String _CAL_LEFT = "z";
     private static final String _CAL_EMERGENCY = "e";
     
+    
+    private static final String _CAL_LEFT_SPECIAL = "q";
     private static final String _SENSING_REQUEST = "s";
     private static final String _TRAILER = "|";
 
@@ -159,6 +161,8 @@ public class Compiler {
                 return _CAL_FRONT_ML + _TRAILER;
             case Front_MR:
                 return _CAL_FRONT_MR + _TRAILER;
+            case LeftSpecial:
+                return _CAL_LEFT_SPECIAL + _TRAILER;
             case Left:
                 return _CAL_LEFT + _TRAILER;
             case Emergency:

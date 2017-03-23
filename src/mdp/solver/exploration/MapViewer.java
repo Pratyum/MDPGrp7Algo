@@ -24,6 +24,7 @@ public class MapViewer {
     private int[][] explored;
     private int[][] robotPosition;
     private int[][] confidentDetectionArea;
+    private int[][] scanningRepeatedArea;
     public LinkedList<RobotMovementHistory> robotMovementHistory;
 
     MapViewer() {
@@ -74,8 +75,46 @@ public class MapViewer {
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
+        
+        scanningRepeatedArea = new int[][] { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
+                
+                
+                
+       
     }
 
+    public boolean checkScanningRepeatedArea(Vector2 v){
+        if (map.checkValidPosition(v)) {
+            if (scanningRepeatedArea[v.i()][v.j()] == 1)
+                return true;
+        }
+        return false;
+        
+    }
+    
+    public void markScanningRepeatedArea(Vector2 v){
+        if (map.checkValidPosition(v)) {
+            scanningRepeatedArea[v.i()][v.j()] =1;
+                
+        }
+    }
+    
+    
+    
     public boolean markRobotVisited(Vector2 v) {
         if (map.checkValidPosition(v)) {
             robotPosition[v.i()][v.j()] = 1;
@@ -265,6 +304,9 @@ public class MapViewer {
                     case 2:
                         result += "x ";
                         break;
+                    case -1:
+                        result += "? ";
+                        break;    
                     default:
                         result += "  ";
                         break;
@@ -908,20 +950,20 @@ public class MapViewer {
         left_b = left_m.fnAdd(_robot.orientation().getBehind().toVector2());
 
         if (!map.checkValidBoundary(left_m)
-                || map.getPoint(left_m).obstacleState() == WPObstacleState.IsActualObstacle) {
+                || checkExploredState(left_m)==2) {
             m = 1;
         }
 
         if (!map.checkValidBoundary(left_f)
-                || map.getPoint(left_f).obstacleState() == WPObstacleState.IsActualObstacle) {
+                || checkExploredState(left_f)==2) {
             f = 1;
         }
         if (!map.checkValidBoundary(left_b)
-                || map.getPoint(left_b).obstacleState() == WPObstacleState.IsActualObstacle) {
+                || checkExploredState(left_b)==2) {
             b = 1;
         }
 
-        return (m + f + b) >= 2;
+        return (m + f + b) == 3;
     }
 
     public boolean checkIfInDangerousZone(Robot _robot) throws InterruptedException, IOException {
@@ -1001,6 +1043,93 @@ public class MapViewer {
             return explored[v.i()][v.j()];
         else
             return -2;
+    }
+
+    public boolean checkIfRightFrontDangerous(Robot _robot) {
+        Vector2 left_m, left_f, left_b, right_up, right_down, right_middle, front_m, front_l, front_r;
+
+        int right, front;
+        
+        front=0;right=0;
+
+        right_up = _robot.position().fnAdd(_robot.orientation().toVector2())
+                .fnAdd(_robot.orientation().getRight().toVector2().fnMultiply(2));
+        right_down = _robot.position().fnAdd(_robot.orientation().getBehind().toVector2())
+                .fnAdd(_robot.orientation().getRight().toVector2().fnMultiply(2));
+        right_middle = _robot.position().fnAdd(_robot.orientation().getRight().toVector2().fnMultiply(2));
+
+        front_m = _robot.position().fnAdd(_robot.orientation().toVector2().fnMultiply(2));
+        front_l = front_m.fnAdd(_robot.orientation().getLeft().toVector2());
+        front_r = front_m.fnAdd(_robot.orientation().getRight().toVector2());
+
+
+        if (!map.checkValidBoundary(right_up)
+                || checkExploredState(right_up) ==2) {
+            right++;
+        }
+
+        if (!map.checkValidBoundary(right_down)
+                || checkExploredState(right_down) ==2) {
+            right++;
+        }
+        if (!map.checkValidBoundary(right_middle)
+                || checkExploredState(right_middle) ==2) {
+            right++;
+        }
+
+        if (!map.checkValidBoundary(front_m)
+                || checkExploredState(front_m) ==2) {
+            front++;
+        }
+
+        if (!map.checkValidBoundary(front_l)
+                || checkExploredState(front_l) ==2) {
+            front++;
+        }
+        if (!map.checkValidBoundary(front_r)
+                || checkExploredState(front_r) ==2) {
+            front++;
+        }
+
+        if (front <= 1 && right <= 1 )
+            return true;
+        else
+            return false;
+    }
+
+    public boolean checkIfLeftToCalibrate(Robot _robot) {
+        // TODO Auto-generated method stub
+        Vector2 left_m, left_f, left_b;
+
+        int left;
+        left = 0;
+
+
+        left_m = _robot.position().fnAdd(_robot.orientation().getLeft().toVector2().fnMultiply(2));
+        left_f = left_m.fnAdd(_robot.orientation().toVector2());
+        left_b = left_m.fnAdd(_robot.orientation().getBehind().toVector2());
+        
+        
+        if (!map.checkValidBoundary(left_m)
+                || checkExploredState(left_m) ==2) {
+            left++;
+        }
+
+        if (!map.checkValidBoundary(left_f)
+                || checkExploredState(left_f) ==2) {
+            left++;
+        }
+        if (!map.checkValidBoundary(left_b)
+                || checkExploredState(left_b) ==2) {
+            left++;
+        }
+        
+        if(left >=2)
+            return true;
+        else
+            return false;
+        
+        
     }
 
 }

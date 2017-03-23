@@ -89,7 +89,11 @@ public class ActionFormulator {
 
                 reachableList = mapViewer.findScannableReachableFromGoal(goalList.get(i), _robot);
                 for (int j = 0; j < reachableList.size(); j++) {
+
                     if (!mapViewer.checkRobotVisited(reachableList.get(j))) {
+                        // if
+                        // (!mapViewer.checkScanningRepeatedArea(reachableList.get(j)))
+                        // {
 
                         goal = reachableList.get(j);
                         reachablePointFound = true;
@@ -115,8 +119,8 @@ public class ActionFormulator {
 
                 System.out.println(robotActions.toString());
                 // System.out.println("Action size: " + robotActions.size());
-
-                for (int i = 0; i < robotActions.size(); i++) {
+                int i = 0;
+                for (i = 0; i < robotActions.size(); i++) {
                     Robot robotSimulator = new Robot(new Vector2(_robot.position().i(), _robot.position().j()),
                             _robot.orientation());
                     if (i >= 1)
@@ -124,6 +128,7 @@ public class ActionFormulator {
 
                     if (ventureIntoDangerousZone == false && !mapViewer.checkIfInDangerousZone(robotSimulator)) {
                         robotSimulator.execute(robotActions.get(i));
+
                         if (mapViewer.checkIfInDangerousZone(robotSimulator)) {
 
                             ventureIntoDangerousZone = true;
@@ -134,23 +139,9 @@ public class ActionFormulator {
                         }
                     }
 
-                    Robot robotSimulator2 = new Robot(new Vector2(_robot.position().i(), _robot.position().j()),
-                            _robot.orientation());
-                    if (i >= 1)
-                        robotSimulator2.execute(robotActions.get(i - 1));
 
-                    if (mapViewer.checkLeftObstacles(robotSimulator2))
-                        if (Main.isSimulating())
-                            System.out.println("Send calibration command " + CalibrationType.Left.toString());
-                        else
-                            Main.getRpi().sendCalibrationCommand(CalibrationType.Left);
 
-                    // only front back on the right side
-                    if (mapViewer.checkRightFrontBack(robotSimulator2))
-                        if (Main.isSimulating())
-                            System.out.println("Send calibration command " + CalibrationType.Right.toString());
-                        else
-                            Main.getRpi().sendCalibrationCommand(CalibrationType.Right);
+        
 
                     // for actions , check next move and give calibration
                     // command
@@ -182,6 +173,23 @@ public class ActionFormulator {
                     _robot.bufferAction(robotActions.get(i));
 
                 }
+
+                /// change
+
+                /*
+                 * if(i == robotActions.size()) {
+                 * mapViewer.markScanningRepeatedArea(_robot.position());
+                 * _robot.bufferAction(RobotAction.RotateLeft); view(_robot);
+                 * _robot.bufferAction(RobotAction.RotateLeft); view(_robot);
+                 * _robot.bufferAction(RobotAction.RotateLeft); view(_robot);
+                 * 
+                 * }
+                 */
+
+                /////
+
+                view(_robot);
+
             }
 
             // prepare for next loop
@@ -265,6 +273,7 @@ public class ActionFormulator {
         /// check current map configuration , give calibration command
 
         if (robot.checkIfHavingBufferActions()) {
+            predictAndSendCalibrationReminder(robot, robot.getBufferedActions().get(0));
             robot.executeBufferActions(ExplorationSolver.getExePeriod());
         }
 
@@ -290,10 +299,10 @@ public class ActionFormulator {
         }
 
         Map subjective_map = mapViewer.updateMap(robot, s);
-        System.out.println(mapViewer.exploredAreaToString());
+        //System.out.println(mapViewer.exploredAreaToString());
         // System.out.println(mapViewer.robotVisitedPlaceToString());
         // System.out.println(mapViewer.confidenceDetectionAreaToString());
-        System.out.println(subjective_map.toString(robot));
+        //System.out.println(subjective_map.toString(robot));
 
         isSensingDataArrived = false;
 
@@ -566,10 +575,7 @@ public class ActionFormulator {
             }
         }
 
-        
-        
         return false;
-        
 
         /*
          * counter=0; while(counter<6 &&
@@ -619,5 +625,27 @@ public class ActionFormulator {
          * }
          */
 
+    }
+
+    public void predictAndSendCalibrationReminder(Robot _robot, RobotAction action) {
+
+        Robot robotSimulator = new Robot(new Vector2(_robot.position().i(), _robot.position().j()),
+                _robot.orientation());
+        robotSimulator.execute(action);
+
+        if (mapViewer.checkLeftObstacles(robotSimulator)){
+            if (Main.isSimulating())
+                System.out.println("Send calibration command " + CalibrationType.Left.toString());
+            else
+                Main.getRpi().sendCalibrationCommand(CalibrationType.Left);
+        }
+        
+        // only front back on the right side
+        if (mapViewer.checkRightFrontBack(robotSimulator)){
+            if (Main.isSimulating())
+                   System.out.println("Send calibration command " + CalibrationType.Right.toString());
+            else
+                Main.getRpi().sendCalibrationCommand(CalibrationType.Right);
+        }
     }
 }

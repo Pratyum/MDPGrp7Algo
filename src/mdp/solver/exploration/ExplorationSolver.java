@@ -118,7 +118,8 @@ public class ExplorationSolver {
                 goalZoneReached = true;
             }
             actionFormulator.rightWallFollower(_robot);
-
+            
+            
             actionFormulator.actionSimplifier(_robot);
         }
 

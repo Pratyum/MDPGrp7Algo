@@ -117,7 +117,8 @@ public class Robot {
             if (!Main.isSimulating()) {
             		executionEndTime = System.currentTimeMillis();
             		System.out.println("Computational time for next movement"+ (executionStartTime- executionEndTime) + "ms");
-                Main.getRpi().sendMoveCommand(bufferedActions, Translator.MODE_0);
+                
+            	Main.getRpi().sendMoveCommand(bufferedActions, Translator.MODE_0);
                 
                 while (!actionCompleted) {
                 }
@@ -136,6 +137,9 @@ public class Robot {
             int first = 0;
             int index =0;
             for (RobotAction action : bufferedActions) {
+                
+                
+                
                 execute(action);
                 if(mapViewer.checkRobotVisited(_position)){
                     robotVisitedBefore= true;
@@ -193,6 +197,10 @@ public class Robot {
     public boolean clearCalibrationCounter() {
         calibrationCounter = 0;
         return true;
+    }
+    
+    public  LinkedList<RobotAction> getBufferedActions(){
+        return bufferedActions;
     }
 
 }
