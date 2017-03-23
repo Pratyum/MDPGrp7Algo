@@ -457,6 +457,7 @@ public class MapViewer {
         Vector2 obstaclePosition;
         Vector2 edge, edge_l, edge_r, edge_b, edge_rm;
         int i = 1;
+        int leftRange= 5;
         Vector2 robotPosition = robot.position();
         markExploredEmpty(robotPosition);
         markExploredDirectEmpty(robotPosition.i(), robotPosition.j() + 1);
@@ -533,7 +534,7 @@ public class MapViewer {
             }
 
         } else {
-            for (i = 1; i <= 5; i++) {
+            for (i = 1; i <= leftRange; i++) {
                 markExploredEmpty(edge_l.fnAdd(robot.orientation().getLeft().toVector2().fnMultiply(i)));
             }
         }
