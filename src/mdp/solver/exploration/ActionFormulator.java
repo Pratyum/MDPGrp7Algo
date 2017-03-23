@@ -356,20 +356,110 @@ public class ActionFormulator {
 
     public void actionSimplifier(Robot _robot) throws InterruptedException, IOException {
         // TODO Auto-generated method stub
-        if (!_robot.checkIfRobotVisitedBefore())
-            cutRightWall(_robot);
 
-        // turnAroundFromRight(_robot);
+        if (!_robot.checkIfRobotVisitedBefore()) {
+            boolean rightBlocked = (mapViewer.checkWalkable(_robot, Direction.Right) == Know.No);
+            boolean frontBlocked = (mapViewer.checkWalkable(_robot, Direction.Up) == Know.No);
+            System.out.println("Check Left Wall " + checkLeftWallCondition(_robot));
+            if (checkLeftWallCondition(_robot)) {
+
+                if (cutRightWall(_robot)) {
+
+                    // both cut
+                    _robot.bufferAction(RobotAction.RotateLeft);
+                    view(_robot);
+                    _robot.bufferAction(RobotAction.MoveForward);
+
+                    view(_robot);
+
+                } else if (rightBlocked && frontBlocked) {
+                    // only cut left
+                    _robot.bufferAction(RobotAction.RotateLeft);
+                    view(_robot);
+                    _robot.bufferAction(RobotAction.RotateLeft);
+                    view(_robot);
+                    _robot.bufferAction(RobotAction.MoveForward);
+
+                    view(_robot);
+
+                }
+                // else go left without cutting left
+
+            } else {
+                // left cut not allowed, check right cut
+                cutRightWall(_robot);
+            }
+
+        }
     }
+
+    // turnAroundFromRight(_robot);
 
     private void turnAroundFromRight(Robot _robot) {
         // TODO Auto-generated method stub
 
     }
 
+    public boolean checkLeftWallCondition(Robot _robot) {
+
+        Vector2 left_m, left_b, left_f, leftDiagonal, basicVector, doubtedPosition, fromPosition_m, fromPosition_l,
+                fromPosition_r;
+        boolean left_m_explored, left_f_explored, left_b_explored, leftDiagonalObstacle;
+
+        left_m_explored = false;
+        left_f_explored = false;
+        left_b_explored = false;
+
+        basicVector = _robot.orientation().getLeft().toVector2();
+        doubtedPosition = _robot.position().fnAdd(basicVector);
+        left_m = _robot.position().fnAdd(_robot.orientation().getLeft().toVector2().fnMultiply(2));
+        left_f = left_m.fnAdd(_robot.orientation().toVector2());
+        left_b = left_m.fnAdd(_robot.orientation().getBehind().toVector2());
+        leftDiagonal = left_m.fnAdd(_robot.orientation().getBehind().toVector2().fnMultiply(2));
+
+        if (mapViewer.getSubjectiveMap().checkValidBoundary(left_m)
+                && mapViewer.getSubjectiveMap().checkValidBoundary(left_f)
+                && mapViewer.getSubjectiveMap().checkValidBoundary(left_b)) {
+            if (mapViewer.getExploredState(left_f) == 1 && mapViewer.getExploredState(left_m) == 1
+                    && mapViewer.getExploredState(left_b) == 1) {
+
+                left_m = left_m.fnAdd(basicVector);
+                left_f = left_f.fnAdd(basicVector);
+                left_b = left_b.fnAdd(basicVector);
+
+                if ((!mapViewer.getSubjectiveMap().checkValidBoundary(left_f)
+                        || mapViewer.getExploredState(left_f) == 2)
+                        && (!mapViewer.getSubjectiveMap().checkValidBoundary(left_m)
+                                || mapViewer.getExploredState(left_m) == 2)
+                        && (!mapViewer.getSubjectiveMap().checkValidBoundary(left_b)
+                                || mapViewer.getExploredState(left_b) == 2)) {
+
+                    if (mapViewer.getSubjectiveMap().checkValidBoundary(leftDiagonal)
+                            && mapViewer.getExploredState(leftDiagonal) == 2) {
+
+                        if (!doubtedPosition.equals(new Vector2(1, 1))
+                                && !doubtedPosition.equals(new Vector2(Map.DIM_I - 2, Map.DIM_J - 2)))
+                            return true;
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        return false;
+
+    }
+
     public boolean cutRightWall(Robot _robot) throws InterruptedException, IOException {
-        Vector2 left_m, left_f, left_b, right_up, right_down, right_middle, front_m, front_l, front_r,unexploredDiagonal1
-        , unexploredDiagonal2, unexploredDiagonal3;
+
+        if (_robot.checkIfRobotVisitedBefore())
+            return false;
+
+        Vector2 left_m, left_f, left_b, right_up, right_down, right_middle, front_m, front_l, front_r,
+                unexploredDiagonal1, unexploredDiagonal2, unexploredDiagonal3;
         boolean frontWall;
         boolean right_up_explored, right_down_explored, right_middle_explored;
         boolean left_m_explored, left_f_explored, left_b_explored;
@@ -393,8 +483,6 @@ public class ActionFormulator {
                 .fnAdd(_robot.orientation().getRight().toVector2().fnMultiply(2));
         right_middle = _robot.position().fnAdd(_robot.orientation().getRight().toVector2().fnMultiply(2));
 
-        
-        
         front_m = _robot.position().fnAdd(_robot.orientation().toVector2().fnMultiply(2));
         front_l = front_m.fnAdd(_robot.orientation().getLeft().toVector2());
         front_r = front_m.fnAdd(_robot.orientation().getRight().toVector2());
@@ -407,63 +495,56 @@ public class ActionFormulator {
 
         //
         counter = 0;
-        while (counter <4 && mapViewer.getSubjectiveMap().checkValidBoundary(right_up)
+        while (counter < 4 && mapViewer.getSubjectiveMap().checkValidBoundary(right_up)
                 && mapViewer.getSubjectiveMap().getPoint(right_up).obstacleState() != WPObstacleState.IsActualObstacle
                 && mapViewer.getExploredState(right_up) != 0) {
             right_up = right_up.fnAdd(_robot.orientation().getRight().toVector2());
             counter++;
         }
-        
-        
-        if (!mapViewer.getSubjectiveMap().checkValidBoundary(right_up) 
+
+        if (!mapViewer.getSubjectiveMap().checkValidBoundary(right_up)
                 || mapViewer.getSubjectiveMap().getPoint(right_up).obstacleState() == WPObstacleState.IsActualObstacle)
             right_up_explored = true;
-        
-        
+
         //
         counter = 0;
-        while (counter <4 && mapViewer.getSubjectiveMap().checkValidBoundary(right_up)
+        while (counter < 4 && mapViewer.getSubjectiveMap().checkValidBoundary(right_up)
                 && mapViewer.getSubjectiveMap().getPoint(right_up).obstacleState() != WPObstacleState.IsActualObstacle
                 && mapViewer.getExploredState(right_up) != 0) {
             right_up = right_up.fnAdd(_robot.orientation().getRight().toVector2());
             counter++;
         }
-        
-        
-        if (!mapViewer.getSubjectiveMap().checkValidBoundary(right_up) 
+
+        if (!mapViewer.getSubjectiveMap().checkValidBoundary(right_up)
                 || mapViewer.getSubjectiveMap().getPoint(right_up).obstacleState() == WPObstacleState.IsActualObstacle)
             right_up_explored = true;
-        
+
         //
         counter = 0;
-        while (counter <4 && mapViewer.getSubjectiveMap().checkValidBoundary(right_down)
+        while (counter < 4 && mapViewer.getSubjectiveMap().checkValidBoundary(right_down)
                 && mapViewer.getSubjectiveMap().getPoint(right_down).obstacleState() != WPObstacleState.IsActualObstacle
                 && mapViewer.getExploredState(right_down) != 0) {
             right_down = right_down.fnAdd(_robot.orientation().getRight().toVector2());
             counter++;
         }
-        
-        
-        if (!mapViewer.getSubjectiveMap().checkValidBoundary(right_down) 
-                || mapViewer.getSubjectiveMap().getPoint(right_down).obstacleState() == WPObstacleState.IsActualObstacle)
+
+        if (!mapViewer.getSubjectiveMap().checkValidBoundary(right_down) || mapViewer.getSubjectiveMap()
+                .getPoint(right_down).obstacleState() == WPObstacleState.IsActualObstacle)
             right_down_explored = true;
-        
-        
+
         //
         counter = 0;
-        while (counter <4 && mapViewer.getSubjectiveMap().checkValidBoundary(right_middle)
-                && mapViewer.getSubjectiveMap().getPoint(right_middle).obstacleState() != WPObstacleState.IsActualObstacle
+        while (counter < 4 && mapViewer.getSubjectiveMap().checkValidBoundary(right_middle)
+                && mapViewer.getSubjectiveMap().getPoint(right_middle)
+                        .obstacleState() != WPObstacleState.IsActualObstacle
                 && mapViewer.getExploredState(right_middle) != 0) {
             right_middle = right_middle.fnAdd(_robot.orientation().getRight().toVector2());
             counter++;
         }
-        
-        
-        if (!mapViewer.getSubjectiveMap().checkValidBoundary(right_middle) 
-                || mapViewer.getSubjectiveMap().getPoint(right_middle).obstacleState() == WPObstacleState.IsActualObstacle)
-            right_middle_explored = true;
-        
 
+        if (!mapViewer.getSubjectiveMap().checkValidBoundary(right_middle) || mapViewer.getSubjectiveMap()
+                .getPoint(right_middle).obstacleState() == WPObstacleState.IsActualObstacle)
+            right_middle_explored = true;
 
         //
         unexploredDiagonal1 = _robot.position().fnAdd(_robot.orientation().getBehind().toVector2().fnMultiply(2))
@@ -471,21 +552,24 @@ public class ActionFormulator {
         unexploredDiagonal2 = unexploredDiagonal1.fnAdd(_robot.orientation().getRight().toVector2());
         unexploredDiagonal3 = unexploredDiagonal2.fnAdd(_robot.orientation().getRight().toVector2());
 
+        if (right_middle_explored && right_down_explored && right_up_explored && frontWall) {
 
-        if (
-                right_middle_explored && right_down_explored && right_up_explored && frontWall) {
-            
-            if((!mapViewer.getSubjectiveMap().checkValidBoundary(unexploredDiagonal1)||mapViewer.getSubjectiveMap().getPoint(unexploredDiagonal1).obstacleState() == WPObstacleState.IsActualObstacle)
-                    &&
-                    (!mapViewer.getSubjectiveMap().checkValidBoundary(unexploredDiagonal2)||mapViewer.getExploredState(unexploredDiagonal2) != 0)
-                    &&
-                    (!mapViewer.getSubjectiveMap().checkValidBoundary(unexploredDiagonal3)||mapViewer.getExploredState(unexploredDiagonal3) != 0)
-                    )
-                    _robot.bufferAction(RobotAction.RotateLeft);
-
-        } else {
-            return false;
+            if ((!mapViewer.getSubjectiveMap().checkValidBoundary(unexploredDiagonal1) || mapViewer.getSubjectiveMap()
+                    .getPoint(unexploredDiagonal1).obstacleState() == WPObstacleState.IsActualObstacle)
+                    && (!mapViewer.getSubjectiveMap().checkValidBoundary(unexploredDiagonal2)
+                            || mapViewer.getExploredState(unexploredDiagonal2) != 0)
+                    && (!mapViewer.getSubjectiveMap().checkValidBoundary(unexploredDiagonal3)
+                            || mapViewer.getExploredState(unexploredDiagonal3) != 0)) {
+                _robot.bufferAction(RobotAction.RotateLeft);
+                view(_robot);
+                return true;
+            }
         }
+
+        
+        
+        return false;
+        
 
         /*
          * counter=0; while(counter<6 &&
@@ -534,6 +618,6 @@ public class ActionFormulator {
          * 
          * }
          */
-        return true;
+
     }
 }

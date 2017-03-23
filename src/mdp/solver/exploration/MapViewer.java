@@ -186,6 +186,8 @@ public class MapViewer {
             if ((!(v.i() >= map.DIM_I - 3 && v.j() >= map.DIM_J - 3)) && (!(v.i() < 3 && v.j() < 3)))
 
                 explored[v.i()][v.j()] = 2;
+            else
+                explored[v.i()][v.j()] = 1;   //goal and start position set as empty
         }
     }
 
