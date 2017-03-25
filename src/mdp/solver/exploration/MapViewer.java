@@ -16,7 +16,8 @@ import mdp.common.Direction;
 import mdp.Main;
 import mdp.map.WPObstacleState;
 
-public class MapViewer {
+
+public class MapViewer  {
 
     private Map map;
 
@@ -235,7 +236,7 @@ public class MapViewer {
         explored[i][j] = 1;
     }
 
-    private int checkExploredState(Vector2 v) {
+    public int checkExploredState(Vector2 v) {
         if (!map.checkValidBoundary(v)) {
             return 2;
         }
@@ -374,10 +375,10 @@ public class MapViewer {
 
         Know l, r, b, f;
 
-        l = checkWalkable(robot, Direction.Left);
-        r = checkWalkable(robot, Direction.Right);
-        b = checkWalkable(robot, Direction.Down);
-        f = checkWalkable(robot, Direction.Up);
+        l = explorationUtil.checkWalkable(robot, Direction.Left, this);
+        r = explorationUtil.checkWalkable(robot, Direction.Right, this);
+        b = explorationUtil.checkWalkable(robot, Direction.Down,this);
+        f = explorationUtil.checkWalkable(robot, Direction.Up, this);
 
         if (l == Know.Yes && r == Know.Yes && b == Know.Yes && f == Know.Yes) {
             return Know.Yes;
@@ -396,7 +397,7 @@ public class MapViewer {
 
         return checkBackRightConnectingPoint(robot) != WPObstacleState.IsActualObstacle
                 && checkFrontRightConnectingPoint(robot) != WPObstacleState.IsActualObstacle
-                && checkWalkable(robot, Direction.Right) == Know.Yes;
+                && explorationUtil.checkWalkable(robot, Direction.Right,this) == Know.Yes;
         // do sth
 
     }
@@ -406,50 +407,7 @@ public class MapViewer {
     }
 
     // 1 walkable, 0 not walkable, 2 need further exploration
-    public Know checkWalkable(Robot robot, Direction d) throws InterruptedException, IOException {
-        if (robot.checkIfHavingBufferActions()) {
-            robot.executeBufferActions(ExplorationSolver.getExePeriod());
-        }
 
-        Vector2 edge1, edge2, edge3;
-        int s1, s2, s3;
-        Direction dir = Direction.Up;
-
-        switch (d) {
-        case Up:
-            dir = robot.orientation();
-            break;
-        case Down:
-            dir = robot.orientation().getLeft().getLeft();
-            break;
-        case Right:
-            dir = robot.orientation().getRight();
-            break;
-        case Left:
-            dir = robot.orientation().getLeft();
-            break;
-        default:
-            break;
-        }
-
-        edge2 = robot.position().fnAdd(dir.toVector2().fnMultiply(2));
-        edge1 = edge2.fnAdd(dir.getLeft().toVector2());
-        edge3 = edge2.fnAdd(dir.getRight().toVector2());
-
-        s1 = checkExploredState(edge1);
-        s2 = checkExploredState(edge2);
-        s3 = checkExploredState(edge3);
-
-        if (s1 == 1 && s2 == 1 && s3 == 1) {
-            return Know.Yes;
-        } else if (s1 == 2 || s2 == 2 || s3 == 2) // got obstacle
-        {
-            return Know.No;
-        } else {
-            return Know.Unsure;
-        }
-
-    }
 
     // take RPI data from Solver , update what I saw
     public Map updateMap(Robot robot, SensingData s) {
@@ -475,6 +433,7 @@ public class MapViewer {
         edge_b = robot.position().fnAdd(robot.orientation().getRight().toVector2())
                 .fnAdd(robot.orientation().getBehind().toVector2());
         edge_rm = robot.position().fnAdd(robot.orientation().getRight().toVector2());
+        
         if (s.front_m != 0) {
             obstaclePosition = edge.fnAdd(robot.orientation().toVector2().fnMultiply(s.front_m));
             if (map.checkValidBoundary(obstaclePosition)) {
@@ -579,7 +538,7 @@ public class MapViewer {
         // update map with proper obstacles
         map = new Map(explored, true);
 
-        insertExploredIntoMap();
+        //insertExploredIntoMap();
         Main.getGUI().update(map);
         return map;
     }
@@ -707,7 +666,7 @@ public class MapViewer {
 
     }
 
-    private boolean checkValidExploredRange(Vector2 v) {
+    public boolean checkValidExploredRange(Vector2 v) {
 
         return v.i() >= 0 && v.i() < (map.DIM_I) && v.j() >= 0 && v.j() < (map.DIM_J);
     }
@@ -716,7 +675,7 @@ public class MapViewer {
         Vector2 position;
         switch (action) {
         case MoveForward:
-            if (checkWalkable(robot, Direction.Up) == Know.No) {
+            if (explorationUtil.checkWalkable(robot, Direction.Up, this) == Know.No) {
                 return false;
             }
             break;
@@ -727,118 +686,20 @@ public class MapViewer {
         return true;
     }
 
-    public LinkedList<Vector2> findScannableReachableFromGoal(Vector2 position, Robot robot) {
-
-        LinkedList<Vector2> reachable = new LinkedList<Vector2>();
-        AStarSolver astarSolver = new AStarSolver();
-        AStarSolverResult astarSolverResult;
-
-        if (map.checkValidBoundary(position) && map.getPoint(position).obstacleState() == WPObstacleState.IsWalkable) {
-            astarSolverResult = astarSolver.solve(getSubjectiveMap(), robot, position);
-
-            if (!astarSolverResult.shortestPath.isEmpty()) {
-                reachable.add(position);
-            }
-        }
-
-        LinkedList<Vector2> list;
-        int num;
-
-        boolean leftBlocked, rightBlocked, upBlocked, downBlocked;
-        leftBlocked = false;
-        rightBlocked = false;
-        upBlocked = false;
-        downBlocked = false;
-
-        int i = 1;
-        while (i <= 3) {
-            Vector2 up = position.fnAdd(new Vector2(-i, 0));
-            Vector2 down = position.fnAdd(new Vector2(i, 0));
-            Vector2 left = position.fnAdd(new Vector2(0, -i));
-            Vector2 right = position.fnAdd(new Vector2(0, i));
-
-            if (!map.checkValidBoundary(up) || map.getPoint(up).obstacleState() == WPObstacleState.IsActualObstacle) {
-                upBlocked = true;
-            }
-
-            if (!map.checkValidBoundary(down)
-                    || map.getPoint(down).obstacleState() == WPObstacleState.IsActualObstacle) {
-                downBlocked = true;
-            }
-
-            if (!map.checkValidBoundary(left)
-                    || map.getPoint(left).obstacleState() == WPObstacleState.IsActualObstacle) {
-                leftBlocked = true;
-            }
-            if (!map.checkValidBoundary(right)
-                    || map.getPoint(right).obstacleState() == WPObstacleState.IsActualObstacle) {
-                rightBlocked = true;
-            }
-
-            list = IdentifyWalkableAround(i, position, upBlocked, downBlocked, leftBlocked, rightBlocked);
-
-            num = 0;
-
-            for (num = 0; num < list.size(); num++) {
-                astarSolverResult = astarSolver.solve(getSubjectiveMap(), robot, list.get(num));
-                if (!astarSolverResult.shortestPath.isEmpty())
-                    reachable.add(new Vector2(list.get(num).i(), list.get(num).j()));
-
-            }
-            list.clear();
-            i++;
-        }
-        ;
-
-        return reachable;
-
+    public boolean checkValidBoundary(Vector2 v){
+        
+        return map.checkValidBoundary(v);
     }
-
-    private LinkedList<Vector2> IdentifyWalkableAround(int width, Vector2 center, boolean upBlocked,
-            boolean downBlocked, boolean leftBlocked, boolean rightBlocked) {
-        Vector2 up = center.fnAdd(new Vector2(-width, 0));
-        Vector2 down = center.fnAdd(new Vector2(width, 0));
-        Vector2 left = center.fnAdd(new Vector2(0, -width));
-        Vector2 right = center.fnAdd(new Vector2(0, width));
-
-        LinkedList<Vector2> traversingList = new LinkedList<Vector2>();
-
-        if (!upBlocked) {
-            addWalkableToList(traversingList, up);
-            addWalkableToList(traversingList, up.fnAdd(new Vector2(0, 1)));
-            addWalkableToList(traversingList, up.fnAdd(new Vector2(0, -1)));
-        }
-
-        if (!downBlocked) {
-            addWalkableToList(traversingList, down);
-            addWalkableToList(traversingList, down.fnAdd(new Vector2(0, 1)));
-            addWalkableToList(traversingList, down.fnAdd(new Vector2(0, -1)));
-        }
-
-        if (!leftBlocked) {
-            addWalkableToList(traversingList, left);
-            addWalkableToList(traversingList, left.fnAdd(new Vector2(-1, 0)));
-            addWalkableToList(traversingList, left.fnAdd(new Vector2(1, 0)));
-        }
-
-        if (!rightBlocked) {
-            addWalkableToList(traversingList, right);
-            addWalkableToList(traversingList, right.fnAdd(new Vector2(1, 0)));
-            addWalkableToList(traversingList, right.fnAdd(new Vector2(-1, 0)));
-        }
-
-        // continue
-
-        return traversingList; // the special vector marks no vector found
-
+    
+    public WPObstacleState getObstacleState(Vector2 v){
+        
+        return map.getPoint(v).obstacleState();
     }
+    
+    
+ 
 
-    private void addWalkableToList(LinkedList<Vector2> traversingList, Vector2 v) {
-        if (checkValidExploredRange(v)) {
-            if (map.getPoint(v).obstacleState() == WPObstacleState.IsWalkable)
-                traversingList.add(v);
-        }
-    }
+ 
 
     public ArrayList<Vector2> getUnExplored() {
         ArrayList<Vector2> unexplored = new ArrayList<Vector2>();
@@ -967,76 +828,9 @@ public class MapViewer {
         return (m + f + b) == 3;
     }
 
-    public boolean checkIfInDangerousZone(Robot _robot) throws InterruptedException, IOException {
+    
+    
 
-        Vector2 left_m, left_f, left_b, right_up, right_down, right_middle, front_m, front_l, front_r;
-
-        int left, right, front;
-        left = 0;
-        right = 0;
-        front = 0;
-
-        left_m = _robot.position().fnAdd(_robot.orientation().getLeft().toVector2().fnMultiply(2));
-        left_f = left_m.fnAdd(_robot.orientation().toVector2());
-        left_b = left_m.fnAdd(_robot.orientation().getBehind().toVector2());
-
-        right_up = _robot.position().fnAdd(_robot.orientation().toVector2())
-                .fnAdd(_robot.orientation().getRight().toVector2().fnMultiply(2));
-        right_down = _robot.position().fnAdd(_robot.orientation().getBehind().toVector2())
-                .fnAdd(_robot.orientation().getRight().toVector2().fnMultiply(2));
-        right_middle = _robot.position().fnAdd(_robot.orientation().getRight().toVector2().fnMultiply(2));
-
-        front_m = _robot.position().fnAdd(_robot.orientation().toVector2().fnMultiply(2));
-        front_l = front_m.fnAdd(_robot.orientation().getLeft().toVector2());
-        front_r = front_m.fnAdd(_robot.orientation().getRight().toVector2());
-
-        if (!map.checkValidBoundary(left_m)
-                || map.getPoint(left_m).obstacleState() == WPObstacleState.IsActualObstacle) {
-            left++;
-        }
-
-        if (!map.checkValidBoundary(left_f)
-                || map.getPoint(left_f).obstacleState() == WPObstacleState.IsActualObstacle) {
-            left++;
-        }
-        if (!map.checkValidBoundary(left_b)
-                || map.getPoint(left_b).obstacleState() == WPObstacleState.IsActualObstacle) {
-            left++;
-        }
-
-        if (!map.checkValidBoundary(right_up)
-                || map.getPoint(right_up).obstacleState() == WPObstacleState.IsActualObstacle) {
-            right++;
-        }
-
-        if (!map.checkValidBoundary(right_down)
-                || map.getPoint(right_down).obstacleState() == WPObstacleState.IsActualObstacle) {
-            right++;
-        }
-        if (!map.checkValidBoundary(right_middle)
-                || map.getPoint(right_middle).obstacleState() == WPObstacleState.IsActualObstacle) {
-            right++;
-        }
-
-        if (!map.checkValidBoundary(front_m)
-                || map.getPoint(front_m).obstacleState() == WPObstacleState.IsActualObstacle) {
-            front++;
-        }
-
-        if (!map.checkValidBoundary(front_l)
-                || map.getPoint(front_l).obstacleState() == WPObstacleState.IsActualObstacle) {
-            front++;
-        }
-        if (!map.checkValidBoundary(front_r)
-                || map.getPoint(front_r).obstacleState() == WPObstacleState.IsActualObstacle) {
-            front++;
-        }
-
-        if (front <= 1 && right <= 1 && left <= 1)
-            return true;
-        else
-            return false;
-    }
 
     public int getExploredState(Vector2 v) {
         // TODO Auto-generated method stub
@@ -1046,91 +840,5 @@ public class MapViewer {
             return -2;
     }
 
-    public boolean checkIfRightFrontDangerous(Robot _robot) {
-        Vector2 left_m, left_f, left_b, right_up, right_down, right_middle, front_m, front_l, front_r;
-
-        int right, front;
-        
-        front=0;right=0;
-
-        right_up = _robot.position().fnAdd(_robot.orientation().toVector2())
-                .fnAdd(_robot.orientation().getRight().toVector2().fnMultiply(2));
-        right_down = _robot.position().fnAdd(_robot.orientation().getBehind().toVector2())
-                .fnAdd(_robot.orientation().getRight().toVector2().fnMultiply(2));
-        right_middle = _robot.position().fnAdd(_robot.orientation().getRight().toVector2().fnMultiply(2));
-
-        front_m = _robot.position().fnAdd(_robot.orientation().toVector2().fnMultiply(2));
-        front_l = front_m.fnAdd(_robot.orientation().getLeft().toVector2());
-        front_r = front_m.fnAdd(_robot.orientation().getRight().toVector2());
-
-
-        if (!map.checkValidBoundary(right_up)
-                || checkExploredState(right_up) ==2) {
-            right++;
-        }
-
-        if (!map.checkValidBoundary(right_down)
-                || checkExploredState(right_down) ==2) {
-            right++;
-        }
-        if (!map.checkValidBoundary(right_middle)
-                || checkExploredState(right_middle) ==2) {
-            right++;
-        }
-
-        if (!map.checkValidBoundary(front_m)
-                || checkExploredState(front_m) ==2) {
-            front++;
-        }
-
-        if (!map.checkValidBoundary(front_l)
-                || checkExploredState(front_l) ==2) {
-            front++;
-        }
-        if (!map.checkValidBoundary(front_r)
-                || checkExploredState(front_r) ==2) {
-            front++;
-        }
-
-        if (front <= 1 && right <= 1 )
-            return true;
-        else
-            return false;
-    }
-
-    public boolean checkIfLeftToCalibrate(Robot _robot) {
-        // TODO Auto-generated method stub
-        Vector2 left_m, left_f, left_b;
-
-        int left;
-        left = 0;
-
-
-        left_m = _robot.position().fnAdd(_robot.orientation().getLeft().toVector2().fnMultiply(2));
-        left_f = left_m.fnAdd(_robot.orientation().toVector2());
-        left_b = left_m.fnAdd(_robot.orientation().getBehind().toVector2());
-        
-        
-        if (!map.checkValidBoundary(left_m)
-                || checkExploredState(left_m) ==2) {
-            left++;
-        }
-
-        if (!map.checkValidBoundary(left_f)
-                || checkExploredState(left_f) ==2) {
-            left++;
-        }
-        if (!map.checkValidBoundary(left_b)
-                || checkExploredState(left_b) ==2) {
-            left++;
-        }
-        
-        if(left >=2)
-            return true;
-        else
-            return false;
-        
-        
-    }
-
+ 
 }

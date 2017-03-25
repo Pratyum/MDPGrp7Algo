@@ -87,7 +87,7 @@ public class ActionFormulator {
 
                 System.out.println("Processing goal " + goalList.get(i).toString());
 
-                reachableList = mapViewer.findScannableReachableFromGoal(goalList.get(i), _robot);
+                reachableList = explorationUtil.findScannableReachableFromGoal(goalList.get(i), _robot , mapViewer);
                 for (int j = 0; j < reachableList.size(); j++) {
 
                     if (!mapViewer.checkRobotVisited(reachableList.get(j))) {
@@ -126,10 +126,10 @@ public class ActionFormulator {
                     if (i >= 1)
                         robotSimulator.execute(robotActions.get(i - 1));
 
-                    if (ventureIntoDangerousZone == false && !mapViewer.checkIfInDangerousZone(robotSimulator)) {
+                    if (ventureIntoDangerousZone == false && !explorationUtil.checkIfInDangerousZone(robotSimulator, mapViewer)) {
                         robotSimulator.execute(robotActions.get(i));
 
-                        if (mapViewer.checkIfInDangerousZone(robotSimulator)) {
+                        if (explorationUtil.checkIfInDangerousZone(robotSimulator, mapViewer)) {
 
                             ventureIntoDangerousZone = true;
 
@@ -151,11 +151,11 @@ public class ActionFormulator {
                     if (mapViewer.checkIfNavigationComplete())
                         break;
 
-                    if (mapViewer.checkIfInDangerousZone(_robot)) {
+                    if (explorationUtil.checkIfInDangerousZone(_robot , mapViewer)) {
                         dangerousZoneEntered = true;
                     }
 
-                    if (dangerousZoneEntered && ventureIntoDangerousZone && !mapViewer.checkIfInDangerousZone(_robot)) {
+                    if (dangerousZoneEntered && ventureIntoDangerousZone && !explorationUtil.checkIfInDangerousZone(_robot, mapViewer)) {
                         dangerousZoneEntered = false;
                         ventureIntoDangerousZone = false;
                     }
@@ -210,9 +210,9 @@ public class ActionFormulator {
          * while(mapViewer.checkIfRight5SquaresEmpty(robot)){
          * robot.bufferAction(RobotAction.MoveBackward); view(robot); }
          */
-        if (null != mapViewer.checkWalkable(robot, Direction.Right)) {
+        if (null != explorationUtil.checkWalkable(robot, Direction.Right, mapViewer)) {
 
-            switch (mapViewer.checkWalkable(robot, Direction.Right)) {
+            switch (explorationUtil.checkWalkable(robot, Direction.Right, mapViewer)) {
             case Yes:
                 robot.bufferAction(RobotAction.RotateRight);
                 view(robot);
@@ -225,10 +225,10 @@ public class ActionFormulator {
             case Unsure: {
                 robot.bufferAction(RobotAction.RotateRight);
                 view(robot);
-                if (null == mapViewer.checkWalkable(robot, Direction.Up)) {
+                if (null == explorationUtil.checkWalkable(robot, Direction.Up, mapViewer)) {
                     System.out.println("Error1");
                 } else {
-                    switch (mapViewer.checkWalkable(robot, Direction.Up)) {
+                    switch (explorationUtil.checkWalkable(robot, Direction.Up, mapViewer)) {
                     case Yes:
                         robot.bufferAction(RobotAction.MoveForward);
                         break;
@@ -340,14 +340,14 @@ public class ActionFormulator {
 
     public void turnLeftTillEmpty(Robot robot) throws InterruptedException, IOException {
 
-        Know check = mapViewer.checkWalkable(robot, Direction.Up);
+        Know check = explorationUtil.checkWalkable(robot, Direction.Up, mapViewer);
 
         /* if (check == Know.Unsure) { */
         view(robot);
         /* } */
         // make sure it is viewed before turn
         // update
-        check = mapViewer.checkWalkable(robot, Direction.Up);
+        check = explorationUtil.checkWalkable(robot, Direction.Up, mapViewer);
 
         if (check == Know.Yes) {
             robot.bufferAction(RobotAction.MoveForward);
@@ -367,8 +367,8 @@ public class ActionFormulator {
         // TODO Auto-generated method stub
 
         if (!_robot.checkIfRobotVisitedBefore()) {
-            boolean rightBlocked = (mapViewer.checkWalkable(_robot, Direction.Right) == Know.No);
-            boolean frontBlocked = (mapViewer.checkWalkable(_robot, Direction.Up) == Know.No);
+            boolean rightBlocked = (explorationUtil.checkWalkable(_robot, Direction.Right, mapViewer) == Know.No);
+            boolean frontBlocked = (explorationUtil.checkWalkable(_robot, Direction.Up, mapViewer) == Know.No);
             System.out.println("Check Left Wall " + checkLeftWallCondition(_robot));
             if (checkLeftWallCondition(_robot)) {
 
