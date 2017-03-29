@@ -538,46 +538,49 @@ public class EventHandler implements IHandleable {
         
         AStarSolver solver = new AStarSolver();
         /////////////////////////////
-        AStarSolverResult solveResult = solver.solve(_gui.getMap(), _gui.getRobot());
-        _gui.getMap().highlight(solveResult.openedPoints, WPSpecialState.IsOpenedPoint);
-        _gui.getMap().highlight(solveResult.closedPoints, WPSpecialState.IsClosedPoint);
-        _gui.getMap().highlight(solveResult.shortestPath, WPSpecialState.IsPathPoint);
-        LinkedList<RobotAction> actions = RobotAction
-                .fromPath(_gui.getRobot(), solveResult.shortestPath);
-
-        System.out.println("Main.isSimulating() = " + Main.isSimulating());
-        if (!Main.isSimulating()) {
-            // messaging arduino
-            System.out.println("Sending sensing request to rpi (-> arduino) ");
-            Main.getRpi().sendMoveCommand(actions, Translator.MODE_1);
-        }
-        _shortestPathThread = new Timer();
-        _shortestPathThread.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (!actions.isEmpty()) {
-                    _gui.getRobot().execute(actions.pop());
-                    _gui.update(_gui.getMap(), _gui.getRobot());
-                } else {
-                    System.out.println("Shortest path completed.");
-                    this.cancel();
-                }
-            }
-        }, exePeriod, exePeriod);
-        /////////////////////////////
-//        Map map = _gui.getMap();
-//        Robot robot = _gui.getRobot();
-//        
-//        AStarSolverResult solveResult = solver.solve(map, robot, SolveType.Smooth);
-//        List<Vector2> smoothPath = AStarUtil.smoothenPath(map, solveResult.shortestPath, false);
-//        
-//        map.highlight(smoothPath, WPSpecialState.IsPathPoint);
-//        robot.position(smoothPath.get(smoothPath.size() - 1));
-//        _gui.update(map, robot);
-//        
+//        AStarSolverResult solveResult = solver.solve(_gui.getMap(), _gui.getRobot());
+//        _gui.getMap().highlight(solveResult.openedPoints, WPSpecialState.IsOpenedPoint);
+//        _gui.getMap().highlight(solveResult.closedPoints, WPSpecialState.IsClosedPoint);
+//        _gui.getMap().highlight(solveResult.shortestPath, WPSpecialState.IsPathPoint);
+//        LinkedList<RobotAction> actions = RobotAction
+//                .fromPath(_gui.getRobot(), solveResult.shortestPath);
+//
+//        System.out.println("Main.isSimulating() = " + Main.isSimulating());
 //        if (!Main.isSimulating()) {
-//            Main.getRpi().sendSmoothMoveCommand(smoothPath);
+//            // messaging arduino
+//            System.out.println("Sending sensing request to rpi (-> arduino) ");
+//            Main.getRpi().sendMoveCommand(actions, Translator.MODE_1);
 //        }
+//        _shortestPathThread = new Timer();
+//        _shortestPathThread.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                if (!actions.isEmpty()) {
+//                    _gui.getRobot().execute(actions.pop());
+//                    _gui.update(_gui.getMap(), _gui.getRobot());
+//                } else {
+//                    System.out.println("Shortest path completed.");
+//                    this.cancel();
+//                }
+//            }
+//        }, exePeriod, exePeriod);
+        /////////////////////////////
+        Map map = _gui.getMap();
+        Robot robot = _gui.getRobot();
+        
+        AStarSolverResult solveResult = solver.solve(map, robot, SolveType.Smooth);
+        List<Vector2> smoothPath = AStarUtil.smoothenPath(map, solveResult.shortestPath, false);
+        System.out.println("smoothPath = ");
+        smoothPath.forEach(pos -> {
+            System.out.println(pos);
+        });
+        map.highlight(smoothPath, WPSpecialState.IsPathPoint);
+        robot.position(smoothPath.get(smoothPath.size() - 1));
+        _gui.update(map, robot);
+        
+        if (!Main.isSimulating()) {
+            Main.getRpi().sendSmoothMoveCommand(smoothPath);
+        }
         /////////////////////////////
 
     }
