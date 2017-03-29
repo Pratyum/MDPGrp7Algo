@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -31,6 +32,8 @@ import mdp.solver.exploration.ExplorationSolver;
 import mdp.solver.exploration.Terminator;
 import mdp.solver.shortestpath.AStarSolver;
 import mdp.solver.shortestpath.AStarSolverResult;
+import mdp.solver.shortestpath.AStarUtil;
+import mdp.solver.shortestpath.SolveType;
 
 public class EventHandler implements IHandleable {
 
@@ -532,7 +535,9 @@ public class EventHandler implements IHandleable {
     private void _shortestPathProcedure(int exePeriod) throws IOException {
         System.out.println("Starting Shortest Path");
         _isShortestPath = true;
+        
         AStarSolver solver = new AStarSolver();
+        /////////////////////////////
         AStarSolverResult solveResult = solver.solve(_gui.getMap(), _gui.getRobot());
         _gui.getMap().highlight(solveResult.openedPoints, WPSpecialState.IsOpenedPoint);
         _gui.getMap().highlight(solveResult.closedPoints, WPSpecialState.IsClosedPoint);
@@ -541,14 +546,11 @@ public class EventHandler implements IHandleable {
                 .fromPath(_gui.getRobot(), solveResult.shortestPath);
 
         System.out.println("Main.isSimulating() = " + Main.isSimulating());
-        /////////////////////////////
         if (!Main.isSimulating()) {
             // messaging arduino
             System.out.println("Sending sensing request to rpi (-> arduino) ");
             Main.getRpi().sendMoveCommand(actions, Translator.MODE_1);
         }
-        /////////////////////////////
-
         _shortestPathThread = new Timer();
         _shortestPathThread.schedule(new TimerTask() {
             @Override
@@ -562,5 +564,21 @@ public class EventHandler implements IHandleable {
                 }
             }
         }, exePeriod, exePeriod);
+        /////////////////////////////
+//        Map map = _gui.getMap();
+//        Robot robot = _gui.getRobot();
+//        
+//        AStarSolverResult solveResult = solver.solve(map, robot, SolveType.Smooth);
+//        List<Vector2> smoothPath = AStarUtil.smoothenPath(map, solveResult.shortestPath, false);
+//        
+//        map.highlight(smoothPath, WPSpecialState.IsPathPoint);
+//        robot.position(smoothPath.get(smoothPath.size() - 1));
+//        _gui.update(map, robot);
+//        
+//        if (!Main.isSimulating()) {
+//            Main.getRpi().sendSmoothMoveCommand(smoothPath);
+//        }
+        /////////////////////////////
+
     }
 }

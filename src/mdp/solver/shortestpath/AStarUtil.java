@@ -52,19 +52,23 @@ public class AStarUtil {
             int maxJ = Integer.max(lastSavedPos.j(), curPos.j());
             boolean actualObsDetected = false;
             boolean virtualObsDetected = false;
+            boolean isTooRisky = false;
             for (int i = minI; i <= maxI; i++) {
                 for (int j = minJ; j <= maxJ; j++) {
                     WPObstacleState curObsState = map
                             .getPoint(new Vector2(i, j))
                             .obstacleState();
-                    if (curObsState.equals(WPObstacleState.IsActualObstacle)) {
+                    if (!curObsState.equals(WPObstacleState.IsWalkable)) {
                         actualObsDetected = true;
                         break;
                     } else if (curObsState.equals(WPObstacleState.IsVirtualObstacle)) {
                         virtualObsDetected = true;
                     }
+//                    if (Math.abs(maxI - i) > 3 || Math.abs(maxJ - j) > 3) {
+//                        isTooRisky = true;
+//                    }
                 }
-                if (actualObsDetected) {
+                if (actualObsDetected || isTooRisky) {
                     break;
                 }
             }
@@ -77,7 +81,7 @@ public class AStarUtil {
             }
 
             // if there is, save the prev pos
-            if (actualObsDetected) {
+            if (actualObsDetected || isTooRisky) {
                 // check if prevPos & lastSavedPos are on the same row/col
                 if ((prevPos.i() == lastSavedPos.i()
                         || prevPos.j() == lastSavedPos.j())

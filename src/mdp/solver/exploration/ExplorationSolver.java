@@ -187,6 +187,9 @@ public class ExplorationSolver {
         // }
         System.out.println("Starting callback");
         _restoreOrientation(callback);
+        if (!Main.isSimulating()) {
+            Main.getRpi().sendExplorationEndMarker();
+        }
     }
 
     private static void _restoreOrientation(Runnable callback) throws IOException {
@@ -207,6 +210,6 @@ public class ExplorationSolver {
             _robot.bufferAction(RobotAction.RotateRight);
             _robot.executeBufferActions(_exePeriod);
         }
-
+        callback.run();
     }
 }

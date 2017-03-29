@@ -37,9 +37,14 @@ public class Compiler {
     private static String _roundToString(double target) {
         return new DecimalFormat(_DECIMAL_FORMAT).format(target);
     }
+    
+    static String compileArbitrary(String action) {
+        return action + _TRAILER;
+    }
 
     static String compileActions(List<RobotAction> actions, String mode) {
         String result = "";
+        result += !mode.isEmpty() ? mode + _TRAILER : "";
         int count = 1;
         String lastAction = "";
         for (RobotAction action : actions) {
@@ -89,12 +94,12 @@ public class Compiler {
         result += (isRotating ? "" : count) + _TRAILER;
         System.out.println("Sending out: " + result);
         
-        result = (!mode.isEmpty() ? mode + _TRAILER : "") + result;
         return result;
     }
 
-    static String compileSmoothActions(List<Vector2> smoothPath) {
+    static String compileSmoothActions(List<Vector2> smoothPath, String mode) {
         String result = "";
+        result += !mode.isEmpty() ? mode + _TRAILER : "";
         double orientation;
         switch (new Robot().orientation()) {
             case Up:

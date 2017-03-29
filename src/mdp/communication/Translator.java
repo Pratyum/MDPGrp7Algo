@@ -17,6 +17,8 @@ public class Translator implements ITranslatable {
 
     private static final String _TO_ARDUINO_MARKER = "a";
     private static final String _TO_ANDROID_MARKER = "b";
+    
+    private static final String _EXPLORATION_END_MARKER = "q";
 
     private static final String _MSG_SEPARATOR = "_";
 
@@ -24,6 +26,7 @@ public class Translator implements ITranslatable {
     
     public static final String MODE_0 = "";
     public static final String MODE_1 = "m1";
+    public static final String MODE_2 = "m2";
 
     private SocketCommunicator _socketCommunicator;
     private String _inputBuffer;
@@ -67,7 +70,7 @@ public class Translator implements ITranslatable {
     @Override
     public void sendSmoothMoveCommand(List<Vector2> smoothPath) {
         try {
-            String message = _TO_ARDUINO_MARKER + Compiler.compileSmoothActions(smoothPath);
+            String message = _TO_ARDUINO_MARKER + Compiler.compileSmoothActions(smoothPath, MODE_2);
             System.out.println("message = " + message);
             _socketCommunicator.echo(message);
 //            _socketCommunicator.echo(_TO_ARDUINO_MARKER + "r54.321|");
@@ -131,5 +134,16 @@ public class Translator implements ITranslatable {
                 }, 0, _PROBING_PERIOD);
             }
         }.start();
+    }
+
+    @Override
+    public void sendExplorationEndMarker() {
+        try {
+            String message = _TO_ARDUINO_MARKER + 
+                    Compiler.compileArbitrary(_EXPLORATION_END_MARKER);
+            _socketCommunicator.echo(message);
+        } catch (IOException ex) {
+            Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
