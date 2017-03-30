@@ -515,7 +515,7 @@ public class EventHandler implements IHandleable {
                 Main.getGUI().update(finalMap);
             }
         };
-        
+
         Terminator terminator = null;
         if (termRound) {
             terminator = new Terminator(1, interruptCallback);
@@ -524,8 +524,10 @@ public class EventHandler implements IHandleable {
         } else if (termTime != 0) {
             terminator = new Terminator(termTime, interruptCallback);
         }
-        if (terminator != null) terminator.observe();
-        
+        if (terminator != null) {
+            terminator.observe();
+        }
+
         _gui.trigger(GUIClickEvent.OnStartTimer);
         ExplorationSolver.solve(_gui.getMap(), exePeriod);
         System.out.println("Exploration completed.");
@@ -535,8 +537,64 @@ public class EventHandler implements IHandleable {
     private void _shortestPathProcedure(int exePeriod) throws IOException {
         System.out.println("Starting Shortest Path");
         _isShortestPath = true;
-        
+
         AStarSolver solver = new AStarSolver();
+        Map map = _gui.getMap();
+        Robot robot = _gui.getRobot();
+
+        // decide two go for diagonal or not
+        List<Vector2> normalSolve = solver.solve(map, robot).shortestPath;
+        List<Vector2> diagonalSolve = AStarUtil.smoothenPath(map, solver.solve(map, robot, SolveType.Smooth).shortestPath, false);
+        float normalPathCost
+                = 0.65f * AStarUtil.countTurn(normalSolve)
+                + 0.35f * AStarUtil.calDistance(normalSolve);
+        float diagPathCost
+                = 0.65f * AStarUtil.countTurnSmooth(diagonalSolve)
+                + 0.35f * AStarUtil.calDistance(diagonalSolve);
+
+        System.out.println("normalPathCost = " + normalPathCost);
+        System.out.println("diagPathCost = " + diagPathCost);
+
+        if (diagPathCost < normalPathCost) {
+            // do diagonal
+            System.out.println("smoothPath = ");
+            diagonalSolve.forEach(pos -> {
+                System.out.println(pos);
+            });
+            map.highlight(diagonalSolve, WPSpecialState.IsPathPoint);
+            robot.position(diagonalSolve.get(diagonalSolve.size() - 1));
+            _gui.update(map, robot);
+
+            if (!Main.isSimulating()) {
+                Main.getRpi().sendSmoothMoveCommand(diagonalSolve);
+            }
+        } else {
+            // do quad directional
+            map.highlight(normalSolve, WPSpecialState.IsPathPoint);
+            LinkedList<RobotAction> actions = RobotAction
+                    .fromPath(_gui.getRobot(), normalSolve);
+
+            System.out.println("Main.isSimulating() = " + Main.isSimulating());
+            if (!Main.isSimulating()) {
+                // messaging arduino
+                System.out.println("Sending sensing request to rpi (-> arduino) ");
+                Main.getRpi().sendMoveCommand(actions, Translator.MODE_1);
+            }
+            _shortestPathThread = new Timer();
+            _shortestPathThread.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (!actions.isEmpty()) {
+                        _gui.getRobot().execute(actions.pop());
+                        _gui.update(_gui.getMap(), _gui.getRobot());
+                    } else {
+                        System.out.println("Shortest path completed.");
+                        this.cancel();
+                    }
+                }
+            }, exePeriod, exePeriod);
+        }
+
         /////////////////////////////
 //        AStarSolverResult solveResult = solver.solve(_gui.getMap(), _gui.getRobot());
 //        _gui.getMap().highlight(solveResult.openedPoints, WPSpecialState.IsOpenedPoint);
@@ -565,23 +623,19 @@ public class EventHandler implements IHandleable {
 //            }
 //        }, exePeriod, exePeriod);
         /////////////////////////////
-        Map map = _gui.getMap();
-        Robot robot = _gui.getRobot();
-        
-        AStarSolverResult solveResult = solver.solve(map, robot, SolveType.Smooth);
-        List<Vector2> smoothPath = AStarUtil.smoothenPath(map, solveResult.shortestPath, false);
-        System.out.println("smoothPath = ");
-        smoothPath.forEach(pos -> {
-            System.out.println(pos);
-        });
-        map.highlight(smoothPath, WPSpecialState.IsPathPoint);
-        robot.position(smoothPath.get(smoothPath.size() - 1));
-        _gui.update(map, robot);
-        
-        if (!Main.isSimulating()) {
-            Main.getRpi().sendSmoothMoveCommand(smoothPath);
-        }
+//        AStarSolverResult solveResult = solver.solve(map, robot, SolveType.Smooth);
+//        List<Vector2> smoothPath = AStarUtil.smoothenPath(map, solveResult.shortestPath, false);
+//        System.out.println("smoothPath = ");
+//        smoothPath.forEach(pos -> {
+//            System.out.println(pos);
+//        });
+//        map.highlight(smoothPath, WPSpecialState.IsPathPoint);
+//        robot.position(smoothPath.get(smoothPath.size() - 1));
+//        _gui.update(map, robot);
+//
+//        if (!Main.isSimulating()) {
+//            Main.getRpi().sendSmoothMoveCommand(smoothPath);
+//        }
         /////////////////////////////
-
     }
 }

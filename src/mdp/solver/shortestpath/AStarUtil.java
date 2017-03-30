@@ -1,6 +1,7 @@
 package mdp.solver.shortestpath;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import mdp.common.Direction;
 import mdp.robot.Robot;
@@ -8,11 +9,36 @@ import mdp.common.Vector2;
 import mdp.map.Map;
 import mdp.map.WPObstacleState;
 import mdp.map.WPSpecialState;
+import mdp.robot.RobotAction;
 
 public class AStarUtil {
 
     private static final int _SCAN_FACTOR = 50;
     private static final float _SCAN_EXPANSION = 0.3f;
+    
+    public static float calDistance(List<Vector2> path) {
+        float result = 0;
+        Vector2 prev = null;
+        for (Vector2 cur : path) {
+            if (prev != null) {
+                Vector2 diff = cur.fnAdd(prev.fnMultiply(-1));
+                result += Math.sqrt(Math.pow(diff.i(), 2) + Math.pow(diff.j(), 2));
+            }
+            prev = cur;
+        }
+        return result;
+    }
+
+    public static int countTurn(List<Vector2> path) {
+        LinkedList<RobotAction> actions = RobotAction.fromPath(new Robot(), path);
+        return (int) actions.stream()
+                .filter(a -> a.equals(RobotAction.RotateLeft) || a.equals(RobotAction.RotateRight))
+                .count();
+    }
+
+    public static int countTurnSmooth(List<Vector2> smoothPath) {
+        return smoothPath.size() - 1;
+    }
 
     public static int getMDistance(Vector2 point1, Vector2 point2) {
         return Math.abs(point1.i() - point2.i())
@@ -128,7 +154,7 @@ public class AStarUtil {
 
 //        List<Vector2> scanned = new ArrayList<>();
         map.highlight(path, WPSpecialState.IsClosedPoint);
-        
+
         Vector2 prevPos = null;
         Vector2 prevTurnPos = null;
         for (Vector2 curPos : path) {
@@ -153,7 +179,7 @@ public class AStarUtil {
 
                     float incI = offDiff.i() / (float) steps;
                     float incJ = offDiff.j() / (float) steps;
-                    
+
                     float tempI = offPrev.i() + offI * _SCAN_EXPANSION;
                     float tempJ = offPrev.j() + offJ * _SCAN_EXPANSION;
 
@@ -161,18 +187,22 @@ public class AStarUtil {
                         tempI += incI;
                         tempJ += incJ;
                         Vector2 newPoint = new Vector2(Math.round(tempI), Math.round(tempJ));
-                        if (map.checkValidBoundary(newPoint) && 
-                                map.getPoint(newPoint).obstacleState()
-                                .equals(WPObstacleState.IsActualObstacle)) {
+                        if (map.checkValidBoundary(newPoint)
+                                && map.getPoint(newPoint).obstacleState()
+                                        .equals(WPObstacleState.IsActualObstacle)) {
                             isCrashing = true;
                             break;
                         }
-                        
+
 //                        if (!scanned.contains(newPoint)) scanned.add(newPoint);
                     }
-                    if (isCrashing) break;
+                    if (isCrashing) {
+                        break;
+                    }
                 }
-                if (isCrashing) break;
+                if (isCrashing) {
+                    break;
+                }
             }
             if (isCrashing) {
                 result.add(prevTurnPos);
@@ -180,11 +210,10 @@ public class AStarUtil {
             }
             prevTurnPos = curPos;
         }
-        
-        result.add(path.get(path.size() - 1));
-        
-//        map.highlight(scanned, WPSpecialState.IsOpenedPoint);
 
+        result.add(path.get(path.size() - 1));
+
+//        map.highlight(scanned, WPSpecialState.IsOpenedPoint);
         return result;
     }
 

@@ -149,7 +149,7 @@ public class Robot {
                     robotVisitedBefore = false;
                 mapViewer.markRobotVisited(_position);
                 
-                System.out.println("Execute action: "+action.toString());
+                //System.out.println("Execute action: "+action.toString());
                 /*f(first == 0 && mapViewer.detectCircle(_position, _orientation)!=-1){
                 		first = 1;
                 		index = mapViewer.detectCircle(_position, _orientation);
