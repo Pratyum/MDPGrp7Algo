@@ -555,7 +555,8 @@ public class EventHandler implements IHandleable {
         System.out.println("normalPathCost = " + normalPathCost);
         System.out.println("diagPathCost = " + diagPathCost);
 
-        if (diagPathCost < normalPathCost) {
+        if (false) {
+//    	if (diagPathCost < normalPathCost) {
             // do diagonal
             System.out.println("smoothPath = ");
             diagonalSolve.forEach(pos -> {

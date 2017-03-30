@@ -60,10 +60,13 @@ public class AStarUtil {
 
     public static int getSmoothMoveCost(Direction origin, Direction direction) {
         if (direction == origin) {
-            return 3;
+//            return 3;
+            return 1;
         } else if (direction == origin.getBehind()) {
-            return 2;
+//            return 2;
+            return 3;
         } else {
+//            return 2;
             return 2;
         }
     }

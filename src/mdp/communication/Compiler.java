@@ -134,14 +134,15 @@ public class Compiler {
             String roundedAngle = _roundToString(rotation);
             String rotationStr;
             if (!"0".equals(roundedAngle)) {
-                rotationStr = rotateDirection + _roundToString(rotation) + _TRAILER;
+                rotationStr = rotateDirection + _roundToString(rotation * 0.99f) + _TRAILER;
             } else {
                 rotationStr = "";
             }
             
             // calculate distance to travel
             double distance = Math.sqrt(Math.pow(posDiff.i(), 2) + Math.pow(posDiff.j(), 2));
-            String distanceStr = "f" + _roundToString(distance) + _TRAILER;
+            String distanceStr = "f" + _roundToString(distance * 0.99f) + _TRAILER;
+//            String distanceStr = "f" + _roundToString(distance) + _TRAILER;
             
             // wrapping up
             result += rotationStr + distanceStr;
